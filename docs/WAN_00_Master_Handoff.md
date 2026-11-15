@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.2 | November 15, 2026 | Owner: John Hoyos
+Version 1.3 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -8,7 +8,7 @@ Build a shot-based platform for music videos up to 5 minutes and short films and
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
 
 ## Batch register
-B00 is complete. B01–B04 are ready in parallel, with QA preparation ready. Full B05 depends on their integration. Exact completion evidence and branch assignments are in docs/B00_EVIDENCE.md and docs/WORKSTREAMS.md.
+B00 is complete. B01–B04 source snapshots and review fixes are combined in the B05 local fixture checkpoint. B04 CPU export and QA preparation pass; B01/B02/B03 remain partial. Full hosted B05 is open. Exact completion evidence and branch assignments are in docs/B00_EVIDENCE.md and docs/WORKSTREAMS.md.
 
 | Batch | Lead | Depends on | Evidence needed to close |
 |---|---|---|---|
@@ -34,8 +34,8 @@ Commands actually run and results, with evidence links
 Known gaps, cost incurred, and resources still active  
 Next eligible batch, recipient, and exact input they need
 
-## First action
-Start B01–B04 and QA preparation from baseline c9c364ab3f68cfca24489715ab0cd8419d0d4f60 on their assigned branches. GitHub issues #2–#6 contain the instructions. The user has created the five workstream chats. Their execution status is updated through GitHub evidence. The approved plan covers implementation preparation. B06 still needs a project-specific dollar ceiling and runtime envelope before renting the GPU.
+## Next action
+Continue B05 with issue #17: agree the Studio persistence contract and implement authenticated Studio/backend transport. Then connect the durable queue to Pod lifecycle, budget accounting and hosted export/storage. See [checkpoint evidence](B05_INTEGRATION_CHECKPOINT.md) for verified behavior and explicit gaps. No user action is needed for this source implementation. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -49,3 +49,7 @@ Canonical implementation and fixture records are in https://github.com/hoyosgarc
 ## B00 closure
 
 [PR #11](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/11) merged. Baseline commit `c9c364ab3f68cfca24489715ab0cd8419d0d4f60`. Five workstream branches exist from that exact commit. [All batch issues](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues) cover B00–B09. Authentication/deployment vendors and Runpod budget are pending. React/TypeScript studio, Python services, PostgreSQL metadata and S3-compatible storage interfaces are implementation defaults selected during B00 and can be revised before infrastructure provisioning.
+
+## Command Center integration review
+
+Local actual-worker → durable completion → review → timeline/audio export → restart recovery passes with fictional media. Root tests: 44; worker: 17; media: 4; Studio model/DOM: 16, with build passing. Export cache corruption and browser-storage conflict defects fixed. Browser acceptance is blocked by Chromium socket restrictions; container build, real GPU and hosted authentication remain unverified. No production deployment, GPU allocation or spending occurred. Detailed source revisions, acceptance boundaries and next steps are in docs/B05_INTEGRATION_CHECKPOINT.md in the repository.
