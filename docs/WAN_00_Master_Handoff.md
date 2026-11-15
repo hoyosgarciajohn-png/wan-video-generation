@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.15 | November 15, 2026 | Owner: John Hoyos
+Version 1.16 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -35,7 +35,7 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Build and verify the pinned images on a compatible Docker host, then complete hosted storage/identity and the authenticated remote worker/storage bridge. Budget/lifecycle integration is now rehearsed with the built-in fake provider only; live Runpod dispatch remains disabled. Local backup/restore is rehearsed, while image builds remain unverified. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
+Review deployment/FIRST_RENDER_PROPOSAL.md. The available workspace cannot build Docker images, and Runpod account inspection reached a sign-in wall. A compatible existing build host, verified registry image, hosted controller/storage and independent cleanup monitor are still required. The proposed first trial is $5 total, 30 minutes from admission, one shot and one attempt; John has not approved those numeric terms. The proposal reserves $4 for the Pod and $1 for separately tracked storage. No authority or launch configuration was installed. Automated Runpod bill retrieval remains pending; the current signed-receipt path requires trusted reconciliation. No actual Wan render, deployment or GPU spending has occurred.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -372,3 +372,11 @@ No cloud calls, live resources, deployment, keys for John or spending occurred.
 Validation: 158 Python root tests passed in 37.387 seconds on the corrected source; 36 worker tests passed. Shared contract and expanded isolated runtime-source imports passed. The final source-bound preflight remains PLAN_ONLY with all nine gates missing or blocked.
 
 Previous publication: [authenticated admission PR #30](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/30) merged at `6238c8c1e0076f87bf55f82ccaa4349055361235`.
+
+## Build/hosting review and first-render proposal
+
+PR #31 merged at `21a5bcab35db6ef047f9190c4185b38415f8882f`; its tested tree is `0af62a393cfa8eb2ea5b3461ac952099de2c7994`. This follow-up is documentation only. The available Linux workspace has no container engine, NVIDIA device or daemon socket and rejects Unix socket binding. No compatible build host or hosted controller/watchdog has been verified. Runpod is waiting for the owner to sign in; account balance, capacity and pre-existing resources are unknown.
+
+See deployment/FIRST_RENDER_PROPOSAL.md and deployment/first-render-proposal.json for the concrete, unapproved $5/30-minute/one-attempt envelope, current public price assumptions, storage retention, ordered host acceptance and billing follow-up. Approval fields remain null. Shared storage is not covered by the existing Pod ledger; $1 is held separately from the proposed $4 Pod grant. No recurring hosting, paid build service, account top-up or automatic retry is included.
+
+The independent watchdog is callable source, not a running service. A local deadline is not a provider hard spending stop. Automatic bill retrieval and final-charge reconciliation remain pending; no bill was retrieved. All image/CUDA/host gates remain unverified. Prior 158 controller and 36 worker fictional checks are preserved without rerunning unchanged behavior. No GPU, build, key provisioning or paid resource was started. Next inputs: John’s specific numeric approval, Runpod sign-in and selection of a compatible existing build host; Command Center then coordinates actual image and hosted acceptance before the supervised first render.
