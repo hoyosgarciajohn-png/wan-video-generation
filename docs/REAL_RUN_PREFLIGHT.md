@@ -5,10 +5,11 @@ artifact. It never admits a live batch, creates a Pod, downloads weights, builds
 an image, runs Docker, contacts a provider or issues worker credentials. Every
 result retains `execution_authorized: false` and `ready_for_live_run: false`.
 
-A missing budget or hostname is not the only remaining blocker. The live admission
-and real-model worker/storage connection are **not implemented**. The existing
+A missing budget or hostname is not the only remaining blocker. Authenticated live admission and activation are **not implemented**. The canonical
+real-profile queue/worker/storage/cleanup data path is now connected only through
+the explicit synthetic test authority in [REAL_JOB_BRIDGE.md](REAL_JOB_BRIDGE.md). The existing
 `SimulationCoordinator` still accepts only the fictional provider, and
-`WorkerTransport` still rejects non-fixture batches. Supplying documents or changing
+default `WorkerTransport` still rejects non-fixture batches. Supplying documents or changing
 an input file cannot activate Wan execution.
 
 ## Produce and check a plan
@@ -110,8 +111,9 @@ An actual live approval verifier still has to be implemented and reviewed.
 
 - Authenticated real approval verification and transactional live queue/budget
   admission, without weakening the simulation-only coordinator.
-- The real-model lifecycle-to-attempt, lease, credential and remote storage bridge,
-  without weakening the current fixture-only worker transport.
+- Authenticated live activation of the tested real-profile lifecycle-to-attempt,
+  lease, credential and storage bridge, without promoting simulated approvals or
+  weakening the default fixture-only worker transport.
 - A verified durable host, TLS endpoint, storage retention and recovery acceptance.
 - Registry access, actual locked weight verification on the selected volume, CUDA
   inference and measured cold/warm GPU behavior.

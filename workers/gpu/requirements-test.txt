@@ -1,0 +1,3 @@
+-r ../../requirements-dev.txt
+# Matches the image lock; CPU-only reference decoding tests need no Torch/CUDA.
+pillow==13.0.0

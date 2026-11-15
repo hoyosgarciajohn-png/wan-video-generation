@@ -21,7 +21,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 
 TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
-          'budget_approvals','budget_reservations','budget_events','worker_credentials'}
+          'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links'}
 DB_NAME = 'database.sqlite'
 
 
@@ -145,6 +145,46 @@ def _inspect_budget(db, names, projects):
     require(settlements == set(reservations), 'Settled reservation lacks final billing evidence')
 
 
+def _inspect_real_jobs(db, names, projects):
+    if 'real_job_links' not in names:
+        return set()
+    from services.controller.real_jobs import RealJobBridge
+    from workers.gpu.common import LOCK
+    rows = db.execute('SELECT batch,owner,project,approval,mode,config_hash FROM real_job_links').fetchall()
+    if not rows:
+        return set()
+    require({'budget_approvals','budget_reservations','budget_events','pod_batches'} <= names,
+            'Linked job accounting or lifecycle unavailable')
+    linked = set()
+    for batch_id, owner, project, approval_id, mode, config_hash in rows:
+        require(project in projects and projects[project]['project']['owner_id'] == owner and mode == 'test',
+                'Live/unknown linked authority is not restorable')
+        batch = next((b for b in projects[project]['batches'] if b['id'] == batch_id), None)
+        require(batch and batch['execution_mode'] == 'runpod' and batch['model_profile'] == LOCK['profile'],
+                'Linked canonical model profile mismatch')
+        approval = db.execute('SELECT owner,project,mode,terms FROM budget_approvals WHERE id=?', (approval_id,)).fetchone()
+        require(approval and tuple(approval[:3]) == (owner, project, 'simulation'), 'Linked approval ownership mismatch')
+        terms = json.loads(approval[3])
+        require(RealJobBridge.configuration_hash(terms['profile']) == config_hash and
+                batch['budget']['approved_cents'] == terms['approved_cents'], 'Linked approval configuration changed')
+        reservation = db.execute('SELECT owner,project,approval,state FROM budget_reservations WHERE batch=?', (batch_id,)).fetchone()
+        require(reservation and tuple(reservation[:3]) == (owner, project, approval_id) and reservation[3] == 'settled',
+                'Linked job retains unsettled monetary liability')
+        spent = db.execute('SELECT COALESCE(SUM(amount_cents),0) FROM budget_events WHERE batch=?', (batch_id,)).fetchone()[0]
+        require(batch['budget']['spent_cents'] == spent and batch['budget']['reserved_cents'] == 0,
+                'Canonical budget is not reconciled with settled accounting')
+        pod = db.execute('SELECT project,state,cleanup,pod_id,snapshot FROM pod_batches WHERE id=?', (batch_id,)).fetchone()
+        require(pod and tuple(pod[:4]) == (project, batch['state'], batch['cleanup_state'], batch['provider_resource_id']),
+                'Canonical lifecycle state is not reconciled')
+        frozen = json.loads(pod[4])
+        require(frozen.get('mode') == 'test' and frozen.get('config_hash') == config_hash and
+                all(frozen['canonical_batch'][key] == batch[key] for key in
+                    ('id','project_id','idempotency_key','execution_mode','model_profile','shot_snapshots','approved_at','deadline_at')),
+                'Immutable linked snapshot mismatch')
+        linked.add(batch_id)
+    return linked
+
+
 def _inspect(db):
     require(db.execute('PRAGMA integrity_check').fetchall() == [('ok',)], 'Database integrity check failed')
     require(not db.execute('PRAGMA foreign_key_check').fetchall(), 'Database foreign key check failed')
@@ -196,15 +236,16 @@ def _inspect(db):
                     state in ('uploading','completed','expired','aborted'), 'Invalid upload session')
             if state == 'completed':
                 require(any(a['id'] == asset_id for a in projects[project_id]['assets']), 'Completed upload asset unavailable')
+    linked_test_jobs = _inspect_real_jobs(db, names, projects)
     if 'worker_credentials' in names:
         for token_hash, owner, project_id, batch_id, worker, expires, revoked in db.execute(
                 'SELECT token_hash,owner,project,batch,worker,expires,revoked FROM worker_credentials'):
             require(project_id in projects and projects[project_id]['project']['owner_id'] == owner,
                     'Worker credential owner mismatch')
             batch = next((b for b in projects[project_id]['batches'] if b['id'] == batch_id), None)
-            require(batch and batch['execution_mode'] == 'fixture' and
-                    all(batch['budget'][key] == 0 for key in ('approved_cents','reserved_cents','spent_cents')),
-                    'Worker credential batch is not a zero-cost fixture')
+            require(batch and ((batch['execution_mode'] == 'fixture' and
+                    all(batch['budget'][key] == 0 for key in ('approved_cents','reserved_cents','spent_cents'))) or
+                    batch_id in linked_test_jobs), 'Worker credential batch has no valid fixture/test binding')
             require(isinstance(token_hash, str) and len(token_hash) == 64 and
                     all(c in '0123456789abcdef' for c in token_hash) and
                     isinstance(worker, str) and bool(worker) and revoked in (0, 1),

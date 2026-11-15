@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.11 | November 15, 2026 | Owner: John Hoyos
+Version 1.12 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -227,3 +227,40 @@ and verifies against current source. All nine gates remain missing or blocked.
 See docs/REAL_RUN_PREFLIGHT.md for evidence limits and exact plan fields.
 
 Previous publication: [remote bridge PR #26](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/26) merged at `8ee3150938d7b569b48b354b5f109f827b7b0052`.
+
+## Disarmed canonical Wan-profile bridge checkpoint
+
+The queue-to-worker connection now has executable source: one transaction freezes
+the pinned model/shot profile, reserves fictional budget and links a canonical
+runpod-shaped batch to lifecycle state and durable test authority. Scoped verified
+completion commits its take and lifecycle terminal outcome together; independent
+cleanup and final billing remain separate. Restart and checked restore preserve
+settled history, while restored worker credentials remain revoked.
+
+The normal RealJobBridge constructor is disarmed. Its only enabled factory is
+for_testing with the exact built-in fake provider. Default public admission and
+worker transport remain fixture-only. Neither a preflight report, caller boolean
+nor simulated approval grants live authority. A trusted test server must explicitly
+install the bridge, and durable links identify every rehearsal as synthetic.
+
+Independent tests generated and fully decoded a real H.264 file with 25 frames at
+1280x704/24fps under the pinned profile's requested contract. Verified completion,
+replay, cleanup, fictional settlement, restart and recovered history pass. These
+pixels came from FFmpeg, not Wan. Deadline/cancellation fences pass; revocation
+blocks future admission/dispatch but does not implicitly cancel an already
+provisioned reservation. The existing documented cancellation policy is preserved.
+
+The worker now decodes and validates image references before expensive model
+startup. CPU-mocked adapter tests check invocation/profile arguments; they do not
+import real Wan, load weights or execute CUDA. See docs/REAL_JOB_BRIDGE.md and
+workers/gpu/README.md for exact boundaries.
+
+Remaining for live execution: authenticated owner approval with a specific dollar
+ceiling/runtime envelope, a separately reviewed live provider/configuration factory,
+actual built-image/host/storage evidence, authoritative billing and observed cleanup,
+and a supervised capped GPU benchmark. John has not supplied real spending terms.
+No cloud resources, deployment, CI, model download or GPU spending occurred.
+
+Validation: 130 Python root tests and 29 worker tests pass; contract and static/runtime-source artifact checks pass. The empty-input preflight was regenerated against the final source and remains non-executable with all nine gates missing or blocked.
+
+Previous publication: [real-run preflight PR #27](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/27) merged at `df0be05f79e730b585c4695ed32a2ebbfe005f33`.

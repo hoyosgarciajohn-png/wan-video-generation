@@ -9,8 +9,23 @@ from .common import LOCK, atomic_json, require
 from .weights import verify
 
 
+def reference_image(path, size):
+    if not path:
+        return None
+    from PIL import Image
+    # Decode before loading weights or allocating GPU model memory. Only a single
+    # raster frame is part of the frozen conditioning contract.
+    with Image.open(path, formats=('PNG', 'JPEG', 'WEBP')) as opened:
+        require(opened.size == size, 'Reference must match frozen dimensions')
+        require(getattr(opened, 'n_frames', 1) == 1, 'Animated references unsupported')
+        return opened.convert('RGB')
+
+
 def main(spec_path):
     spec = json.loads(Path(spec_path).read_text())
+    s = spec['snapshot']
+    size = (s['settings']['width'], s['settings']['height'])
+    image = reference_image(spec['image'], size)
     verify(spec['weights'])
     source = Path(os.environ.get('WAN_SOURCE', '/opt/wan'))
     require(source.joinpath('REVISION').read_text().strip() == LOCK['profile']['code_revision'],
@@ -20,7 +35,6 @@ def main(spec_path):
     sys.path.insert(0, str(source))
     import torch
     import wan
-    from PIL import Image
     from wan.configs import WAN_CONFIGS
     from wan.utils.utils import save_video
     require(torch.cuda.is_available(), 'CUDA GPU required')
@@ -31,14 +45,6 @@ def main(spec_path):
                        device_id=0, rank=0, t5_cpu=True, convert_model_dtype=True)
     torch.cuda.synchronize()
     loaded = time.monotonic()
-    s = spec['snapshot']
-    size = (s['settings']['width'], s['settings']['height'])
-    image = None
-    if spec['image']:
-        # B00 takes require exact frozen dimensions. Reject mismatched references explicitly.
-        with Image.open(spec['image']) as opened:
-            require(opened.size == size, 'Reference must match frozen dimensions')
-            image = opened.convert('RGB')
     video = model.generate(s['prompt'], img=image, size=size, max_area=size[0]*size[1],
                            frame_num=spec['frames'], shift=5.0, sample_solver='unipc',
                            sampling_steps=50, guide_scale=5.0, seed=s['settings']['seed'],

@@ -131,7 +131,8 @@ def validate_claim(claim):
         record('asset', asset)
         require(asset['project_id'] == p['id'] and asset['owner_id'] == p['owner_id'],
                 'Input ownership mismatch')
-        require(asset['kind'] == 'image' and asset['bytes'] <= 20_000_000, 'Invalid reference')
+        require(asset['kind'] == 'image' and 0 < asset['bytes'] <= 20_000_000
+                and asset['mime_type'] in ('image/png', 'image/jpeg', 'image/webp'), 'Invalid reference')
         require(asset['object_key'].startswith(f"projects/{p['id']}/"), 'Unscoped input')
 
 
