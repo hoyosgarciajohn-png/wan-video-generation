@@ -1,0 +1,4 @@
+{
+  "job_status_before_archive": "failure",
+  "note": "Completed gates require manifest/log checks. Cancellation or missing evidence is not PASS."
+}

@@ -104,7 +104,7 @@ manifest, logs, fixture result and output together for review.
 | image_build | Build pinned CPU or GPU Dockerfile from the inventoried isolated context | Runtime, CUDA execution or deployment |
 | image_identity | Inspect the build's immutable ID and confirm Linux amd64 | Registry publication |
 | CPU runtime_smoke | Import controller, serve built static Studio/health, require session auth on loopback | Production HTTP readiness or browser-native acceptance |
-| GPU runtime_smoke | Import Torch 2.8/FlashAttention/WanTI2V, check Python/ABI and installed source revision marker | CUDA inference or valid model bytes; source archive checksum is enforced by the Docker build helper |
+| GPU runtime_smoke | Import Torch 2.8/FlashAttention, check Python/ABI and source revision, compile Wan source without executing it | Wan import, CUDA inference or valid model bytes; source archive checksum is enforced by the Docker build helper |
 | fixture_smoke | Run the actual worker's synthetic CPU fixture, verify durable result/output checksums and zero GPU cost | Wan-generated quality or GPU performance |
 | weights_verification | Verify every existing checkpoint file against model.lock.json | Loading/inference performance or correctness |
 
@@ -146,3 +146,9 @@ cleanup, retaining failed gate state, and refusing symlink/oversize artifacts.
 Workflow YAML and manual-only/read-only/time-bound settings were checked. Prior
 verifier/runtime suites were preserved without rerunning unchanged behavior.
 Actual cloud run results are recorded separately after observation.
+
+Wan's locked T5 source initializes CUDA during import. CPU image verification
+therefore reports `wan_cuda_import: UNVERIFIED_REQUIRES_GPU`; it compiles source
+syntax and imports Torch/FlashAttention without pretending a CUDA device exists.
+Actual Wan import remains part of the supervised GPU trial. The upstream source
+is not patched and no model weights are downloaded by these checks.

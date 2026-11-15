@@ -427,3 +427,11 @@ The bounded cleanup list now also includes unused Java and CodeQL SDKs; the
 minimum is preserved. GPU image and inference gates remain unverified pending
 the corrected run. PR #34 added the workflow; PR #35 corrected GitHub runner
 context validation before the first build. No Runpod resources were used.
+
+The third GPU run (43773064856) passed host capacity, then exposed an eager CUDA
+initialization in Wan's T5 module during import on a CPU builder. Build/smoke
+checks now import actual Torch/FlashAttention and compile Wan source syntax;
+`wan_cuda_import` remains explicitly unverified until the GPU trial. No CUDA
+mock or upstream patch is used. Two targeted syntax checks and seven preflight
+checks pass. The source-bound offline plan is refreshed but remains disarmed.
+Actual successful GPU image evidence still awaits the corrected build.

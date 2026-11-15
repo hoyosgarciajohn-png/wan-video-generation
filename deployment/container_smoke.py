@@ -39,19 +39,30 @@ def cpu():
     return {'static_http': 'PASS', 'controller_import': 'PASS', 'cuda_inference': 'UNVERIFIED'}
 
 
+def source_syntax(root):
+    files = sorted(Path(root).rglob('*.py'))
+    if not files:
+        raise ValueError('Wan Python source is missing')
+    for path in files:
+        compile(path.read_bytes(), str(path), 'exec')
+    return len(files)
+
+
 def gpu():
     import torch
     import flash_attn
-    sys.path.insert(0, '/opt/wan')
-    from wan import WanTI2V
     lock = json.loads(Path('/app/workers/gpu/model.lock.json').read_text())
     assert Path('/opt/wan/REVISION').read_text().strip() == lock['profile']['code_revision']
     assert torch.__version__.split('+')[0] == '2.8.0'
     assert torch._C._GLIBCXX_USE_CXX11_ABI
     assert sys.version_info[:2] == (3, 11)
-    assert WanTI2V and flash_attn
+    assert flash_attn
+    source_files = source_syntax('/opt/wan/wan')
     return {'runtime_import': 'PASS', 'source_revision': lock['profile']['code_revision'],
-            'torch': torch.__version__, 'cuda_inference': 'UNVERIFIED', 'weights': 'UNVERIFIED'}
+            'torch': torch.__version__, 'runtime_import_scope': 'torch_and_flash_attn_only',
+            'wan_source_syntax': 'PASS', 'wan_source_files': source_files,
+            'wan_cuda_import': 'UNVERIFIED_REQUIRES_GPU',
+            'cuda_inference': 'UNVERIFIED', 'weights': 'UNVERIFIED'}
 
 
 if __name__ == '__main__':
