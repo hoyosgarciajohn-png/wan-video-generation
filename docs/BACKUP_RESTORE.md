@@ -129,3 +129,11 @@ uses real synthetic fixture rendering and CPU export, backs up pending work,
 restores into new paths, resumes runners, verifies history and byte checksums, and
 fully decodes the recovered video exports. This is synthetic local evidence;
 human creative acceptance and a production deployment remain separate approvals.
+
+## Remote worker credentials
+
+Backup snapshots revoke every worker credential. The live source remains unchanged;
+restored installations require newly issued trusted-operator credentials. Restore
+rejects a snapshot containing an active worker credential. Existing credential hashes
+remain historical records, not usable restored capabilities. The separate-process
+bridge integration test verifies both source continuity and restored rejection.

@@ -2,7 +2,7 @@
 
 Issue [#2](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/2). Shared contract 0.1.0. Source baseline `c9c364ab3f68cfca24489715ab0cd8419d0d4f60`. Owned paths are `workers/gpu/` and its tests.
 
-This worker processes one frozen attempt, maintains its lease, validates output with ffprobe, publishes it to a durable filesystem mount, and submits a completion manifest. A controller determines whether another attempt may start. Fixture execution uses synthetic silent blue video and performs zero provider requests.
+This worker processes one frozen attempt, maintains its lease, validates output with ffprobe, uploads it to the controller through an authenticated stream, and submits a completion manifest. A controller determines whether another attempt may start. Fixture execution uses synthetic silent blue video and performs zero provider requests.
 
 ## Local verification
 
@@ -42,20 +42,37 @@ Use `model.lock.json`'s exact `profile` for both the batch and attempt. Revision
 
 Requested duration rounds upward to the first `4n+1` frame count covering the request. A 2,000 ms shot renders 49 frames, reported as 2,042 ms. A 5,000 ms shot renders 121 frames, reported as 5,042 ms. The timeline can trim to the requested duration. Creative acceptance remains with John in the live session.
 
-## B02 integration input
+## Scoped remote transport
 
-The 0.1.0 shared records stay intact. These envelopes select the currently unspecified transport fields and require B02 agreement during integration.
+The 0.1.0 shared records stay intact. The controller implements these authenticated envelopes; the current integrated server admits only synthetic fixture rendering.
 
 | Operation | Request | Response expected by B01 |
 |---|---|---|
 | POST `/v1/worker/claim` | Empty JSON object, bearer credential scoped by B02 | 204, or `{contract_version, project, batch, attempt, shot_snapshot, input_assets}` using shared record definitions |
 | POST `/v1/worker/attempts/{id}/heartbeat` | `{lease_id, progress}` with progress from 0 to 1 | `{lease_expires_at}` with a timezone-bearing timestamp |
 | POST `/v1/worker/attempts/{id}/complete` | `{lease_id, output_asset_manifest: {asset, media}}` | One shared take record, including on identical replay |
+| PUT `/v1/worker/attempts/{id}/artifact` | Raw MP4, exact Content-Length, X-WAN-Lease-ID and X-WAN-SHA256 | `{bytes, sha256, object_key}`; identical replay accepted |
+| GET `/v1/worker/attempts/{id}/inputs/{asset_id}` | Lease header; reference must belong to frozen claim | Bounded bytes verified against frozen size/checksum |
 | POST `/v1/worker/attempts/{id}/fail` | `{lease_id, code}` | Any successful JSON acknowledgment or 204 |
 
 `media` contains `duration_ms`, `width`, `height` and `frame_rate`. The worker requires an HTTPS backend, disables redirects and reads the bearer credential only from the environment. Claims receive no automatic network retry because an ambiguous claim needs server reconciliation. Completion ambiguity retains the journal and never sends a render-failure event. B02 must support completion replay after a committed take even if that lease has since expired. An uncommitted fenced lease must be rejected.
 
-The current adapter uses shared POSIX storage. Mount input files read-only and mount outputs on storage that survives the Pod. B02 must validate object existence, hash, owner and media metadata before committing the take and must supply atomic claim/fencing semantics. A local scratch directory only proves the offline flow. Hosted object-store upload transport, credential issuance, and cross-service replay are pending B02/B05 integration. Outputs and journals from failed or fenced attempts are retained for controller reconciliation.
+The controller and worker use separate filesystem roots. Outputs stream to the controller before completion; the controller validates size, checksum, namespace, lease and MP4 metadata before committing a take. Artifact transfer is capped at 32 MiB. References download into a writable worker input cache and are checksum-verified before publication. Current fixture claims contain no references; real Wan admission remains pending.
+
+Run one remote fixture attempt with service-issued credentials supplied through the environment (never command-line arguments):
+
+```sh
+# WAN_WORKER_API_URL and WAN_WORKER_TOKEN are injected by secret configuration.
+python -m workers.gpu.cli worker \
+  --output-root /srv/wan/worker-state --input-root /srv/wan/input-cache \
+  --result /srv/wan/worker-state/result.json
+```
+
+HTTPS is required and redirects are refused. For local TCP tests only, `--allow-local-http` permits an HTTP origin whose hostname is exactly `127.0.0.1` or `localhost`. The controller issues short-lived, owner/project/batch/worker-scoped credentials through a trusted Python API; there is no public credential-issuance route. Errors redact response bodies and credentials.
+
+Keep the worker state directory private and persistent across process retries. `worker-claim.json` saves the frozen claim and a SHA-256 origin/credential binding, never the bearer token. A process lock prevents concurrent claims in this directory. Once upload is confirmed, `completion.json` durably records its receipt before completion. An ambiguous upload replays identical bytes; an ambiguous completion reuses the saved receipt and output without rendering or uploading again. A successful result is persisted before removing the claim journal. A lost claim response is reconciled by the controller for the same assigned worker on the next explicit invocation.
+
+Recovery requires the same still-valid credential. A rotated credential fails the local binding check; expired or fenced attempts require trusted controller reconciliation rather than deleting journals and blindly retrying. Retain both journals and output for that reconciliation. Remote transport is implemented, but hosted TLS, production secret delivery, object-store integration and real GPU inference remain unverified.
 
 ## Exact B06 benchmark invocation
 
@@ -72,7 +89,7 @@ docker run --rm --entrypoint python \
 docker run --rm --gpus device=0 \
   -e WAN_WORKER_API_URL -e WAN_WORKER_TOKEN \
   --mount type=bind,src=/srv/wan/models,dst=/models,readonly \
-  --mount type=bind,src=/srv/wan/inputs,dst=/inputs,readonly \
+  --mount type=bind,src=/srv/wan/inputs,dst=/inputs \
   --mount type=bind,src=/srv/wan/outputs,dst=/outputs \
   "$WAN_WORKER_IMAGE_DIGEST" worker \
   --weights /models --input-root /inputs --output-root /outputs \

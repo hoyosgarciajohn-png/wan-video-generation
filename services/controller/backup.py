@@ -21,7 +21,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 
 TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
-          'budget_approvals','budget_reservations','budget_events'}
+          'budget_approvals','budget_reservations','budget_events','worker_credentials'}
 DB_NAME = 'database.sqlite'
 
 
@@ -196,15 +196,31 @@ def _inspect(db):
                     state in ('uploading','completed','expired','aborted'), 'Invalid upload session')
             if state == 'completed':
                 require(any(a['id'] == asset_id for a in projects[project_id]['assets']), 'Completed upload asset unavailable')
+    if 'worker_credentials' in names:
+        for token_hash, owner, project_id, batch_id, worker, expires, revoked in db.execute(
+                'SELECT token_hash,owner,project,batch,worker,expires,revoked FROM worker_credentials'):
+            require(project_id in projects and projects[project_id]['project']['owner_id'] == owner,
+                    'Worker credential owner mismatch')
+            batch = next((b for b in projects[project_id]['batches'] if b['id'] == batch_id), None)
+            require(batch and batch['execution_mode'] == 'fixture' and
+                    all(batch['budget'][key] == 0 for key in ('approved_cents','reserved_cents','spent_cents')),
+                    'Worker credential batch is not a zero-cost fixture')
+            require(isinstance(token_hash, str) and len(token_hash) == 64 and
+                    all(c in '0123456789abcdef' for c in token_hash) and
+                    isinstance(worker, str) and bool(worker) and revoked in (0, 1),
+                    'Invalid worker credential')
+            timestamp(expires)
     _inspect_budget(db, names, projects)
     return assets
 
 
 def _normalize(db, now):
-    counts = dict(uploads_aborted=0, attempts_fenced=0)
+    counts = dict(uploads_aborted=0, attempts_fenced=0, worker_credentials_revoked=0)
     names = _tables(db)
     if 'upload_sessions' in names:
         counts['uploads_aborted'] = db.execute("UPDATE upload_sessions SET state='aborted' WHERE state='uploading'").rowcount
+    if 'worker_credentials' in names:
+        counts['worker_credentials_revoked'] = db.execute('UPDATE worker_credentials SET revoked=1 WHERE revoked=0').rowcount
     for project_id, raw in db.execute('SELECT id,bundle FROM projects').fetchall():
         bundle = json.loads(raw)
         changed = False
@@ -324,7 +340,9 @@ def _verify_backup(directory):
     require(isinstance(manifest['created_at'], str) and timestamp(manifest['created_at']).tzinfo is not None,
             'Invalid backup timestamp')
     recovery = manifest['recovery']
-    require(isinstance(recovery, dict) and set(recovery) == {'uploads_aborted','attempts_fenced'} and
+    require(isinstance(recovery, dict) and set(recovery) in (
+                {'uploads_aborted','attempts_fenced'},
+                {'uploads_aborted','attempts_fenced','worker_credentials_revoked'}) and
             all(type(v) is int and v >= 0 for v in recovery.values()), 'Invalid recovery summary')
     require(isinstance(manifest['files'], list) and 0 < len(manifest['files']) <= 100000, 'Invalid file inventory')
     entries = {}
@@ -347,6 +365,9 @@ def _verify_backup(directory):
     require(actual == set(entries) | {'manifest.json','COMPLETE'}, 'Unlisted backup files')
     with _connect(directory / DB_NAME, readonly=True) as db:
         assets = _inspect(db)
+        if 'worker_credentials' in _tables(db):
+            require(db.execute('SELECT count(*) FROM worker_credentials WHERE revoked!=1').fetchone()[0] == 0,
+                    'Backup worker credentials must be revoked before restore')
     require(set(entries) == {DB_NAME} | {'assets/' + key for key in assets}, 'Manifest does not match database references')
     for key, asset in assets.items():
         entry = entries['assets/' + key]
