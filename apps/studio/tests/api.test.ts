@@ -125,3 +125,61 @@ test("server commands preserve identity revision and idempotency", async () => {
     },
   ]);
 });
+test("protected upload timeline and export commands preserve full payload", async () => {
+  const bodies: { url: string; body: unknown }[] = [];
+  const client = new StudioClient(async (url, init) => {
+    bodies.push({ url: String(url), body: JSON.parse(String(init?.body)) });
+    return Response.json({ workspace: initialWorkspace() });
+  });
+  await client.command({
+    kind: "upload",
+    projectId: "project-1",
+    name: "theme.wav",
+    mime_type: "audio/wav",
+    data_base64: "YWJj",
+    expected_revision: 2,
+    idempotency_key: "upload-key",
+  });
+  await client.command({
+    kind: "timeline",
+    projectId: "project-1",
+    audio_asset_id: "audio-1",
+    expected_revision: 3,
+    idempotency_key: "timeline-key",
+  });
+  await client.command({
+    kind: "export",
+    projectId: "project-1",
+    timeline_id: "timeline-1",
+    timeline_revision: 2,
+    idempotency_key: "export-key",
+  });
+  assert.deepEqual(bodies, [
+    {
+      url: "/v1/studio/projects/project-1/assets",
+      body: {
+        name: "theme.wav",
+        mime_type: "audio/wav",
+        data_base64: "YWJj",
+        expected_revision: 2,
+        idempotency_key: "upload-key",
+      },
+    },
+    {
+      url: "/v1/studio/projects/project-1/timelines",
+      body: {
+        audio_asset_id: "audio-1",
+        expected_revision: 3,
+        idempotency_key: "timeline-key",
+      },
+    },
+    {
+      url: "/v1/studio/projects/project-1/exports",
+      body: {
+        timeline_id: "timeline-1",
+        timeline_revision: 2,
+        idempotency_key: "export-key",
+      },
+    },
+  ]);
+});

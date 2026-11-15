@@ -20,9 +20,16 @@ from services.controller.studio import StudioWorkspace, StudioConflict
 from workers.gpu.common import scoped
 from services.controller.commands import RenderCommands
 from services.controller.runner import FixtureRunner
+from services.controller.media_commands import MediaCommands
+from services.controller.export_runner import ExportRunner
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
+MAX_UPLOAD_BODY = 6 * 1024 * 1024
+
+
+def body_limit(path):
+    return MAX_UPLOAD_BODY if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/assets", path) else MAX_BODY
 
 
 class HTTPError(Exception):
@@ -52,6 +59,7 @@ class StudioAPI:
             raise ValueError('Provision at least one 32-character token and owner identity')
         self.studio, self.origin, self.clock = studio, origin, clock
         self.commands = RenderCommands(studio)
+        self.media_commands = MediaCommands(studio)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -85,7 +93,7 @@ class StudioAPI:
                 raise HTTPError(403)
             if headers.get('Sec-Fetch-Site') == 'cross-site':
                 raise HTTPError(403)
-            if len(body) > MAX_BODY:
+            if len(body) > body_limit(path):
                 raise HTTPError(413)
             # No cross-origin requests, even on session establishment. Custom header
             # + JSON content type excludes form posts; no CORS preflight is granted.
@@ -127,6 +135,16 @@ class StudioAPI:
                     return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
                 raise HTTPError(405)
             owner = self.owner(headers)
+            media_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/(assets|timelines|exports)', path)
+            if media_match:
+                if method != 'POST':
+                    raise HTTPError(405)
+                operation = {'assets': self.media_commands.upload, 'timelines': self.media_commands.assemble,
+                             'exports': self.media_commands.export}[media_match[2]]
+                try:
+                    return Reply(200, operation(owner, media_match[1], value))
+                except KeyError:
+                    raise HTTPError(404)
             command_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/(batches|takes)(?:/([A-Za-z0-9_-]+)/(cancel|review))?', path)
             if command_match:
                 if method != 'POST':
@@ -221,7 +239,7 @@ def make_server(api, address=('127.0.0.1', 8787)):
                     if len(lengths) > 1:
                         raise ValueError()
                     size = int(lengths[0]) if lengths else 0
-                    if not 0 <= size <= MAX_BODY:
+                    if not 0 <= size <= body_limit(self.path):
                         raise ValueError()
                     body = self.rfile.read(size)
                     if len(body) != size:
@@ -270,6 +288,8 @@ def main():
     stop = threading.Event()
     worker = threading.Thread(target=FixtureRunner(control).serve, args=(stop,), daemon=True)
     worker.start()
+    exporter = threading.Thread(target=ExportRunner(control).serve, args=(stop,), daemon=True)
+    exporter.start()
     print(f'WAN Studio local API on 127.0.0.1:{server.server_port}; paid dispatch disabled', flush=True)
     try:
         server.serve_forever()
@@ -279,6 +299,7 @@ def main():
         stop.set()
         server.server_close()
         worker.join(timeout=30)
+        exporter.join(timeout=30)
 
 
 if __name__ == '__main__':

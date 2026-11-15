@@ -118,3 +118,9 @@ connected. The HTTP CLI starts the actual synthetic background worker. See
 [RENDER_COMMANDS_V1.md](RENDER_COMMANDS_V1.md) for current routes, review selection,
 retry/recovery behavior and evidence. Earlier disabled-command descriptions above
 record the prior checkpoint. Uploads and timeline/export transport remain pending.
+
+## Subsequent media increment
+
+Protected media upload, soundtrack timeline assembly and durable export commands
+are now connected locally. See [MEDIA_COMMANDS_V1.md](MEDIA_COMMANDS_V1.md) for
+current interfaces, limits, verification and remaining hosted gates.

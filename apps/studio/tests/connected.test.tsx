@@ -6,6 +6,7 @@ import {
   fireEvent,
   cleanup,
   waitFor,
+  act,
 } from "@testing-library/react";
 import { ConnectedStudio } from "../src/ConnectedStudio";
 import { StudioClient } from "../src/api";
@@ -309,4 +310,188 @@ test("connected cancel and take decisions use server commands", async () => {
     requests[1].body.idempotency_key,
     requests[2].body.idempotency_key,
   );
+});
+test("connected uploads send bytes to server without local fixture metadata", async () => {
+  const state = initialWorkspace();
+  let upload: Record<string, unknown> | undefined;
+  const originalReader = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "FileReader",
+  );
+  Object.defineProperty(globalThis, "FileReader", {
+    value: window.FileReader,
+    configurable: true,
+  });
+  try {
+    const client = new StudioClient(async (url, init) => {
+      if (String(url).endsWith("session"))
+        return Response.json({ owner_id: "fictional-owner" });
+      if (String(url).endsWith("/assets")) {
+        upload = JSON.parse(String(init?.body));
+        const next = structuredClone(state);
+        next.revision++;
+        next.projects[0].bundle.assets.push({
+          id: "server-image",
+          project_id: next.projects[0].bundle.project.id,
+          owner_id: "fictional-owner",
+          kind: "image",
+          object_key: "protected/image.png",
+          mime_type: "image/png",
+          bytes: 3,
+          sha256: "a".repeat(64),
+          duration_ms: null,
+        });
+        next.projects[0].assetNames["server-image"] = "character.png";
+        next.projects[0].media["server-image"] =
+          "/v1/studio/projects/fictional-project/assets/server-image/content";
+        return Response.json({ workspace: next });
+      }
+      return Response.json({ id: "default", workspace: state });
+    });
+    render(<ConnectedStudio client={client} />);
+    await screen.findByLabelText("Shot prompt");
+    fireEvent.click(screen.getByRole("button", { name: "References" }));
+    fireEvent.change(screen.getByLabelText("Add image or soundtrack"), {
+      target: {
+        files: [
+          new window.File(["abc"], "character.png", { type: "image/png" }),
+        ],
+      },
+    });
+    await screen.findByAltText("character.png");
+    assert.equal(upload!.data_base64, "YWJj");
+    assert.equal(upload!.name, "character.png");
+    assert.equal(upload!.expected_revision, 0);
+    assert.equal(localStorage.length, 0);
+    upload = undefined;
+    fireEvent.change(screen.getByLabelText("Add image or soundtrack"), {
+      target: {
+        files: [
+          new window.File(["abc"], "unsupported.ogg", { type: "audio/ogg" }),
+        ],
+      },
+    });
+    await screen.findByRole("alert");
+    assert.equal(upload, undefined);
+  } finally {
+    if (originalReader)
+      Object.defineProperty(globalThis, "FileReader", originalReader);
+    else Reflect.deleteProperty(globalThis, "FileReader");
+  }
+});
+test("timeline soundtrack export and polling expose protected download", async () => {
+  const original = initialWorkspace();
+  const state = structuredClone(original);
+  state.projects[0].bundle.timelines = [];
+  state.projects[0].bundle.exports = [];
+  const requests: { url: string; body: Record<string, unknown> }[] = [];
+  let queued = false;
+  const client = new StudioClient(async (url, init) => {
+    if (String(url).endsWith("session"))
+      return Response.json({ owner_id: "fictional-owner" });
+    if (init?.method === "POST") {
+      const body = JSON.parse(String(init.body));
+      requests.push({ url: String(url), body });
+      if (String(url).endsWith("/timelines")) {
+        state.projects[0].bundle.timelines = structuredClone(
+          original.projects[0].bundle.timelines,
+        );
+        state.revision++;
+      } else {
+        state.projects[0].bundle.exports = [
+          {
+            ...original.projects[0].bundle.exports[0],
+            state: "queued",
+            output_asset_id: null,
+          },
+        ];
+        queued = true;
+      }
+      return Response.json({ workspace: state });
+    }
+    if (queued) {
+      state.projects[0].bundle.exports[0].state = "succeeded";
+      state.projects[0].bundle.exports[0].output_asset_id = "asset-video";
+    }
+    return Response.json({ id: "default", workspace: state });
+  });
+  render(<ConnectedStudio client={client} />);
+  await screen.findByLabelText("Shot prompt");
+  fireEvent.click(screen.getByRole("button", { name: "Timeline and export" }));
+  fireEvent.input(screen.getByLabelText("Timeline soundtrack"), {
+    target: { value: "asset-audio" },
+  });
+  fireEvent.change(screen.getByLabelText("Timeline soundtrack"), {
+    target: { value: "asset-audio" },
+  });
+  fireEvent.click(
+    screen.getByRole("button", { name: "Assemble selected takes" }),
+  );
+  await screen.findByRole("button", { name: "Export revision 1" });
+  assert.equal(requests[0].body.audio_asset_id, "asset-audio");
+  fireEvent.click(screen.getByRole("button", { name: "Export revision 1" }));
+  const download = await screen.findByRole(
+    "link",
+    { name: "Download MP4" },
+    { timeout: 3000 },
+  );
+  assert.ok(
+    download.getAttribute("href")!.endsWith("/assets/asset-video/content"),
+  );
+  assert.ok(download.hasAttribute("download"));
+  assert.equal(requests[1].body.timeline_revision, 1);
+  assert.ok(screen.getByRole("heading", { name: "Timeline and export" }));
+});
+test("file reading cannot submit a stale upload after editing starts", async () => {
+  const state = initialWorkspace();
+  let posts = 0;
+  let finish: (() => void) | undefined;
+  const originalReader = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "FileReader",
+  );
+  class DelayedReader {
+    result = "data:audio/x-wav;base64,YWJj";
+    onload?: () => void;
+    readAsDataURL() {
+      finish = () => this.onload?.();
+    }
+  }
+  Object.defineProperty(globalThis, "FileReader", {
+    value: DelayedReader,
+    configurable: true,
+  });
+  try {
+    const client = new StudioClient(async (url, init) => {
+      if (String(url).endsWith("session"))
+        return Response.json({ owner_id: "fictional-owner" });
+      if (init?.method === "POST") posts++;
+      return Response.json({ id: "default", workspace: state });
+    });
+    render(<ConnectedStudio client={client} />);
+    await screen.findByLabelText("Shot prompt");
+    fireEvent.click(screen.getByRole("button", { name: "References" }));
+    fireEvent.change(screen.getByLabelText("Add image or soundtrack"), {
+      target: {
+        files: [new window.File(["abc"], "song.wav", { type: "audio/x-wav" })],
+      },
+    });
+    fireEvent.change(screen.getByLabelText("Script or creative brief"), {
+      target: { value: "New unsaved script" },
+    });
+    await act(async () => finish!());
+    await screen.findByText(
+      "Save pending edits before sending a server command.",
+    );
+    assert.equal(posts, 0);
+    assert.equal(
+      (screen.getByLabelText("Script or creative brief") as HTMLTextAreaElement)
+        .value,
+      "New unsaved script",
+    );
+  } finally {
+    if (originalReader)
+      Object.defineProperty(globalThis, "FileReader", originalReader);
+    else Reflect.deleteProperty(globalThis, "FileReader");
+  }
 });
