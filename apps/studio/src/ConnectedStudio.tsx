@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { App } from "./App";
-import { StudioClient, type StudioCommand } from "./api";
+import { StudioClient, type StudioCommand, type UploadProgress } from "./api";
 import { errorMessage, StudioError, type Workspace } from "./model";
 import type { Project } from "./contract";
 
@@ -14,6 +14,7 @@ export function ConnectedStudio({
   const [workspace, setWorkspace] = useState<Workspace>();
   const [dirty, setDirty] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress>();
   const [pending, setPending] = useState<StudioCommand>();
   const freshness = useRef(0);
   const [busy, setBusy] = useState(true);
@@ -96,13 +97,18 @@ export function ConnectedStudio({
     }
     freshness.current++;
     setPending(command);
+    if (command.kind !== "upload-file") setUploadProgress(undefined);
     await action(async () => {
       try {
-        const next = await api.command(command);
+        const next = await api.command(command, setUploadProgress);
         accept(next, false);
         setPending(undefined);
       } catch (e) {
-        if (e instanceof StudioError && [401, 404, 409, 422].includes(e.code))
+        if (
+          e instanceof StudioError &&
+          ([404, 409, 410, 422].includes(e.code) ||
+            (e.code === 401 && command.kind !== "upload-file"))
+        )
           setPending(undefined);
         throw e;
       }
@@ -149,6 +155,14 @@ export function ConnectedStudio({
           server.
         </p>
         {error && <p role="alert">{error}</p>}
+        {pending?.kind === "upload-file" && uploadProgress && (
+          <p role="status">
+            Uploaded {(uploadProgress.received / 1048576).toFixed(1)} of{" "}
+            {(uploadProgress.total / 1048576).toFixed(1)} MiB. Interrupted
+            uploads resume from verified server chunks while this tab stays
+            open.
+          </p>
+        )}
         {pending && (
           <div role="status">
             <p>
@@ -325,11 +339,11 @@ export function ConnectedStudio({
             connected={{
               workspace,
               owner,
-              upload: (projectId, data) =>
+              upload: (projectId, file) =>
                 runCommand({
-                  kind: "upload",
+                  kind: "upload-file",
                   projectId,
-                  ...data,
+                  file,
                   expected_revision: workspace.revision,
                   idempotency_key: crypto.randomUUID(),
                 }),

@@ -31,7 +31,7 @@ Review fixes prevent export retry from trusting corrupted cached video and preve
 
 Commands: `python -m unittest discover -s tests -v`, `python -m unittest workers.gpu.tests.test_worker -q`, `python -m unittest workers.media.test_export -v`, `python scripts/validate_contract.py --media-root fixtures`. Studio commands and browser details are recorded in apps/studio/B03_EVIDENCE.md.
 
-## Remaining implementation, in order
+## Remaining implementation at this historical checkpoint
 
 1. Resolve issue #17 with a versioned Studio persistence contract: scene/script metadata, selected takes, revision control and upload/preview operations. Connect Studio to authenticated backend transport; local browser state is still its current store.
 2. Add hosted persistence/storage and durable export admission, cancellation and publication. The local service uses a shared filesystem and SQLite; it is not a deployed multi-host database or signed-download service.
@@ -40,3 +40,16 @@ Commands: `python -m unittest discover -s tests -v`, `python -m unittest workers
 5. Run hosted fictional creator journey and isolation/download tests, then B06 real GPU benchmark with John’s explicit project dollar ceiling and runtime envelope.
 
 B04 CPU component is accepted with the cache fix; QA preparation is accepted. B01/B02/B03 remain partial and full B05 stays open. Human creative review remains for the live owner session. No production deployment occurred. GPU spend: $0. GPU resources created by this work: zero. Existing account-wide resources were not inspected.
+
+## Subsequent local integration
+
+The connected Studio, fixture render and media command increments supersede the
+local transport gaps above. See STUDIO_API_V1.md, RENDER_COMMANDS_V1.md and
+MEDIA_COMMANDS_V1.md. The larger-upload increment adds restartable local upload
+sessions with 1 MiB chunks and WAV/MP3 support up to 128 MiB (UPLOADS_V1.md).
+
+Next work is hosted storage/identity readiness, quotas and restore evidence,
+provider lifecycle/budget integration, and a buildable pinned Wan runtime.
+Docker, Podman and buildctl are absent in the current environment; no container
+build is claimed. Native browser acceptance and full hosted B05 remain open.
+No deployment or GPU spend occurred.

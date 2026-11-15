@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.6 | November 15, 2026 | Owner: John Hoyos
+Version 1.7 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -35,7 +35,7 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Prepare hosted storage/deployment and Runpod lifecycle/budget integration, including larger durable audio uploads and a buildable pinned Wan runtime. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
+Prepare hosted storage/deployment and Runpod lifecycle/budget integration, including storage quotas/backups, hosted identity and a buildable pinned Wan runtime. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -71,3 +71,26 @@ Previous publication: [connected Studio PR #20](https://github.com/hoyosgarciajo
 Protected PNG/JPEG/WebP and WAV/MP3 upload, immutable soundtrack timeline assembly, durable background CPU export and authenticated MP4 download are connected. The actual TypeScript client completed the entire local workflow; the downloaded file contains video/audio and fully decodes. Development upload caps are 1 MiB images and 4 MiB audio; larger original tracks require the next storage increment. 77 Python, 14 Studio model/client and 16 DOM tests pass, plus build/formatting. Tests and limitations are documented in docs/MEDIA_COMMANDS_V1.md and apps/studio/B03_EVIDENCE.md. Synthetic CPU footage only; no actual Wan generation, GPU cost or public deployment.
 
 Previous publication: [render controls PR #21](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/21) merged at `a458c0ed4711c1bd144515ac60cdd6815eace62a`.
+
+## Larger soundtrack upload checkpoint
+
+Connected Studio now uploads WAV/MP3 originals up to 128 MiB using 1 MiB chunks,
+with owner-scoped durable sessions, verified chunk manifests, progress and safe
+same-tab retry after network loss or reauthentication. Server sessions survive
+process restart; closing/reloading the browser loses the in-memory File/session,
+and the current UI starts a new upload after reselection. Images remain capped
+at 1 MiB. Completed/aborted/expired staging is reconciled after crashes.
+
+Validation: 85 Python tests PASS; 16 Studio model/client and 17 DOM tests PASS;
+build, formatting, contract/media validation and whitespace PASS. The actual
+TypeScript client uploaded a 5.04 MiB, 55-second synthetic WAV, recovered from a
+lost committed-chunk response, and completed render/review/timeline/export with
+a protected fully decoded MP4. These are synthetic CPU results, not Wan output.
+See docs/UPLOADS_V1.md and apps/studio/B03_EVIDENCE.md.
+
+Next: hosted storage/identity readiness, durable storage quotas and backup/restore,
+Pod lifecycle and budget integration, and a buildable pinned Wan runtime. Docker,
+Podman and buildctl are absent here; no container build was performed. Full hosted
+B05, native browser and creative acceptance remain open. No deployment or GPU spend.
+
+Previous publication: [media controls PR #22](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/22) merged at `57e7cb9e226565cc5b67bbb1be2661544615fff5`.
