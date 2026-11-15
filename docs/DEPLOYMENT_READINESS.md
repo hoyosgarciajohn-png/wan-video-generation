@@ -133,3 +133,11 @@ and a native Linux amd64 local Unix-socket daemon; it records build/inspect/smok
 logs against the captured immutable image ID. CPU fixture and GPU import/source
 checks do not run CUDA inference. Optional existing-weight verification performs
 no download. No CI trigger or paid build/deployment has been executed.
+
+## Selected cloud build route
+
+The manual `Verify Wan containers` GitHub Actions workflow now provides a
+disposable Linux amd64 Docker host, bounded runtime and evidence collection.
+See deployment/BUILD_VERIFICATION.md for account allowance and capacity checks.
+Only observed run artifacts may close image gates; cloud build setup does not
+close registry, HTTPS, storage, watchdog, owner-authority or CUDA gates.

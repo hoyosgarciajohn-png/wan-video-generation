@@ -1,10 +1,45 @@
 # On-demand image build verification
 
-This is preparation for an operator-selected local build host. No GitHub workflow,
-remote CI trigger, registry push or hosted deployment is added. The current host
-has no Docker, Podman, buildctl or buildkitd. The checked-in
-`BUILD_GATE_STATUS.json` therefore keeps every image/runtime/inference gate
-**UNVERIFIED** and every image ID null.
+The selected build host is a disposable GitHub-hosted Ubuntu 24.04 VM, using
+its own native Linux amd64 Docker daemon. John approved the cloud build route.
+The scratch workspace still has no Docker. `BUILD_GATE_STATUS.json` records
+actual reviewed evidence; adding a workflow alone does not close any gate.
+
+## Manual cloud build
+
+Open the repository's Actions → **Verify Wan containers** → Run workflow.
+Select **main** and **cpu** first, then **gpu** after inspecting the CPU result.
+There is no push, pull-request or scheduled trigger, registry push, image upload,
+GPU access, model download or deployment. Repository credentials are read-only
+and are not persisted in the checkout. No Runpod key is supplied.
+
+GitHub billing was read on November 15: GitHub Free, $7.09 / $12 included compute
+used, $4.91 remaining, 0 / 0.5 GB Actions storage, $0 billable Actions usage.
+The existing account Actions budget is $0 with paid usage blocked; it was not
+changed. Recheck allowance before later dispatches. Included credit is shared
+with other work; these observations are not a reservation or final bill.
+
+One target runs at a time. Each job has a 35-minute outer timeout and the actual
+build/check command has a 30-minute timeout plus a 30-second termination grace.
+The runner must have a local Unix Docker socket, x86_64 architecture, at least
+6 GiB RAM and 6 GiB free Docker disk for CPU or 40 GiB for GPU. The GPU check may
+remove only five listed unused SDK directories on the disposable GitHub-hosted
+VM to meet the disk threshold. It never prunes Docker data or user workspaces.
+Capacity failure stops before pulling layers.
+
+The pinned checkout and artifact actions run the existing build verifier.
+Logs, inventoried context, actual image ID, smoke helper and synthetic fixture
+are archived with a 64 MiB uncompressed limit and one-day artifact retention.
+Containers and images disappear with the disposable runner; the archive is
+verification evidence, not a deployable image. Download evidence before expiry.
+A canceled/timed-out job, incomplete log or missing artifact is not PASS.
+
+Keep original command paths in downloaded evidence; do not rewrite manifests
+or their checksums to imitate a different host. The current live admission
+validator expects original absolute evidence paths and a published registry
+digest. Cloud verification alone cannot be used as installed launch authority.
+Private registry publication, pull verification, HTTPS hosting, durable storage
+and the independent watchdog remain separate work.
 
 ## Plan without building
 
@@ -81,11 +116,11 @@ images/cache and evidence remain for review and are not pruned automatically.
 No cleanup command removes unrelated local images or data.
 
 CUDA inference, paid GPU benchmarking and hosted deployment remain UNVERIFIED
-even after every prepared image/fixture gate passes. B06 needs its own approved
-dollar ceiling/runtime envelope and live evidence. The GPU benchmark command in
+even after every prepared image/fixture gate passes. B06 has an approved $5 / 1,800-second / one-attempt envelope; it still needs
+verified infrastructure and actual live evidence. The GPU benchmark command in
 `workers/gpu/README.md` is a separate operation; this script does not invoke it.
 
-## Evidence collected in this preparation batch
+## Historical local preparation evidence
 
 - Fresh command lookup found none of Docker, Podman, buildctl or buildkitd.
 - Both CPU/GPU plan paths were exercised in temporary external directories. They
@@ -103,3 +138,11 @@ After a compatible host runs the explicit commands, the Command Center reviews
 its actual manifest/logs before updating image gates. Keep
 `docs/DEPLOYMENT_READINESS.md` and the B01 build record honest about any remaining
 container, browser, inference and production-release gaps.
+
+## Cloud workflow preparation evidence
+
+Four fictional targeted checks passed for capacity refusal, preventing local-host
+cleanup, retaining failed gate state, and refusing symlink/oversize artifacts.
+Workflow YAML and manual-only/read-only/time-bound settings were checked. Prior
+verifier/runtime suites were preserved without rerunning unchanged behavior.
+Actual cloud run results are recorded separately after observation.
