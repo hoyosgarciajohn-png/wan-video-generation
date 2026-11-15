@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.4 | November 15, 2026 | Owner: John Hoyos
+Version 1.5 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -35,7 +35,7 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Continue B05 by exposing fixture batch submission, status/cancellation, take review and timeline/export commands over the authenticated Studio API. Creator persistence and authenticated media reads now work locally; see docs/STUDIO_API_V1.md. Reference uploads, hosted storage/identity and queue-to-Pod budget/lifecycle integration remain open. No owner action is needed for source implementation. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
+Continue B05 with protected reference/audio uploads and timeline assembly/export commands. Authenticated fixture render submission, background execution, polling, cancellation and take review now work locally; see docs/RENDER_COMMANDS_V1.md. Hosted storage/identity, real Wan/container verification and queue-to-Pod budget/lifecycle integration remain open. No owner action is needed for source implementation. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -59,3 +59,9 @@ Local actual-worker → durable completion → review → timeline/audio export 
 Studio now defaults to a server connection with operator-provisioned token login, HttpOnly session, owner-scoped project creation and revision-checked storyboard/script saves. It preserves server render history, protects media downloads and retains a recoverable in-memory draft after authentication expiry. The actual TypeScript client passes a real local Python HTTP roundtrip. Checks: 61 Python, 12 Studio model/client and 10 DOM tests; build/format PASS. This is local development, not a live hosted release. Full B05 remains open, no paid GPU or production deployment. See docs/STUDIO_API_V1.md for precise contract, evidence and next tasks.
 
 Previous publication: [integration PR #19](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/19) merged at `ab02e6ccc780e193a1bde6bdb75b8f126b2b52f1`. PRs #13–#16 and #18 were superseded by that checkpoint; their outstanding batch gates remain open. Continue from current main rather than the original B00 workstream branches.
+
+## Connected render checkpoint
+
+Studio commands now submit saved frozen shots to the durable background fixture runner, poll completed takes, cancel active work and approve/reject takes through authenticated server operations. Exact request retries cannot create duplicate batches/reviews; selection updates atomically with approval. 70 Python tests and the actual TypeScript-client/server/render/download/review scenario pass. Studio: 13 model/client and 13 DOM tests, build and formatting PASS; evidence is in apps/studio/B03_EVIDENCE.md. These are synthetic CPU outputs, not Wan/GPU results. Full hosted B05 remains open. No GPU spend or deployment.
+
+Previous publication: [connected Studio PR #20](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/20) merged at `1d148371c7ca202e71089723ef33334dbc092363`.

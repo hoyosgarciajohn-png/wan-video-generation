@@ -3,8 +3,8 @@
 Status: implemented and tested locally. Bundle contract remains 0.1.0. The separate
 workspace envelope has `version: 1`, an integer creator revision and `projects`.
 See contracts/studio-workspace.schema.json and fixtures/studio-workspace.json.
-This resolves the creator-persistence portion of issue #17; it does not close the
-upload/render/review/timeline operations portion.
+This records the creator-persistence checkpoint of issue #17; it does not close the
+upload/timeline operations portion.
 
 ## Identity and transport
 
@@ -69,8 +69,9 @@ The UI clearly distinguishes unsaved edits from successful server saves. It lock
 saving after a 409 until reload, and retains unsaved work in an in-memory recovery
 draft if authentication expires. That draft can be downloaded; it is not autosaved
 or persisted across closing the tab. A dirty/recovery draft triggers the browser
-leave-page warning. Connected mode disables the fixture simulator, upload and
-review commands; it never labels simulated work as a server-rendered result.
+leave-page warning. Connected mode disables the browser fixture simulator and unsupported uploads.
+Render/review commands now use the server; see RENDER_COMMANDS_V1.md. It never labels
+browser-simulated work as a server-rendered result.
 
 ## Run and verify
 
@@ -106,7 +107,14 @@ Validation for this checkpoint:
 
 Browser acceptance remains unverified under the previously observed Chromium socket
 restriction. Hosted deployment, production identity, remote storage, reference
-uploads, render/review/timeline/export commands, queue-to-Pod lifecycle and paid budget
-settlement remain open. Next: add those commands over this authenticated boundary,
-starting with fixture batch submission/status/cancellation and take review. GPU
+uploads, timeline/export commands, queue-to-Pod lifecycle and paid budget settlement
+remain open. Next: add uploads and timeline/export over this authenticated boundary. GPU
 spending remains disabled; no external resources or charges were created.
+
+## Subsequent render-command increment
+
+Render submission, cancellation, take review and clean-workspace polling are now
+connected. The HTTP CLI starts the actual synthetic background worker. See
+[RENDER_COMMANDS_V1.md](RENDER_COMMANDS_V1.md) for current routes, review selection,
+retry/recovery behavior and evidence. Earlier disabled-command descriptions above
+record the prior checkpoint. Uploads and timeline/export transport remain pending.

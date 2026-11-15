@@ -183,3 +183,130 @@ test("expired session retains unsaved recovery through reauthentication", async 
   window.dispatchEvent(recoveryBeforeUnload);
   assert.equal(recoveryBeforeUnload.defaultPrevented, true);
 });
+test("render command retry keeps exact payload and polling preserves the active tab", async () => {
+  const state = initialWorkspace();
+  const active = structuredClone(state);
+  active.projects[0].bundle.batches[0].state = "rendering";
+  let posted = 0;
+  let loads = 0;
+  const bodies: string[] = [];
+  const client = new StudioClient(async (url, init) => {
+    if (String(url).endsWith("session"))
+      return Response.json({ owner_id: "fictional-owner" });
+    if (String(url).endsWith("/batches")) {
+      bodies.push(String(init?.body));
+      posted++;
+      return posted === 1
+        ? new Response("ambiguous", { status: 503 })
+        : Response.json({ workspace: active });
+    }
+    loads++;
+    return Response.json({ id: "default", workspace: state });
+  });
+  render(<ConnectedStudio client={client} />);
+  await screen.findByLabelText("Shot prompt");
+  fireEvent.click(screen.getByLabelText("Select A blue studio backdrop"));
+  fireEvent.click(screen.getByRole("button", { name: "Review render batch" }));
+  fireEvent.click(screen.getByRole("button", { name: "Approve batch" }));
+  await screen.findByRole("alert");
+  fireEvent.click(
+    screen.getByRole("button", { name: "Retry pending command" }),
+  );
+  await waitFor(() =>
+    assert.ok(!screen.queryByRole("button", { name: "Retry pending command" })),
+  );
+  assert.equal(bodies.length, 2);
+  assert.equal(bodies[0], bodies[1]);
+  fireEvent.click(screen.getByRole("button", { name: "References" }));
+  await waitFor(() => assert.ok(loads >= 2), { timeout: 3000 });
+  assert.ok(
+    screen.getByRole("heading", { name: "References and source material" }),
+  );
+});
+test("dirty workspaces cannot render and in-flight polling cannot replace edits", async () => {
+  const state = initialWorkspace();
+  state.projects[0].bundle.batches[0].state = "rendering";
+  let loads = 0;
+  let release: ((response: Response) => void) | undefined;
+  const client = new StudioClient(async (url) => {
+    if (String(url).endsWith("session"))
+      return Response.json({ owner_id: "fictional-owner" });
+    loads++;
+    if (loads > 1)
+      return new Promise<Response>((resolve) => {
+        release = resolve;
+      });
+    return Response.json({ id: "default", workspace: state });
+  });
+  render(<ConnectedStudio client={client} />);
+  await screen.findByLabelText("Shot prompt");
+  await waitFor(() => assert.ok(release), { timeout: 3000 });
+  fireEvent.change(screen.getByLabelText("Shot prompt"), {
+    target: { value: "Keep my draft" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Save new revision" }));
+  release!(Response.json({ id: "default", workspace: state }));
+  await waitFor(() =>
+    assert.ok(screen.getByText("Unsaved changes in this tab.")),
+  );
+  assert.equal(
+    (screen.getByLabelText("Shot prompt") as HTMLTextAreaElement).value,
+    "Keep my draft",
+  );
+  fireEvent.click(screen.getByLabelText("Select Keep my draft"));
+  assert.equal(
+    (
+      screen.getByRole("button", {
+        name: "Review render batch",
+      }) as HTMLButtonElement
+    ).disabled,
+    true,
+  );
+});
+test("connected cancel and take decisions use server commands", async () => {
+  const state = initialWorkspace();
+  state.projects[0].bundle.batches[0].state = "rendering";
+  const requests: { url: string; body: Record<string, unknown> }[] = [];
+  const client = new StudioClient(async (url, init) => {
+    if (String(url).endsWith("session"))
+      return Response.json({ owner_id: "fictional-owner" });
+    if (init?.method === "POST") {
+      const body = JSON.parse(String(init.body));
+      requests.push({ url: String(url), body });
+      if (String(url).endsWith("/cancel"))
+        state.projects[0].bundle.batches[0].state = "canceled";
+      else {
+        state.revision++;
+        state.projects[0].selectedTakes =
+          body.decision === "approved" ? { "shot-1": "take-1" } : {};
+        state.projects[0].bundle.reviews.push({
+          ...state.projects[0].bundle.reviews[0],
+          id: `review-${state.revision}`,
+          decision: body.decision,
+        });
+      }
+      return Response.json({ workspace: state });
+    }
+    return Response.json({ id: "default", workspace: state });
+  });
+  render(<ConnectedStudio client={client} />);
+  await screen.findByLabelText("Shot prompt");
+  fireEvent.click(screen.getByRole("button", { name: "Render batches" }));
+  fireEvent.click(screen.getByRole("button", { name: "Cancel server batch" }));
+  await waitFor(() => assert.ok(screen.getByText("canceled", { exact: true })));
+  fireEvent.click(screen.getByRole("button", { name: "Take review" }));
+  fireEvent.click(screen.getByRole("button", { name: "Reject take" }));
+  await waitFor(() => assert.ok(!screen.queryByText("Accepted selection")));
+  fireEvent.click(screen.getByRole("button", { name: "Accept take" }));
+  await screen.findByText("Accepted selection");
+  assert.equal(requests.length, 3);
+  assert.ok(requests[0].url.endsWith("/cancel"));
+  assert.equal(requests[1].body.decision, "rejected");
+  assert.equal(requests[1].body.expected_revision, 0);
+  assert.equal(requests[2].body.decision, "approved");
+  assert.equal(requests[2].body.expected_revision, 1);
+  assert.notEqual(
+    requests[1].body.idempotency_key,
+    requests[2].body.idempotency_key,
+  );
+});

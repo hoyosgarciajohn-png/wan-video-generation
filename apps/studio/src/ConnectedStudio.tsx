@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { App } from "./App";
-import { StudioClient } from "./api";
+import { StudioClient, type StudioCommand } from "./api";
 import { errorMessage, StudioError, type Workspace } from "./model";
 import type { Project } from "./contract";
 
@@ -13,17 +13,22 @@ export function ConnectedStudio({
   const [owner, setOwner] = useState("");
   const [workspace, setWorkspace] = useState<Workspace>();
   const [dirty, setDirty] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [pending, setPending] = useState<StudioCommand>();
+  const freshness = useRef(0);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
   const [conflict, setConflict] = useState(false);
   const [generation, setGeneration] = useState(0);
   const [create, setCreate] = useState(false);
   const [recovery, setRecovery] = useState<Workspace>();
-  function accept(next: Workspace) {
+  function accept(next: Workspace, remount = true) {
+    freshness.current++;
     setWorkspace(next);
     setDirty(false);
+    setEditing(false);
     setConflict(false);
-    setGeneration((value) => value + 1);
+    if (remount) setGeneration((value) => value + 1);
   }
   function failed(e: unknown) {
     setError(errorMessage(e));
@@ -36,14 +41,14 @@ export function ConnectedStudio({
     }
   }
   useEffect(() => {
-    if (!dirty && !recovery) return;
+    if (!dirty && !editing && !recovery) return;
     const preventLoss = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = "";
     };
     window.addEventListener("beforeunload", preventLoss);
     return () => window.removeEventListener("beforeunload", preventLoss);
-  }, [dirty, recovery]);
+  }, [dirty, editing, recovery]);
   useEffect(() => {
     let active = true;
     void (async () => {
@@ -75,15 +80,76 @@ export function ConnectedStudio({
       setBusy(false);
     }
   }
+  async function runCommand(command: StudioCommand) {
+    if (dirty || editing || busy || conflict) return;
+    freshness.current++;
+    setPending(command);
+    await action(async () => {
+      try {
+        const next = await api.command(command);
+        accept(next, false);
+        setPending(undefined);
+      } catch (e) {
+        if (e instanceof StudioError && [401, 404, 409, 422].includes(e.code))
+          setPending(undefined);
+        throw e;
+      }
+    });
+  }
+  const active =
+    workspace?.projects.some((p) =>
+      p.bundle.batches.some(
+        (b) => !["succeeded", "failed", "canceled"].includes(b.state),
+      ),
+    ) ?? false;
+  useEffect(() => {
+    if (!owner || dirty || editing || busy || conflict || pending || !active)
+      return;
+    let stopped = false;
+    let running = false;
+    const timer = setInterval(async () => {
+      if (running) return;
+      running = true;
+      const version = freshness.current;
+      try {
+        const next = await api.load();
+        if (!stopped && freshness.current === version) accept(next, false);
+      } catch (e) {
+        if (!stopped && freshness.current === version) failed(e);
+      } finally {
+        running = false;
+      }
+    }, 1500);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [api, owner, dirty, editing, busy, conflict, pending, active]);
   return (
     <>
       <section className="panel" aria-label="Server connection">
         <h1>WAN Studio · Server workspace</h1>
         <p>
-          Your projects are saved on the connected server. GPU rendering and
-          reference uploads are not enabled in this interface yet.
+          Server fixture rendering produces silent synthetic test clips up to
+          five seconds (320×180, 24 fps), with no reference images or GPU
+          rental. These are not Wan-generated results. Uploads and exports are
+          not connected yet.
         </p>
         {error && <p role="alert">{error}</p>}
+        {pending && (
+          <div role="status">
+            <p>
+              A server command is awaiting confirmation. Retry the same request
+              to avoid duplicate work.
+            </p>
+            <button
+              disabled={busy || !owner}
+              onClick={() => void runCommand(pending)}
+            >
+              Retry pending command
+            </button>
+          </div>
+        )}
         {recovery && (
           <div className="notice">
             <p>
@@ -113,7 +179,7 @@ export function ConnectedStudio({
           {busy
             ? "Connecting or saving…"
             : owner
-              ? dirty
+              ? dirty || editing
                 ? "Unsaved changes in this tab."
                 : "Saved on server."
               : "Disconnected. Sign in to load your projects."}
@@ -153,7 +219,7 @@ export function ConnectedStudio({
         {owner && (
           <div className="actions">
             <button
-              disabled={busy || !dirty || conflict}
+              disabled={busy || !dirty || conflict || Boolean(pending)}
               onClick={() =>
                 void action(async () => accept(await api.save(workspace!)))
               }
@@ -161,12 +227,18 @@ export function ConnectedStudio({
               Save to server
             </button>
             <button
-              disabled={busy}
-              onClick={() => void action(async () => accept(await api.load()))}
+              disabled={busy || Boolean(pending)}
+              onClick={() => {
+                freshness.current++;
+                void action(async () => accept(await api.load()));
+              }}
             >
               {dirty ? "Discard edits and reload server" : "Reload server"}
             </button>
-            <button disabled={busy || dirty} onClick={() => setCreate(!create)}>
+            <button
+              disabled={busy || dirty || editing || Boolean(pending)}
+              onClick={() => setCreate(!create)}
+            >
               New server project
             </button>
             <button
@@ -204,17 +276,26 @@ export function ConnectedStudio({
           >
             <label>
               New project title{" "}
-              <input name="title" required disabled={busy || dirty} />
+              <input
+                name="title"
+                required
+                disabled={busy || dirty || editing || Boolean(pending)}
+              />
             </label>
             <label>
               New project format{" "}
-              <select name="kind" disabled={busy || dirty}>
+              <select
+                name="kind"
+                disabled={busy || dirty || editing || Boolean(pending)}
+              >
                 <option value="music_video">Music video</option>
                 <option value="short_film">Short film</option>
                 <option value="cartoon">Cartoon</option>
               </select>
             </label>
-            <button disabled={busy || dirty}>Create server project</button>
+            <button disabled={busy || dirty || editing || Boolean(pending)}>
+              Create server project
+            </button>
           </form>
         )}
         {!owner && (
@@ -222,13 +303,41 @@ export function ConnectedStudio({
         )}
       </section>
       {owner && workspace && workspace.projects.length > 0 && (
-        <fieldset disabled={busy || conflict} className="workspace-fields">
+        <fieldset
+          disabled={busy || conflict || Boolean(pending)}
+          className="workspace-fields"
+        >
           <App
             key={generation}
             connected={{
               workspace,
               owner,
+              clean: !dirty && !editing && !busy && !conflict && !pending,
+              onEditing: () => {
+                freshness.current++;
+                setEditing(true);
+              },
+              submit: (projectId, shot_ids, idempotency_key) =>
+                void runCommand({
+                  kind: "submit",
+                  projectId,
+                  shot_ids,
+                  expected_revision: workspace.revision,
+                  idempotency_key,
+                }),
+              cancel: (projectId, batchId) =>
+                void runCommand({ kind: "cancel", projectId, batchId }),
+              review: (projectId, takeId, decision) =>
+                void runCommand({
+                  kind: "review",
+                  projectId,
+                  takeId,
+                  decision,
+                  expected_revision: workspace.revision,
+                  idempotency_key: crypto.randomUUID(),
+                }),
               onChange: (next) => {
+                freshness.current++;
                 setWorkspace(next);
                 setDirty(true);
               },

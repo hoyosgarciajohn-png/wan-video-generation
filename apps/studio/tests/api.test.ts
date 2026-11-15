@@ -76,3 +76,52 @@ test("client preserves safe HTTP status and masks network/server details", async
     (e) => e instanceof StudioError && e.code === 503,
   );
 });
+test("server commands preserve identity revision and idempotency", async () => {
+  const calls: { url: string; body: unknown }[] = [];
+  const client = new StudioClient(async (url, init) => {
+    calls.push({ url: String(url), body: JSON.parse(String(init?.body)) });
+    return Response.json({ workspace: initialWorkspace() });
+  });
+  await client.command({
+    kind: "submit",
+    projectId: "project 1",
+    shot_ids: ["shot-1"],
+    expected_revision: 7,
+    idempotency_key: "same-key",
+  });
+  await client.command({
+    kind: "cancel",
+    projectId: "project 1",
+    batchId: "batch/1",
+  });
+  await client.command({
+    kind: "review",
+    projectId: "project 1",
+    takeId: "take 1",
+    decision: "approved",
+    expected_revision: 8,
+    idempotency_key: "review-key",
+  });
+  assert.deepEqual(calls, [
+    {
+      url: "/v1/studio/projects/project%201/batches",
+      body: {
+        shot_ids: ["shot-1"],
+        expected_revision: 7,
+        idempotency_key: "same-key",
+      },
+    },
+    {
+      url: "/v1/studio/projects/project%201/batches/batch%2F1/cancel",
+      body: {},
+    },
+    {
+      url: "/v1/studio/projects/project%201/takes/take%201/review",
+      body: {
+        decision: "approved",
+        expected_revision: 8,
+        idempotency_key: "review-key",
+      },
+    },
+  ]);
+});
