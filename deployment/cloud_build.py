@@ -24,7 +24,7 @@ MAX_EVIDENCE = 64 * 1024 ** 2
 # No Docker images, workspace paths, caches or user files are pruned.
 UNUSED_SDKS = ('/usr/share/dotnet', '/usr/local/lib/android', '/opt/ghc',
                '/usr/local/share/powershell', '/usr/share/swift',
-               '/usr/lib/jvm', '/opt/hostedtoolcache/CodeQL')
+               '/usr/lib/jvm', '/opt/hostedtoolcache/CodeQL', '/usr/local/.ghcup')
 
 
 def require_capacity(target, free_bytes, memory_bytes):
