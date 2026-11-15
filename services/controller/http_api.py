@@ -54,7 +54,7 @@ class Reply:
 
 
 class StudioAPI:
-    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic, real_jobs=None):
+    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic, real_jobs=None, live_admission=None):
         parsed = urlsplit(origin)
         if (parsed.scheme not in ('http', 'https') or not parsed.netloc or
                 parsed.path or parsed.query or parsed.fragment or parsed.username or
@@ -64,6 +64,11 @@ class StudioAPI:
                              for t, o in tokens.items()):
             raise ValueError('Provision at least one 32-character token and owner identity')
         self.studio, self.origin, self.clock = studio, origin, clock
+        if live_admission is not None:
+            from services.controller.live_admission import LiveAdmission
+            if type(live_admission) is not LiveAdmission or live_admission.control is not studio.control:
+                raise ValueError('Live admission requires a trusted service on this controller')
+        self.live_admission = live_admission
         self.commands = RenderCommands(studio)
         self.media_commands = MediaCommands(studio)
         self.uploads = ResumableUploads(studio)
@@ -188,6 +193,24 @@ class StudioAPI:
                     return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
                 raise HTTPError(405)
             owner = self.owner(headers)
+            live_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/live/(approvals|batches)(?:/([A-Za-z0-9_-]+)(?:/(revoke|cancel))?)?', path)
+            if live_match:
+                if self.live_admission is None:
+                    raise HTTPError(404)
+                project_id, collection, record_id, action = live_match.groups()
+                try:
+                    if method == 'POST' and record_id is None:
+                        operation = self.live_admission.approve if collection == 'approvals' else self.live_admission.submit
+                        return Reply(200, operation(owner, project_id, value))
+                    if method == 'POST' and collection == 'approvals' and action == 'revoke' and value == {}:
+                        return Reply(200, self.live_admission.revoke(owner, project_id, record_id))
+                    if method == 'POST' and collection == 'batches' and action == 'cancel' and value == {}:
+                        return Reply(200, self.live_admission.cancel(owner, project_id, record_id))
+                    if method == 'GET' and collection == 'batches' and record_id and action is None:
+                        return Reply(200, self.live_admission.status(owner, project_id, record_id))
+                except KeyError:
+                    raise HTTPError(404)
+                raise HTTPError(405)
             upload_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/uploads(?:/([a-f0-9]{32})(?:/(finish))?)?', path)
             if chunk_match or upload_match:
                 try:

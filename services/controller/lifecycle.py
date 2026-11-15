@@ -127,7 +127,7 @@ class Lifecycle:
                 WHERE id=?
             """, (pod.id, batch))
 
-    def watchdog(self, now):
+    def watchdog(self, now, *, batch_ids=None):
         """Run independently of provisioning and repeat until cleanup is confirmed."""
         with self.transaction() as db:
             rows = db.execute("""
@@ -137,6 +137,8 @@ class Lifecycle:
         unresolved = []
         for row in rows:
             batch = row["id"]
+            if batch_ids is not None and batch not in batch_ids:
+                continue
             self.finish(batch, "failed")
             with self.transaction() as db:
                 current = db.execute(

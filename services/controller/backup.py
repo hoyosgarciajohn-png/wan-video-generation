@@ -21,7 +21,8 @@ from workers.gpu.common import digest, sync_dir, timestamp
 
 TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
-          'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links'}
+          'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
+          'live_approvals','live_reservations','live_job_links'}
 DB_NAME = 'database.sqlite'
 
 
@@ -185,6 +186,70 @@ def _inspect_real_jobs(db, names, projects):
     return linked
 
 
+def _inspect_live_admission(db, names, projects):
+    """Restore only never-dispatched released history; signature keys are external."""
+    tables = {'live_approvals','live_reservations','live_job_links'}
+    if not names & tables:
+        return
+    require(tables <= names, 'Incomplete live admission schema')
+    from services.controller.live_admission import GRANT_FIELDS, configuration_hash
+    from services.controller.real_jobs import RealJobBridge
+    from services.controller.runpod import validate_launch_profile
+    from workers.gpu.common import LOCK
+    approvals = {}
+    def hex_hash(value):
+        return isinstance(value, str) and len(value) == 64 and all(c in '0123456789abcdef' for c in value)
+    for identity, owner, project, raw, revoked in db.execute('SELECT id,owner,project,envelope,revoked FROM live_approvals'):
+        require(project in projects and projects[project]['project']['owner_id'] == owner and revoked in (0,1),
+                'Live approval ownership mismatch')
+        envelope = json.loads(raw)
+        require(isinstance(envelope, dict) and set(envelope) == {'key_id','payload','signature'} and
+                isinstance(envelope['key_id'], str) and bool(envelope['key_id']) and hex_hash(envelope['signature']),
+                'Malformed signed approval history')
+        grant = envelope['payload']
+        require(isinstance(grant, dict) and set(grant) == GRANT_FIELDS and
+                (grant['id'],grant['owner'],grant['project']) == (identity,owner,project) and grant['currency'] == 'USD' and
+                type(grant['approved_cents']) is int and 0 < grant['approved_cents'] <= 2**53-1 and
+                type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= 3600,
+                'Invalid live approval terms')
+        timestamp(grant['valid_until'])
+        require(isinstance(grant['source_sha256'], dict) and bool(grant['source_sha256']) and
+                all(isinstance(k,str) and hex_hash(v) for k,v in grant['source_sha256'].items()), 'Invalid signed source inventory')
+        config_hash = configuration_hash(grant['profile'], grant['launch_profile'])
+        launch = validate_launch_profile(grant['launch_profile'])
+        require(launch['env'] == {} and launch['image'] == grant['profile']['image_ref'] and
+                launch['gpu'] == {'id':grant['profile']['gpu_type'],'count':1} and
+                launch['dataCenterIds'] == [grant['profile']['region']], 'Live launch configuration mismatch')
+        approvals[identity] = (owner, project, grant, config_hash)
+    seen = set()
+    for batch_id, owner, project, approval, raw, reserved, state in db.execute(
+            'SELECT batch,owner,project,approval,request,reserved_cents,state FROM live_reservations'):
+        require(approval in approvals and approvals[approval][:2] == (owner,project) and state == 'released' and
+                type(reserved) is int and 0 < reserved <= approvals[approval][2]['approved_cents'],
+                'Live reservation is unresolved or has invalid ownership')
+        request = json.loads(raw)
+        require(isinstance(request, dict) and request.get('approval_id') == approval and request.get('reservation_cents') == reserved,
+                'Live reservation receipt mismatch')
+        require('pod_batches' in names, 'Live lifecycle missing')
+        pod = db.execute('SELECT project,state,cleanup,pod_id,snapshot FROM pod_batches WHERE id=?',(batch_id,)).fetchone()
+        require(pod and tuple(pod[:4]) == (project,'canceled','confirmed',None), 'Live job may have dispatched')
+        link = db.execute('SELECT owner,project,approval,config_hash,dispatch_state FROM live_job_links WHERE batch=?',(batch_id,)).fetchone()
+        require(link and tuple(link) == (owner,project,approval,approvals[approval][3],'disabled'), 'Live authority link mismatch')
+        batch = next((b for b in projects[project]['batches'] if b['id'] == batch_id),None)
+        require(batch and batch['execution_mode'] == 'runpod' and batch['model_profile'] == LOCK['profile'] and
+                (batch['state'],batch['cleanup_state'],batch['provider_resource_id']) == ('canceled','confirmed',None) and
+                batch['budget'] == dict(currency='USD',approved_cents=approvals[approval][2]['approved_cents'],reserved_cents=0,spent_cents=0),
+                'Released live canonical record mismatch')
+        require(not any(a['batch_id'] == batch_id for a in projects[project]['attempts']), 'Live worker activity cannot be restored by admission-only recovery')
+        frozen = json.loads(pod[4])
+        require(frozen.get('mode') == 'live_pending' and frozen.get('config_hash') == approvals[approval][3] and
+                all(frozen['canonical_batch'][k] == batch[k] for k in
+                    ('id','project_id','idempotency_key','execution_mode','model_profile','shot_snapshots','approved_at','deadline_at')),
+                'Live immutable snapshot mismatch')
+        seen.add(batch_id)
+    require(seen == {row[0] for row in db.execute('SELECT batch FROM live_job_links')}, 'Unmatched live authority link')
+
+
 def _inspect(db):
     require(db.execute('PRAGMA integrity_check').fetchall() == [('ok',)], 'Database integrity check failed')
     require(not db.execute('PRAGMA foreign_key_check').fetchall(), 'Database foreign key check failed')
@@ -252,12 +317,15 @@ def _inspect(db):
                     'Invalid worker credential')
             timestamp(expires)
     _inspect_budget(db, names, projects)
+    _inspect_live_admission(db, names, projects)
     return assets
 
 
 def _normalize(db, now):
-    counts = dict(uploads_aborted=0, attempts_fenced=0, worker_credentials_revoked=0)
+    counts = dict(uploads_aborted=0, attempts_fenced=0, worker_credentials_revoked=0, live_approvals_revoked=0)
     names = _tables(db)
+    if 'live_approvals' in names:
+        counts['live_approvals_revoked'] = db.execute('UPDATE live_approvals SET revoked=1 WHERE revoked=0').rowcount
     if 'upload_sessions' in names:
         counts['uploads_aborted'] = db.execute("UPDATE upload_sessions SET state='aborted' WHERE state='uploading'").rowcount
     if 'worker_credentials' in names:
@@ -383,7 +451,8 @@ def _verify_backup(directory):
     recovery = manifest['recovery']
     require(isinstance(recovery, dict) and set(recovery) in (
                 {'uploads_aborted','attempts_fenced'},
-                {'uploads_aborted','attempts_fenced','worker_credentials_revoked'}) and
+                {'uploads_aborted','attempts_fenced','worker_credentials_revoked'},
+                {'uploads_aborted','attempts_fenced','worker_credentials_revoked','live_approvals_revoked'}) and
             all(type(v) is int and v >= 0 for v in recovery.values()), 'Invalid recovery summary')
     require(isinstance(manifest['files'], list) and 0 < len(manifest['files']) <= 100000, 'Invalid file inventory')
     entries = {}
@@ -406,6 +475,9 @@ def _verify_backup(directory):
     require(actual == set(entries) | {'manifest.json','COMPLETE'}, 'Unlisted backup files')
     with _connect(directory / DB_NAME, readonly=True) as db:
         assets = _inspect(db)
+        if 'live_approvals' in _tables(db):
+            require(db.execute('SELECT count(*) FROM live_approvals WHERE revoked!=1').fetchone()[0] == 0,
+                    'Backup live approvals must be revoked before restore')
         if 'worker_credentials' in _tables(db):
             require(db.execute('SELECT count(*) FROM worker_credentials WHERE revoked!=1').fetchone()[0] == 0,
                     'Backup worker credentials must be revoked before restore')
