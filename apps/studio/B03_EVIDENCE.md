@@ -79,3 +79,27 @@ Recommendation: suitable for continued fixture integration with these fixes;
 B03 acceptance and B05 browser end-to-end completion remain open. No cloud
 resources, GPU cost, production deployment or external mutations were incurred.
 
+
+## Durable workspace adapter — November 15, 2026
+
+Connected mode is now the default. `?mode=fixture` explicitly selects the original
+browser-local rehearsal. The same-origin client implements the agreed issue #17
+session and default-workspace endpoints, cookie credentials, `X-WAN-Request:
+studio` mutation header, and revision-bearing saves. The connection form clears
+its token input immediately after submission and retains no token or server
+workspace in browser storage. Empty server workspaces support first-project
+creation. Editing is staged in tab memory with explicit Save to server; revision
+conflicts lock edits until reload. Shot revisions advance once per server save,
+even after several local edits. Server execution, imports and take approvals are
+read-only/disabled in this increment; fixture simulation is never presented as
+server execution.
+
+Validation: production build and TypeScript pass; 12 model/client tests pass;
+10 DOM tests pass (including session-expiry draft recovery, connected login, empty workspace creation, owner
+identity, explicit save, conflict/reload and no localStorage writes); formatting
+passes. Fetch tests use a controlled HTTP-response implementation and DOM tests
+use jsdom. These do not establish real-browser or live-HTTP end-to-end acceptance.
+The previously observed Chromium execution restriction still limits browser
+acceptance. No GPU resources or paid services are used.
+
+Session expiry preserves unsaved edits as a separate in-memory downloadable JSON draft, retained across reauthentication. The editor is hidden without an authenticated owner. A beforeunload handler protects unsaved edits and retained recovery drafts; regression coverage verifies downloaded draft contents after reauthentication.

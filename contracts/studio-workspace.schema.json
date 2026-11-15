@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wan.local/contracts/studio-workspace.schema.json",
+  "title": "WAN Studio Workspace version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "revision", "projects"],
+  "properties": {
+    "version": {"const": 1, "type": "integer"},
+    "revision": {"type": "integer", "minimum": 0},
+    "projects": {"type": "array", "items": {"$ref": "#/$defs/studioProject"}}
+  },
+  "$defs": {
+    "studioProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle", "scenes", "shotHistory", "selectedTakes", "assetNames", "media", "script"],
+      "properties": {
+        "bundle": {"$ref": "bundle.schema.json"},
+        "scenes": {
+          "type": "array", "minItems": 1, "maxItems": 1000,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "title"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1, "maxLength": 200},
+              "title": {"type": "string", "minLength": 1, "maxLength": 500}
+            }
+          }
+        },
+        "shotHistory": {"type": "array", "items": {"$ref": "bundle.schema.json#/$defs/shot"}},
+        "selectedTakes": {"type": "object", "additionalProperties": {"type": "string"}},
+        "assetNames": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1, "maxLength": 500}},
+        "media": {"type": "object", "additionalProperties": {"type": "string"}},
+        "script": {"type": "string", "maxLength": 1000000}
+      }
+    }
+  }
+}

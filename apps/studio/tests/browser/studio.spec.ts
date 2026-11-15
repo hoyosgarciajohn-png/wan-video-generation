@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 test("edit, freeze, fail, retry, approve, reload and retain history", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?mode=fixture");
   await page.getByLabel("Shot prompt").fill("Fictional sunrise");
   await page.getByRole("button", { name: "Save new revision" }).click();
   await expect(
@@ -67,7 +67,7 @@ test("edit, freeze, fail, retry, approve, reload and retain history", async ({
 test("three formats, project isolation, scene editing and references survive reload", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?mode=fixture");
   for (const kind of ["music_video", "short_film", "cartoon"]) {
     await page
       .getByRole("button", { name: "New project", exact: true })
@@ -131,7 +131,7 @@ test("three formats, project isolation, scene editing and references survive rel
 test("keyboard, dialog focus, accessibility and narrow layouts", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?mode=fixture");
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("link", { name: "Skip to workspace" }),
@@ -176,9 +176,9 @@ test("another tab triggers a recoverable revision conflict", async ({
   page,
   context,
 }) => {
-  await page.goto("/");
+  await page.goto("/?mode=fixture");
   const other = await context.newPage();
-  await other.goto("/");
+  await other.goto("/?mode=fixture");
   await other.getByLabel("Shot prompt").fill("Other fictional editor");
   await other.getByRole("button", { name: "Save new revision" }).click();
   await expect(page.getByRole("alert")).toContainText("A newer version");

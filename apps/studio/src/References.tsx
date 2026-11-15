@@ -8,8 +8,10 @@ export function References({
   project,
   edit,
   report,
+  allowImport = true,
 }: {
   project: StudioProject;
+  allowImport?: boolean;
   edit: (change: Edit, message: string) => void;
   report: (error: unknown) => void;
 }) {
@@ -95,14 +97,18 @@ export function References({
     <section aria-labelledby="refs-heading">
       <h2 id="refs-heading">References and source material</h2>
       <p className="muted">
-        Reuse character and location images across shots. Images up to 1 MB and
-        audio up to 4 MB are saved in this browser for the rehearsal.
+        {allowImport
+          ? "Reuse character and location images across shots. Images up to 1 MB and audio up to 4 MB are saved in this browser for the rehearsal."
+          : "Review server references and edit their names or your creative brief. Use Save to server to persist changes."}
       </p>
+      {!allowImport && (
+        <p>Reference uploads are not connected to the server yet.</p>
+      )}
       <label className="upload">
         Add image or soundtrack
         <input
           type="file"
-          disabled={busy}
+          disabled={busy || !allowImport}
           accept="image/png,image/jpeg,image/webp,audio/wav,audio/mpeg,audio/mp4,audio/ogg"
           onChange={(e) => {
             void importFile(e.target.files?.[0]);

@@ -32,10 +32,21 @@ const labels = {
 const seconds = (ms: number) => `${(ms / 1000).toLocaleString()}s`;
 type Edit = (draft: StudioProject) => void;
 
-export function App() {
+export function App({
+  connected,
+}: {
+  connected?: {
+    workspace: Workspace;
+    owner: string;
+    onChange: (workspace: Workspace) => void;
+  };
+} = {}) {
   const [startup] = useState(() => {
     try {
-      return { state: loadWorkspace(localStorage), error: "" };
+      return {
+        state: connected?.workspace ?? loadWorkspace(localStorage),
+        error: "",
+      };
     } catch (e) {
       return { state: initialWorkspace(), error: errorMessage(e) };
     }
@@ -52,18 +63,22 @@ export function App() {
   );
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState(startup.error);
-  const [notice, setNotice] = useState("Fictional rehearsal ready.");
+  const [notice, setNotice] = useState(
+    connected ? "Loaded from server." : "Fictional rehearsal ready.",
+  );
   const [locked, setLocked] = useState(Boolean(startup.error));
   const [newProject, setNewProject] = useState(false);
   const [batchKey, setBatchKey] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
-  const project = projectFor(state, projectId);
+  const owner = connected?.owner;
+  const project = projectFor(state, projectId, owner);
   const activeShot = project.bundle.shots.find((s) => s.id === shotId);
   const total = project.bundle.shots.reduce(
     (sum, s) => sum + s.target_duration_ms,
     0,
   );
   useEffect(() => {
+    if (connected) return;
     const listener = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY || event.key === null) {
         setLocked(true);
@@ -78,11 +93,29 @@ export function App() {
     try {
       const next = structuredClone(current.current);
       change(next);
-      saveWorkspace(localStorage, next, current.current.revision);
+      if (connected) {
+        // Multiple local edits are one server transaction/revision on explicit save.
+        for (const draft of next.projects) {
+          const original = startup.state.projects.find(
+            (p) => p.bundle.project.id === draft.bundle.project.id,
+          );
+          for (const shot of draft.bundle.shots) {
+            const before = original?.bundle.shots.find((s) => s.id === shot.id);
+            if (!before) shot.revision = 1;
+            else if (shot.revision > before.revision)
+              shot.revision = before.revision + 1;
+          }
+        }
+        connected.onChange(next);
+      } else saveWorkspace(localStorage, next, current.current.revision);
       current.current = next;
       setState(next);
       setError("");
-      setNotice(message);
+      setNotice(
+        connected
+          ? "Unsaved changes. Use Save to server to persist them."
+          : message,
+      );
       return true;
     } catch (e) {
       setError(errorMessage(e));
@@ -91,7 +124,7 @@ export function App() {
     }
   }
   function edit(change: Edit, message = "Saved in this browser.") {
-    commit((next) => change(projectFor(next, projectId)), message);
+    commit((next) => change(projectFor(next, projectId, owner)), message);
   }
   function switchProject(value: string) {
     setProjectId(value);
@@ -138,8 +171,16 @@ export function App() {
         <a className="brand" href="#workspace" aria-label="WAN Studio home">
           WAN <span>STUDIO</span>
         </a>
-        <span className="fixture">Fictional rehearsal · $0 GPU cost</span>
-        <button onClick={() => setNewProject(!newProject)}>New project</button>
+        <span className="fixture">
+          {connected
+            ? "Connected studio · No GPU provisioning"
+            : "Fictional rehearsal · $0 GPU cost"}
+        </span>
+        {!connected && (
+          <button onClick={() => setNewProject(!newProject)}>
+            New project
+          </button>
+        )}
       </header>
       <div className="shell">
         <aside className="sidebar">
@@ -183,8 +224,9 @@ export function App() {
             Download contract bundle
           </button>
           <p className="muted small">
-            Fixture outputs use the supplied two-second blue clip. Your planned
-            shot durations remain editable.
+            {connected
+              ? "Connected editing saves metadata only. Server rendering and take approval controls will be added separately."
+              : "Fixture outputs use the supplied two-second blue clip. Your planned shot durations remain editable."}
           </p>
         </aside>
         <main id="workspace" tabIndex={-1}>
@@ -316,7 +358,7 @@ export function App() {
                       if (
                         commit(
                           (next) =>
-                            addScene(projectFor(next, projectId), title),
+                            addScene(projectFor(next, projectId, owner), title),
                           "Scene added.",
                         )
                       )
@@ -441,7 +483,7 @@ export function App() {
                     <span>{selected.length} shots selected</span>
                     <button
                       className="primary"
-                      disabled={!selected.length}
+                      disabled={Boolean(connected) || !selected.length}
                       onClick={() => {
                         setBatchKey(crypto.randomUUID());
                         dialog.current?.showModal();
@@ -460,7 +502,7 @@ export function App() {
                     if (
                       commit((next) => {
                         saved = saveShot(
-                          projectFor(next, projectId),
+                          projectFor(next, projectId, owner),
                           input,
                           old?.id,
                           old?.revision,
@@ -476,6 +518,7 @@ export function App() {
               <References
                 key={projectId}
                 project={project}
+                allowImport={!connected}
                 edit={edit}
                 report={(e) => setError(errorMessage(e))}
               />
@@ -484,8 +527,9 @@ export function App() {
               <section>
                 <h2>Render batches</h2>
                 <p className="muted">
-                  Advance each fictional batch to rehearse progress and failure
-                  recovery.
+                  {connected
+                    ? "Server execution history is read-only here. Rendering controls are not connected yet."
+                    : "Advance each fictional batch to rehearse progress and failure recovery."}
                 </p>
                 {[...project.bundle.batches].reverse().map((b) => (
                   <article className="panel batch" key={b.id}>
@@ -518,48 +562,49 @@ export function App() {
                         </p>
                       ))}
                     </details>
-                    {["queued", "rendering", "provisioning"].includes(
-                      b.state,
-                    ) && (
-                      <div className="actions">
-                        <button
-                          className="primary"
-                          onClick={() =>
-                            edit(
-                              (p) => advanceBatch(p, b.id),
-                              "Fictional render advanced.",
-                            )
-                          }
-                        >
-                          Advance fixture
-                        </button>
-                        <button
-                          onClick={() =>
-                            edit((p) => {
-                              if (
-                                requireItem(p.bundle.batches, b.id).state ===
-                                "queued"
+                    {!connected &&
+                      ["queued", "rendering", "provisioning"].includes(
+                        b.state,
+                      ) && (
+                        <div className="actions">
+                          <button
+                            className="primary"
+                            onClick={() =>
+                              edit(
+                                (p) => advanceBatch(p, b.id),
+                                "Fictional render advanced.",
                               )
-                                advanceBatch(p, b.id);
-                              advanceBatch(p, b.id, true);
-                            }, "Fictional render failure recorded.")
-                          }
-                        >
-                          Simulate failure
-                        </button>
-                        <button
-                          onClick={() =>
-                            edit((p) => {
-                              requireItem(p.bundle.batches, b.id).state =
-                                "canceled";
-                            }, "Batch canceled. Completed takes retained.")
-                          }
-                        >
-                          Cancel batch
-                        </button>
-                      </div>
-                    )}
-                    {b.state === "failed" && (
+                            }
+                          >
+                            Advance fixture
+                          </button>
+                          <button
+                            onClick={() =>
+                              edit((p) => {
+                                if (
+                                  requireItem(p.bundle.batches, b.id).state ===
+                                  "queued"
+                                )
+                                  advanceBatch(p, b.id);
+                                advanceBatch(p, b.id, true);
+                              }, "Fictional render failure recorded.")
+                            }
+                          >
+                            Simulate failure
+                          </button>
+                          <button
+                            onClick={() =>
+                              edit((p) => {
+                                requireItem(p.bundle.batches, b.id).state =
+                                  "canceled";
+                              }, "Batch canceled. Completed takes retained.")
+                            }
+                          >
+                            Cancel batch
+                          </button>
+                        </div>
+                      )}
+                    {!connected && b.state === "failed" && (
                       <>
                         <p className="error">
                           The fictional render failed or its deadline expired.
@@ -648,7 +693,10 @@ export function App() {
                         <div className="actions">
                           <button
                             className="primary"
-                            disabled={project.selectedTakes[t.shot_id] === t.id}
+                            disabled={
+                              Boolean(connected) ||
+                              project.selectedTakes[t.shot_id] === t.id
+                            }
                             onClick={() =>
                               edit(
                                 (p) => reviewTake(p, t.id, "approved"),
@@ -661,7 +709,10 @@ export function App() {
                               : "Accept take"}
                           </button>
                           <button
-                            disabled={project.selectedTakes[t.shot_id] === t.id}
+                            disabled={
+                              Boolean(connected) ||
+                              project.selectedTakes[t.shot_id] === t.id
+                            }
                             onClick={() =>
                               edit(
                                 (p) => reviewTake(p, t.id, "rejected"),
@@ -693,7 +744,11 @@ export function App() {
             e.preventDefault();
             if (
               commit((next) => {
-                approveBatch(projectFor(next, projectId), selected, batchKey);
+                approveBatch(
+                  projectFor(next, projectId, owner),
+                  selected,
+                  batchKey,
+                );
               }, "Batch approved. Shot revisions are frozen.")
             ) {
               dialog.current?.close();
