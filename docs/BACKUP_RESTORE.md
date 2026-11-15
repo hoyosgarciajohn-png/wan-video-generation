@@ -65,7 +65,10 @@ for an operator backup is also supported.
 The backup excludes uncommitted upload chunks, combined upload staging files,
 worker completion journals and export intermediate/cache files. Unknown database
 tables, views or triggers are rejected rather than silently archiving unexpected
-state. Outstanding or uncertain Runpod obligations also cause creation to fail:
+state. The simulated budget ledger is preserved only when every reservation is explicitly
+settled. Backup verifies owner/project/approval links and cumulative settlement
+arithmetic, including late-charge overruns; confirmed deletion alone does not
+make a liability safe to omit. Outstanding or uncertain Runpod obligations also cause creation to fail:
 paid batches must be terminal with confirmed cleanup, and provider lifecycle rows
 must have confirmed cleanup. This tool never calls a provider or asserts that
 external resources have been deleted.

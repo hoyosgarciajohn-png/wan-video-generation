@@ -123,3 +123,13 @@ was established. See `workers/gpu/evidence/BUILD_ATTEMPT.md`. A Docker-capable h
 must build and smoke both prepared images before those gates close. B06 still
 requires John's explicit GPU dollar ceiling and runtime envelope. This staging
 work incurred no provider spend and left no service running.
+
+## On-demand image verification handoff
+
+Use `deployment/BUILD_VERIFICATION.md` and `deployment/build_verify.py` for the
+next compatible local build host. Default operation is plan-only, with explicit
+UNVERIFIED gates and no Docker commands. Manual `--execute` requires clean source
+and a native Linux amd64 local Unix-socket daemon; it records build/inspect/smoke
+logs against the captured immutable image ID. CPU fixture and GPU import/source
+checks do not run CUDA inference. Optional existing-weight verification performs
+no download. No CI trigger or paid build/deployment has been executed.

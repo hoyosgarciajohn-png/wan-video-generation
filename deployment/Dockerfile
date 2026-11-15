@@ -19,6 +19,7 @@ COPY contracts /app/contracts
 COPY fixtures /app/fixtures
 COPY scripts/validate_contract.py /app/scripts/validate_contract.py
 COPY services/controller /app/services/controller
+COPY src/wan_platform/*.py /app/src/wan_platform/
 COPY workers/gpu/*.py workers/gpu/model.lock.json /app/workers/gpu/
 COPY workers/media/*.py /app/workers/media/
 COPY deployment/local_stage.py deployment/healthcheck.py /app/deployment/

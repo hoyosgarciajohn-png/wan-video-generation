@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.8 | November 15, 2026 | Owner: John Hoyos
+Version 1.9 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -35,7 +35,7 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Prepare hosted storage/deployment and Runpod lifecycle/budget integration, including storage quotas/offsite retention, hosted identity and a buildable pinned Wan runtime. Local backup/restore is now rehearsed; the staging container remains unbuilt. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
+Build and verify the pinned images on a compatible Docker host, then complete hosted storage/identity and the authenticated remote worker/storage bridge. Budget/lifecycle integration is now rehearsed with the built-in fake provider only; live Runpod dispatch remains disabled. Local backup/restore is rehearsed, while image builds remain unverified. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -123,3 +123,33 @@ buildctl are absent. Full hosted B05 and real Wan/GPU generation remain unverifi
 No deployment, provider requests or GPU spending occurred.
 
 Previous publication: [larger soundtrack uploads PR #23](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/23) merged at `cbd300fe74fc8a2f47e8b1c69cfe1273414e2467`.
+
+## Simulated budget/lifecycle and build-verification checkpoint
+
+The coordinator now atomically reserves fictional approved cents with a frozen
+lifecycle job. It rechecks approval and budget at dispatch, retains unknown-create
+liability, and keeps cleanup separate from final billing. Actual-shaped late charges
+and overruns remain recorded without resetting history under a new approval.
+Backup preserves settled simulation history and refuses every unsettled liability,
+including deleted-but-unbilled resources. Only the built-in fake provider is accepted;
+no HTTP spending route or real Runpod dispatch is enabled.
+
+The Python root suite passes 103 tests, including concurrent reservation/replay,
+queued dispatch blocking after overrun, restart/unknown creation, deletion before
+settlement, late corrections and restored ledger history. All amounts in these
+tests are fictional, and fixture generation still records zero real cost.
+See docs/BUDGET_ORCHESTRATION.md. Sixteen combined staging/build-verifier tests
+also pass; artifact/runtime-source import checks include the simulation coordinator.
+
+Manual build-verification tooling prepares a source/hash inventory and separate
+image-build, import, fixture, weight and GPU gates. Plan-only mode executes no
+builds. Runtime checks bind to the captured image ID and reject changed prepared
+source; see deployment/BUILD_VERIFICATION.md. No CI is triggered; image builds, CUDA inference and hosted deployment
+remain explicitly UNVERIFIED. A compatible local Docker host is still required.
+
+Next real gates: host image build/smoke, John's project-specific GPU ceiling and
+runtime envelope, securely provisioned Runpod credentials, and an authenticated
+remote worker/storage bridge. Native browser/hosted B05 and real Wan creative
+acceptance remain open. No live provider allocation, GPU spending or deployment.
+
+Previous publication: [backup/staging PR #24](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/24) merged at `61be611f0df205436dcbad77fe629ebf7d84b9b4`.

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-15",
+  "evidence_type": "host_probe_and_preparation_only",
+  "local_tools": {"docker": "NOT_FOUND", "podman": "NOT_FOUND", "buildctl": "NOT_FOUND", "buildkitd": "NOT_FOUND"},
+  "gates": {
+    "cpu_image_build": "UNVERIFIED",
+    "cpu_image_runtime_smoke": "UNVERIFIED",
+    "gpu_image_build": "UNVERIFIED",
+    "gpu_image_runtime_import": "UNVERIFIED",
+    "gpu_image_fixture_smoke": "UNVERIFIED",
+    "existing_weights_verification": "UNVERIFIED",
+    "cuda_inference": "UNVERIFIED",
+    "gpu_benchmark": "UNVERIFIED",
+    "hosted_deployment": "UNVERIFIED"
+  },
+  "image_ids": {"cpu": null, "gpu": null},
+  "remote_ci_triggered": false,
+  "provider_spend": 0,
+  "note": "Prepared local on-demand verification scripts only. No image build, layer download, container run, weight download, CUDA inference or hosted deployment was executed for this batch."
+}

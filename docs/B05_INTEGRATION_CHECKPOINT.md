@@ -70,3 +70,18 @@ Source packaging is checked; no container build or deployment
 has occurred because Docker/Podman/buildctl are unavailable. See BACKUP_RESTORE.md
 and DEPLOYMENT_READINESS.md. Full hosted B05 and native browser acceptance remain
 open, and no provider requests or GPU spending occurred.
+
+## Simulated budget/lifecycle follow-up
+
+The 103-test Python root suite passes with the simulation-only budget coordinator.
+Reservations and queue admission are atomic; queued dispatch rechecks current
+approval and observed liability, unknown creation remains reserved, and confirmed
+resource deletion does not settle billing. Late charges and overruns survive
+restart and backup/restore; unresolved liabilities prevent backup. Only the
+built-in fake provider is permitted. This does not enable real Runpod dispatch.
+
+Sixteen combined staging/build-verifier tests and artifact source checks pass.
+Manual image verification prepares distinct UNVERIFIED gates and executes nothing
+by default. No CI, container builds, CUDA inference or deployment were activated.
+Host build/smoke, explicit real spend/runtime approval, securely provisioned provider
+credentials, and the remote worker/storage bridge remain required before B06.
