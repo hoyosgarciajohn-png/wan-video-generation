@@ -90,12 +90,17 @@ class Lifecycle:
                                 OR (state='queued' AND ? != 'succeeded'))
             """, (outcome, batch, outcome))
 
-    def provision(self, project, batch, now):
+    def provision(self, project, batch, now, authorize=None):
         row = self.status(project, batch)
         if row["deadline"] <= now:
             self.finish(batch, "failed")
             return
         with self.transaction() as db:
+            current = db.execute("SELECT state FROM pod_batches WHERE id=?", (batch,)).fetchone()
+            if authorize is not None and current["state"] == "queued":
+                # Admission/budget policy shares the durable dispatch transition.
+                # Reconciliation of an already-uncertain create must stay available.
+                authorize(db)
             dispatch = db.execute("""
                 UPDATE pod_batches SET state='provisioning'
                 WHERE id=? AND state='queued'

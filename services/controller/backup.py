@@ -20,7 +20,8 @@ from services.controller.service import canonical
 from workers.gpu.common import digest, sync_dir, timestamp
 
 TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
-          'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches'}
+          'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
+          'budget_approvals','budget_reservations','budget_events'}
 DB_NAME = 'database.sqlite'
 
 
@@ -85,6 +86,65 @@ def _tables(db):
     return names
 
 
+def _inspect_budget(db, names, projects):
+    """Preserve settled simulation history; never restore uncertain liabilities."""
+    ledger_tables = {'budget_approvals', 'budget_reservations', 'budget_events'}
+    if not names & ledger_tables:
+        return
+    require(ledger_tables <= names, 'Incomplete budget ledger schema')
+
+    def owner_matches(owner, project):
+        return project in projects and projects[project]['project']['owner_id'] == owner
+
+    def money(amount, positive=False):
+        return type(amount) is int and (1 if positive else 0) <= amount <= 2**53 - 1
+
+    approvals = {}
+    for identity, owner, project, raw, revoked, mode in db.execute(
+            'SELECT id,owner,project,terms,revoked,mode FROM budget_approvals'):
+        terms = json.loads(raw)
+        require(owner_matches(owner, project) and mode == 'simulation' and revoked in (0, 1),
+                'Invalid budget approval ownership or mode')
+        require(isinstance(terms, dict) and terms.get('currency') == 'USD' and
+                money(terms.get('approved_cents'), True) and
+                type(terms.get('max_runtime_seconds')) is int and 0 < terms['max_runtime_seconds'] <= 86400 and
+                isinstance(terms.get('profile'), dict) and bool(terms['profile']), 'Invalid budget approval terms')
+        timestamp(terms['valid_until'])
+        approvals[identity] = (owner, project)
+    reservations = {}
+    for batch, owner, project, approval, reserved, state, raw in db.execute(
+            'SELECT batch,owner,project,approval,reserved_cents,state,request FROM budget_reservations'):
+        require(owner_matches(owner, project) and approvals.get(approval) == (owner, project) and money(reserved, True),
+                'Invalid reservation ownership or approval')
+        require(state == 'settled', 'Outstanding budget liability must be explicitly settled before backup')
+        require('pod_batches' in names, 'Budget lifecycle unavailable')
+        pod = db.execute('SELECT project,state,cleanup FROM pod_batches WHERE id=?', (batch,)).fetchone()
+        require(pod and pod[0] == project and pod[1] in ('succeeded','failed','canceled') and pod[2] == 'confirmed',
+                'Settled budget lifecycle is not closed')
+        request = json.loads(raw)
+        require(request.get('approval_id') == approval and request.get('reservation_cents') == reserved,
+                'Reservation receipt mismatch')
+        reservations[batch] = (owner, project)
+    totals, settlements = {}, set()
+    for owner, project, batch, raw, kind, delta in db.execute(
+            'SELECT owner,project,batch,request,kind,amount_cents FROM budget_events ORDER BY rowid'):
+        request = json.loads(raw)
+        require(reservations.get(batch) == (owner, project) and kind in ('charge','settlement') and money(delta),
+                'Invalid billing event ownership or amount')
+        require(request.get('batch_id') == batch and request.get('kind') == kind and
+                money(request.get('amount_cents')) and isinstance(request.get('bill_reference'), str) and
+                bool(request['bill_reference'].strip()), 'Billing event receipt mismatch')
+        previous = totals.get(batch, 0)
+        if kind == 'settlement':
+            require(batch not in settlements and request['amount_cents'] >= previous and
+                    delta == request['amount_cents'] - previous, 'Invalid cumulative settlement')
+            settlements.add(batch)
+        else:
+            require(delta == request['amount_cents'], 'Incremental charge mismatch')
+        totals[batch] = previous + delta
+    require(settlements == set(reservations), 'Settled reservation lacks final billing evidence')
+
+
 def _inspect(db):
     require(db.execute('PRAGMA integrity_check').fetchall() == [('ok',)], 'Database integrity check failed')
     require(not db.execute('PRAGMA foreign_key_check').fetchall(), 'Database foreign key check failed')
@@ -136,6 +196,7 @@ def _inspect(db):
                     state in ('uploading','completed','expired','aborted'), 'Invalid upload session')
             if state == 'completed':
                 require(any(a['id'] == asset_id for a in projects[project_id]['assets']), 'Completed upload asset unavailable')
+    _inspect_budget(db, names, projects)
     return assets
 
 

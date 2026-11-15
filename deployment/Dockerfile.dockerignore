@@ -29,3 +29,6 @@
 !deployment/requirements.lock
 !scripts
 !scripts/validate_contract.py
+!src
+!src/wan_platform
+!src/wan_platform/*.py
