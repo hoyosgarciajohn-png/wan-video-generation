@@ -124,3 +124,31 @@ through controlled server responses. Production build/TypeScript and formatting
 pass. Tests remain DOM emulation and mocked HTTP responses; the Command Center's
 separate actual client/server smoke evidence covers the real transport. Native
 browser and owner creative acceptance remain open. No paid resources created.
+
+## Protected upload, timeline and export controls — November 15, 2026
+
+Connected References now sends file bytes to the protected asset endpoint; it
+never manufactures local fixture asset metadata. Images accept PNG/JPEG/WebP up
+to 1 MiB and audio accepts WAV/MP3 up to 4 MiB (`audio/x-wav` normalizes to
+`audio/wav`). Server response metadata is authoritative. A delayed file read
+cannot submit through stale clean-state callbacks after editing begins. Synthetic
+rendering still rejects image references; uploads prepare them for later Wan work.
+
+Added Timeline and export: select one soundtrack or none, assemble all current
+selected approved takes in saved order, queue export of a specific immutable
+timeline revision, observe export state and download the authenticated MP4.
+The soundtrack selector does not mark creator metadata dirty. Assembly/export
+require a clean workspace. Audio starts at zero, trims to the timeline, and pads
+with silence if shorter; manual trims/multi-track audio remain future work.
+Active exports participate in clean-only polling. Upload, assembly and export
+commands retain the exact original payload/key on ambiguous errors; pending
+commands also activate beforeunload protection.
+
+Validation: 14 model/client tests and 16 DOM tests, production build/TypeScript
+and formatting pass. New coverage checks command transport bodies, protected
+upload without browser-local metadata, unsupported audio rejection, delayed-read
+versus edit race, soundtrack selection/assembly, asynchronous export polling and
+authenticated download link attributes. DOM transport tests use controlled
+responses and do not establish native file-dialog/media decoding or browser
+acceptance. Command Center owns separate actual HTTP and exporter verification.
+No paid resources or external mutations were performed by this workstream.

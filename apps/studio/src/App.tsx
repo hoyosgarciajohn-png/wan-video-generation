@@ -1,4 +1,5 @@
 import { ShotEditor } from "./ShotEditor";
+import { TimelinePanel } from "./TimelinePanel";
 import { References } from "./References";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "./contract";
@@ -39,6 +40,16 @@ export function App({
     workspace: Workspace;
     owner: string;
     onChange: (workspace: Workspace) => void;
+    upload?: (
+      projectId: string,
+      data: { name: string; mime_type: string; data_base64: string },
+    ) => Promise<void>;
+    assemble?: (projectId: string, audioAssetId: string | null) => void;
+    exportTimeline?: (
+      projectId: string,
+      timelineId: string,
+      revision: number,
+    ) => void;
     clean?: boolean;
     onEditing?: () => void;
     submit?: (projectId: string, shots: string[], key: string) => void;
@@ -219,17 +230,21 @@ export function App({
             {project.bundle.project.runtime_limit_ms / 60000} min limit
           </p>
           <nav aria-label="Studio sections">
-            {["Storyboard", "References", "Render batches", "Take review"].map(
-              (name) => (
-                <button
-                  key={name}
-                  aria-current={tab === name ? "page" : undefined}
-                  onClick={() => setTab(name)}
-                >
-                  {name}
-                </button>
-              ),
-            )}
+            {[
+              "Storyboard",
+              "References",
+              "Render batches",
+              "Take review",
+              ...(connected ? ["Timeline and export"] : []),
+            ].map((name) => (
+              <button
+                key={name}
+                aria-current={tab === name ? "page" : undefined}
+                onClick={() => setTab(name)}
+              >
+                {name}
+              </button>
+            ))}
           </nav>
           <div className="project-stats">
             <strong>{project.bundle.shots.length}</strong> shots{" "}
@@ -251,6 +266,8 @@ export function App({
           tabIndex={-1}
           onInputCapture={(event) => {
             const input = event.target as HTMLInputElement;
+            if (input.type === "file" || input.dataset.commandInput === "true")
+              return;
             if (
               input.type === "checkbox" &&
               input.getAttribute("aria-label")?.startsWith("Select ")
@@ -550,7 +567,12 @@ export function App({
               <References
                 key={projectId}
                 project={project}
-                allowImport={!connected}
+                allowImport={connected ? Boolean(connected.clean) : true}
+                upload={
+                  connected
+                    ? (data) => connected.upload!(projectId, data)
+                    : undefined
+                }
                 edit={edit}
                 report={(e) => setError(errorMessage(e))}
               />
@@ -680,6 +702,19 @@ export function App({
                   </article>
                 ))}
               </section>
+            )}
+            {tab === "Timeline and export" && connected && (
+              <TimelinePanel
+                key={projectId}
+                project={project}
+                clean={Boolean(connected.clean)}
+                assemble={(audioAssetId) =>
+                  connected.assemble?.(projectId, audioAssetId)
+                }
+                exportTimeline={(timelineId, revision) =>
+                  connected.exportTimeline?.(projectId, timelineId, revision)
+                }
+              />
             )}
             {tab === "Take review" && (
               <section>

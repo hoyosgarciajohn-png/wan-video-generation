@@ -10,6 +10,29 @@ export type StudioCommand =
       expected_revision: number;
       idempotency_key: string;
     }
+  | {
+      kind: "upload";
+      projectId: string;
+      name: string;
+      mime_type: string;
+      data_base64: string;
+      expected_revision: number;
+      idempotency_key: string;
+    }
+  | {
+      kind: "timeline";
+      projectId: string;
+      audio_asset_id: string | null;
+      expected_revision: number;
+      idempotency_key: string;
+    }
+  | {
+      kind: "export";
+      projectId: string;
+      timeline_id: string;
+      timeline_revision: number;
+      idempotency_key: string;
+    }
   | { kind: "cancel"; projectId: string; batchId: string }
   | {
       kind: "review";
@@ -79,6 +102,44 @@ export class StudioClient {
   }
   async command(command: StudioCommand) {
     const prefix = `projects/${encodeURIComponent(command.projectId)}`;
+    if (command.kind === "upload") {
+      const {
+        name,
+        mime_type,
+        data_base64,
+        expected_revision,
+        idempotency_key,
+      } = command;
+      return (
+        await this.call<{ workspace: Workspace }>(`${prefix}/assets`, "POST", {
+          name,
+          mime_type,
+          data_base64,
+          expected_revision,
+          idempotency_key,
+        })
+      ).workspace;
+    }
+    if (command.kind === "timeline") {
+      const { audio_asset_id, expected_revision, idempotency_key } = command;
+      return (
+        await this.call<{ workspace: Workspace }>(
+          `${prefix}/timelines`,
+          "POST",
+          { audio_asset_id, expected_revision, idempotency_key },
+        )
+      ).workspace;
+    }
+    if (command.kind === "export") {
+      const { timeline_id, timeline_revision, idempotency_key } = command;
+      return (
+        await this.call<{ workspace: Workspace }>(`${prefix}/exports`, "POST", {
+          timeline_id,
+          timeline_revision,
+          idempotency_key,
+        })
+      ).workspace;
+    }
     if (command.kind === "submit") {
       const { shot_ids, expected_revision, idempotency_key } = command;
       return (

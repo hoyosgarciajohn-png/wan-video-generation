@@ -9,9 +9,15 @@ export function References({
   edit,
   report,
   allowImport = true,
+  upload,
 }: {
   project: StudioProject;
   allowImport?: boolean;
+  upload?: (data: {
+    name: string;
+    mime_type: string;
+    data_base64: string;
+  }) => Promise<void>;
   edit: (change: Edit, message: string) => void;
   report: (error: unknown) => void;
 }) {
@@ -23,13 +29,11 @@ export function References({
       const image = ["image/png", "image/jpeg", "image/webp"].includes(
         file.type,
       );
-      const audio = [
-        "audio/wav",
-        "audio/x-wav",
-        "audio/mpeg",
-        "audio/mp4",
-        "audio/ogg",
-      ].includes(file.type);
+      const audio = (
+        upload
+          ? ["audio/wav", "audio/x-wav", "audio/mpeg"]
+          : ["audio/wav", "audio/x-wav", "audio/mpeg", "audio/mp4", "audio/ogg"]
+      ).includes(file.type);
       if (
         (!image && !audio) ||
         file.size < 1 ||
@@ -42,6 +46,14 @@ export function References({
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
+      if (upload) {
+        await upload({
+          name: file.name,
+          mime_type: file.type === "audio/x-wav" ? "audio/wav" : file.type,
+          data_base64: data.slice(data.indexOf(",") + 1),
+        });
+        return;
+      }
       let duration: number | null = null;
       if (image)
         await new Promise<void>((resolve, reject) => {
@@ -97,19 +109,23 @@ export function References({
     <section aria-labelledby="refs-heading">
       <h2 id="refs-heading">References and source material</h2>
       <p className="muted">
-        {allowImport
-          ? "Reuse character and location images across shots. Images up to 1 MB and audio up to 4 MB are saved in this browser for the rehearsal."
-          : "Review server references and edit their names or your creative brief. Use Save to server to persist changes."}
+        {upload
+          ? "Upload PNG, JPEG or WebP images up to 1 MiB, or WAV/MP3 audio up to 4 MiB. The server verifies media bytes. Image references can be stored for future Wan workflows; current synthetic renders do not support them."
+          : allowImport
+            ? "Reuse character and location images across shots. Images up to 1 MB and audio up to 4 MB are saved in this browser for the rehearsal."
+            : "Review server references and edit their names or your creative brief. Use Save to server to persist changes."}
       </p>
-      {!allowImport && (
-        <p>Reference uploads are not connected to the server yet.</p>
-      )}
+      {!allowImport && <p>Save pending edits before uploading a reference.</p>}
       <label className="upload">
         Add image or soundtrack
         <input
           type="file"
           disabled={busy || !allowImport}
-          accept="image/png,image/jpeg,image/webp,audio/wav,audio/mpeg,audio/mp4,audio/ogg"
+          accept={
+            upload
+              ? "image/png,image/jpeg,image/webp,audio/wav,audio/x-wav,audio/mpeg"
+              : "image/png,image/jpeg,image/webp,audio/wav,audio/mpeg,audio/mp4,audio/ogg"
+          }
           onChange={(e) => {
             void importFile(e.target.files?.[0]);
             e.target.value = "";

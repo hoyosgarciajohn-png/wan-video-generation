@@ -1,8 +1,9 @@
 // From apps/studio: node --import tsx ../../scripts/check_studio_client.mjs
 // Actual TypeScript client + Python HTTP server. No browser or cloud is implied.
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
-import { mkdtemp, rm, readFile } from 'node:fs/promises';
+import { spawn, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { mkdtemp, rm, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,9 +21,11 @@ from services.controller.service import ControlService
 from services.controller.studio import StudioWorkspace
 from services.controller.http_api import StudioAPI, make_server
 from services.controller.runner import FixtureRunner
+from services.controller.export_runner import ExportRunner
 c=ControlService(os.environ['WAN_TEST_DB'], os.environ['WAN_TEST_ASSETS'])
 s=make_server(StudioAPI(StudioWorkspace(c), {os.environ['WAN_TEST_TOKEN']:'client-owner'}), ('127.0.0.1',0))
 threading.Thread(target=FixtureRunner(c).serve,args=(threading.Event(),),daemon=True).start()
+threading.Thread(target=ExportRunner(c).serve,args=(threading.Event(),),daemon=True).start()
 print(s.server_port, flush=True)
 s.serve_forever()
 `;
@@ -66,13 +69,22 @@ try {
   workspace.projects[0].scenes[0].title = 'Updated opening';
   workspace = await client.save(workspace);
   await assert.rejects(client.save(stale), (error) => error.code === 409);
-  const loaded = await client.load();
+  let loaded = await client.load();
   assert.equal(loaded.projects[0].script, project.script);
   assert.equal(loaded.projects[0].bundle.shots.length, 1);
   assert.equal(loaded.projects[0].scenes[0].title, 'Updated opening');
   assert.equal(loaded.projects[0].bundle.project.owner_id, 'client-owner');
   assert.equal(loaded.projects[0].bundle.takes.length, 0);
   const projectId = loaded.projects[0].bundle.project.id;
+  const audio = await readFile(join(root, 'fixtures/media/audio.wav'));
+  const upload = { kind: 'upload', projectId, name: 'Synthetic soundtrack.wav', mime_type: 'audio/wav',
+    data_base64: audio.toString('base64'), expected_revision: loaded.revision,
+    idempotency_key: 'actual-client-audio-1' };
+  loaded = await client.command(upload);
+  const uploaded = loaded.projects[0].bundle.assets.find((asset) => asset.kind === 'audio');
+  assert.ok(uploaded);
+  const uploadReplay = await client.command(upload);
+  assert.equal(uploadReplay.projects[0].bundle.assets.length, 1);
   const submit = { kind: 'submit', projectId, shot_ids: ['shot-1'],
     expected_revision: loaded.revision, idempotency_key: 'actual-client-render-1' };
   let rendered = await client.command(submit);
@@ -105,9 +117,37 @@ try {
   const canceled = await client.command({ kind: 'cancel', projectId, batchId: second.id });
   assert.ok(['canceled', 'succeeded'].includes(canceled.projects[0].bundle.batches.find((batch) => batch.id === second.id).state));
   // Completion can win the race; deterministic pre-claim cancellation is covered in Python.
+  const assembly = { kind: 'timeline', projectId, audio_asset_id: uploaded.id,
+    expected_revision: canceled.revision, idempotency_key: 'actual-client-timeline-1' };
+  const assembled = await client.command(assembly);
+  const timeline = assembled.projects[0].bundle.timelines.at(-1);
+  assert.equal(timeline.duration_ms, 2000);
+  assert.equal(timeline.audio[0].asset_id, uploaded.id);
+  const exportRequest = { kind: 'export', projectId, timeline_id: timeline.id,
+    timeline_revision: timeline.revision, idempotency_key: 'actual-client-export-1' };
+  let exported = await client.command(exportRequest);
+  const exportDeadline = Date.now() + 20000;
+  while (['queued', 'rendering'].includes(exported.projects[0].bundle.exports[0].state) && Date.now() < exportDeadline) {
+    await new Promise((done) => setTimeout(done, 100));
+    exported = await client.load();
+  }
+  const completed = exported.projects[0].bundle.exports[0];
+  assert.equal(completed.state, 'succeeded');
+  const exportReplay = await client.command(exportRequest);
+  assert.equal(exportReplay.projects[0].bundle.exports.length, 1);
+  const finalResponse = await browserLikeTransport(exported.projects[0].media[completed.output_asset_id], { method: 'GET', headers: {} });
+  assert.equal(finalResponse.status, 200);
+  const finalPath = join(directory, 'downloaded-export.mp4');
+  await writeFile(finalPath, Buffer.from(await finalResponse.arrayBuffer()));
+  const { stdout } = await promisify(execFile)('ffprobe', ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', finalPath]);
+  const inspected = JSON.parse(stdout);
+  assert.ok(inspected.streams.some((stream) => stream.codec_type === 'video'));
+  assert.ok(inspected.streams.some((stream) => stream.codec_type === 'audio'));
+  assert.ok(Math.abs(Number(inspected.format.duration) - 2) < .1);
+  await promisify(execFile)('ffmpeg', ['-v', 'error', '-xerror', '-i', finalPath, '-f', 'null', '-']);
   await client.logout();
   await assert.rejects(client.load(), (error) => error.code === 401);
-  console.log('PASS: actual StudioClient login/save/render/download/review/replay/cancel/logout over local HTTP');
+  console.log('PASS: actual StudioClient upload/render/review/timeline/export/download/decode/replay/logout over local HTTP');
 } finally {
   clearTimeout(timer);
   lines.close();

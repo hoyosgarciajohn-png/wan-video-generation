@@ -22,6 +22,8 @@ export function ConnectedStudio({
   const [generation, setGeneration] = useState(0);
   const [create, setCreate] = useState(false);
   const [recovery, setRecovery] = useState<Workspace>();
+  const commandState = useRef({ dirty, editing, busy, conflict, pending });
+  commandState.current = { dirty, editing, busy, conflict, pending };
   function accept(next: Workspace, remount = true) {
     freshness.current++;
     setWorkspace(next);
@@ -41,14 +43,14 @@ export function ConnectedStudio({
     }
   }
   useEffect(() => {
-    if (!dirty && !editing && !recovery) return;
+    if (!dirty && !editing && !recovery && !pending) return;
     const preventLoss = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = "";
     };
     window.addEventListener("beforeunload", preventLoss);
     return () => window.removeEventListener("beforeunload", preventLoss);
-  }, [dirty, editing, recovery]);
+  }, [dirty, editing, recovery, pending]);
   useEffect(() => {
     let active = true;
     void (async () => {
@@ -81,7 +83,17 @@ export function ConnectedStudio({
     }
   }
   async function runCommand(command: StudioCommand) {
-    if (dirty || editing || busy || conflict) return;
+    const latest = commandState.current;
+    if (
+      latest.dirty ||
+      latest.editing ||
+      latest.busy ||
+      latest.conflict ||
+      (latest.pending && latest.pending !== command)
+    ) {
+      setError("Save pending edits before sending a server command.");
+      return;
+    }
     freshness.current++;
     setPending(command);
     await action(async () => {
@@ -98,7 +110,7 @@ export function ConnectedStudio({
   }
   const active =
     workspace?.projects.some((p) =>
-      p.bundle.batches.some(
+      [...p.bundle.batches, ...p.bundle.exports].some(
         (b) => !["succeeded", "failed", "canceled"].includes(b.state),
       ),
     ) ?? false;
@@ -132,8 +144,9 @@ export function ConnectedStudio({
         <p>
           Server fixture rendering produces silent synthetic test clips up to
           five seconds (320×180, 24 fps), with no reference images or GPU
-          rental. These are not Wan-generated results. Uploads and exports are
-          not connected yet.
+          rental. These are not Wan-generated results. Upload references,
+          assemble accepted takes and export a soundtrack-backed video using the
+          server.
         </p>
         {error && <p role="alert">{error}</p>}
         {pending && (
@@ -312,6 +325,30 @@ export function ConnectedStudio({
             connected={{
               workspace,
               owner,
+              upload: (projectId, data) =>
+                runCommand({
+                  kind: "upload",
+                  projectId,
+                  ...data,
+                  expected_revision: workspace.revision,
+                  idempotency_key: crypto.randomUUID(),
+                }),
+              assemble: (projectId, audio_asset_id) =>
+                void runCommand({
+                  kind: "timeline",
+                  projectId,
+                  audio_asset_id,
+                  expected_revision: workspace.revision,
+                  idempotency_key: crypto.randomUUID(),
+                }),
+              exportTimeline: (projectId, timeline_id, timeline_revision) =>
+                void runCommand({
+                  kind: "export",
+                  projectId,
+                  timeline_id,
+                  timeline_revision,
+                  idempotency_key: crypto.randomUUID(),
+                }),
               clean: !dirty && !editing && !busy && !conflict && !pending,
               onEditing: () => {
                 freshness.current++;
