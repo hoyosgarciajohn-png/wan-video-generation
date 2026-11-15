@@ -23,7 +23,8 @@ MAX_EVIDENCE = 64 * 1024 ** 2
 # Only unused SDK installations on the disposable GitHub-hosted VM may be removed.
 # No Docker images, workspace paths, caches or user files are pruned.
 UNUSED_SDKS = ('/usr/share/dotnet', '/usr/local/lib/android', '/opt/ghc',
-               '/usr/local/share/powershell', '/usr/share/swift')
+               '/usr/local/share/powershell', '/usr/share/swift',
+               '/usr/lib/jvm', '/opt/hostedtoolcache/CodeQL')
 
 
 def require_capacity(target, free_bytes, memory_bytes):
