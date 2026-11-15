@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.10 | November 15, 2026 | Owner: John Hoyos
+Version 1.11 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -185,3 +185,45 @@ orphan retention and hosting remain open. No cloud deployment, GPU allocation or
 spending occurred.
 
 Previous publication: [budget/build gates PR #25](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/25) merged at `a3ceceeb1e7e38329fdbaf58ea6e601f4a1105ae`.
+
+## First real-run readiness checkpoint
+
+A fresh host audit found no container daemon/tools, NVIDIA device/runtime or
+installed Wan/PyTorch stack. Standard daemon sockets are absent and a local Unix
+socket bind is denied. No compatible compute-host connection was available.
+Static inspection found no evidenced Docker pin/import defect to change; image
+build and CUDA gates remain UNVERIFIED. See deployment/FIRST_WAN_RUN.md.
+
+The next owner decisions are concrete: identify an existing approved Linux amd64
+Docker build host (or choose a host provisioned separately), specify the first
+project's dollar ceiling, maximum elapsed runtime and retry allowance, and choose
+the HTTPS controller/persistent storage location. Runpod credentials must then be
+provided through protected secret handling, never pasted into the handoff.
+
+Those inputs do not finish the software. WorkerTransport still admits only
+zero-cost fixture batches and the coordinator still accepts only the fake provider.
+Real Wan admission must connect server-side budget reservation, model/image policy,
+scoped credentials, provider reconciliation and independent cleanup. Supplying a
+GPU URL or deleting the fixture guard is not an acceptable substitute.
+
+Further local fixture code cannot demonstrate actual Wan image compatibility,
+creative quality, VRAM demand or billed cost. The next meaningful acceptance step
+requires the host/owner prerequisites, remaining real-admission implementation and
+an observed capped one-shot benchmark. No GPU, cloud deployment or spending was
+started during this readiness review. Full hosted B05 and B06 remain open.
+
+The offline preflight now binds non-secret run intent to current source/model
+hashes and checks supplied build logs, image identity and fixture bytes for local
+consistency. Missing or fabricated PASS-only evidence remains invalid. Owner
+attestation files are consistency inputs, not authenticated spending authority.
+Saved reports are write-once and detect changed bytes or source; neither their
+hashes nor the report can authorize execution. Both readiness and execution flags
+remain false, including when every supplied input is internally consistent.
+
+Validation for this checkpoint: 121 Python root tests pass, including ten new
+preflight/review cases; eight build-verifier tests and the shared contract pass.
+The checked-in docs/REAL_RUN_PREFLIGHT.json was generated with empty owner inputs
+and verifies against current source. All nine gates remain missing or blocked.
+See docs/REAL_RUN_PREFLIGHT.md for evidence limits and exact plan fields.
+
+Previous publication: [remote bridge PR #26](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/26) merged at `8ee3150938d7b569b48b354b5f109f827b7b0052`.
