@@ -53,3 +53,20 @@ provider lifecycle/budget integration, and a buildable pinned Wan runtime.
 Docker, Podman and buildctl are absent in the current environment; no container
 build is claimed. Native browser acceptance and full hosted B05 remain open.
 No deployment or GPU spend occurred.
+
+## Recovery and staging source readiness
+
+Local backup/restore now verifies SQLite snapshots and immutable committed media,
+fences interrupted render attempts, aborts incomplete uploads, and preserves
+queued exports for recovery. An independent rehearsal restores actual synthetic
+takes and completed output, resumes a pending worker/export, and fully decodes
+recovered MP4 files. The 93-test Python root suite passes, including corruption,
+traversal, overwrite refusal and source-snapshot consistency checks.
+
+The staging package serves built Studio and authenticated API on one loopback
+origin, keeps secrets/state outside the build context, and supplies health and
+shutdown handling. Eight staging tests pass, including recovered-project HTTP access and shutdown.
+Source packaging is checked; no container build or deployment
+has occurred because Docker/Podman/buildctl are unavailable. See BACKUP_RESTORE.md
+and DEPLOYMENT_READINESS.md. Full hosted B05 and native browser acceptance remain
+open, and no provider requests or GPU spending occurred.
