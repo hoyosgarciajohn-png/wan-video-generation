@@ -12,7 +12,7 @@ The Command Center integrates the common baseline and owns `contracts/`, `docs/`
 
 Branches start from the merged B00 foundation. First read your GitHub issue and the root AGENTS.md. Contracts and fixtures are the shared development input. The current fake provider intentionally allows duplicate allocation on blind retry, so the B02 controller must reconcile ambiguous creates.
 
-All prior owner authorizations carry forward. Preparation and fictional development can proceed. The Runpod benchmark dollar ceiling and maximum runtime are still to be specified. Human-input checks happen in the owner's live session.
+All prior owner authorizations carry forward. Preparation and fictional development can proceed. John approved the first trial at $5 total / 30 minutes / one attempt on November 15, 2026; see deployment/first-render-proposal.json. Keep host/image acceptance separate and do not request the same numeric approval again. Human-input checks happen in the owner's live session.
 
 Each handoff includes issue/PR links, commit, contract version, actual checks, remaining issues, costs and active resources. A workstream is ready when its issue has the inputs needed to begin. Record in progress only after the chat or engineer actually starts. Chat dispatch is through these shared records and user messages.
 

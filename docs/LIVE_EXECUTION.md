@@ -61,6 +61,6 @@ Charge events require an observed resource and a reserved/settled reservation. R
 
 ## Remaining operational gates
 
-Source implementation is not deployment. John has not supplied an actual approved project cap/runtime. Installed trust roots, authenticated hosted identity/storage, executed build/GPU acceptance, network-model cache verification, scheduler installation, billing reconciliation and release approval remain pending. Budget estimates are not provider-enforced hard spending stops. Provider outage or cleanup failure retains uncertainty and liability.
+Source implementation is not deployment. John approved the first-trial $5 total / 30-minute / one-attempt envelope on November 15, 2026; see deployment/first-render-proposal.json. The decision is recorded, but a signed runtime grant is not installed. Installed trust roots, authenticated hosted identity/storage, executed build/GPU acceptance, network-model cache verification, scheduler installation, billing reconciliation and release approval remain pending. Budget estimates are not provider-enforced hard spending stops. Provider outage or cleanup failure retains uncertainty and liability.
 
 Focused tests: `python -m unittest discover -s tests -p 'test_live_execution*.py' -v`. The tests use fictional API transport and delegated signatures. Worker media checks, including actual FFmpeg output where exercised, remain synthetic acceptance evidence.

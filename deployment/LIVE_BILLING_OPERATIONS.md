@@ -81,6 +81,7 @@ allocation and retention policy. Terminating a Pod does not authorize deleting a
 shared volume. Establish how storage, transfer and build costs count against the
 total project allowance before launch; do not describe untracked costs as zero.
 
-Actual owner spending terms, verified image/host/storage evidence, reconciler
-credentials, live invoice ingestion and observed cleanup remain operational inputs.
+Owner spending terms are recorded in first-render-proposal.json. Binding those
+terms to installed runtime authority, verified image/host/storage evidence, reconciler
+credentials, live invoice ingestion and observed cleanup remain operational work.
 No test receipt in the repository is an approval to use John's account.
