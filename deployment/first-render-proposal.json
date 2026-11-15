@@ -1,14 +1,21 @@
 {
   "schema_version": 1,
   "as_of": "2026-11-15",
-  "status": "PROPOSED_NOT_APPROVED",
-  "purpose": "decision worksheet only; not consumed as authority",
+  "status": "OWNER_APPROVED_INFRASTRUCTURE_PENDING",
+  "purpose": "owner decision record; not a signed runtime grant or launch configuration",
   "execution_enabled": false,
   "reviewed_source_commit": "21a5bcab35db6ef047f9190c4185b38415f8882f",
-  "approved_cap_cents": null,
-  "approved_runtime_seconds": null,
-  "approval_reference": null,
-  "proposed": {
+  "approved_cap_cents": 500,
+  "approved_runtime_seconds": 1800,
+  "approval_reference": "Command Center chat, November 15 2026: John replied Yes you are approved to the $5 / 30 minutes / one attempt proposal",
+  "verified_build_host": null,
+  "verified_controller_origin": null,
+  "verified_watchdog_host": null,
+  "verified_registry_digest": null,
+  "runpod_account_state": "CONNECTED_READ_ACCESS_VERIFIED",
+  "automatic_bill_retrieval": "CONNECTOR_READ_VERIFIED_APPLICATION_COLLECTOR_PENDING",
+  "provider_hard_spending_stop": false,
+  "approved_terms": {
     "currency": "USD",
     "overall_cap_cents": 500,
     "pod_cap_and_reservation_cents": 400,
@@ -26,11 +33,14 @@
     "watchdog_poll_target_seconds": 15,
     "other_paid_services_allowed": false
   },
-  "verified_build_host": null,
-  "verified_controller_origin": null,
-  "verified_watchdog_host": null,
-  "verified_registry_digest": null,
-  "runpod_account_state": "SIGN_IN_REQUIRED",
-  "automatic_bill_retrieval": "PENDING",
-  "provider_hard_spending_stop": false
+  "gpu_availability_check": {
+    "date": "2026-11-15",
+    "cloud": "SECURE",
+    "product": "POD",
+    "gpu_count": 1,
+    "min_cuda_version": "12.8",
+    "availability": "NONE",
+    "catalog_secure_price_usd_per_hour": "0.89",
+    "capacity_reserved": false
+  }
 }

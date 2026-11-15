@@ -60,8 +60,8 @@ bounded operation and recovery window; the worker journal binds to the original
 credential and fails closed after rotation. Checkpoint verification runs in each
 inference process and belongs in the runtime budget.
 
-Current host findings and the unapproved $5 / 30-minute / one-attempt proposal are
-in `FIRST_RENDER_PROPOSAL.md`. No numeric owner approval has been recorded.
+Current host findings and the approved $5 / 30-minute / one-attempt limits are
+in `FIRST_RENDER_PROPOSAL.md`. Infrastructure and executable authority remain pending.
 
 The worker transport caps an MP4 at 32 MiB. The first benchmark must verify output
 size fits; changing this cap requires a coordinated server/client review.
@@ -80,7 +80,7 @@ size fits; changing this cap requires a coordinated server/client review.
    chosen TLS controller and secret injection without printing tokens. Use
    writable private mounts for worker output/journals and reference cache;
    model weights are read-only during inference.
-4. Obtain the specific budget/runtime approval and arrange independently
+4. Apply the recorded budget/runtime approval and arrange independently
    enforceable cleanup. Confirm the selected GPU and driver work with the
    pinned image before admitting the one-shot benchmark.
 5. Use the benchmark profile and invocation in `workers/gpu/README.md` with

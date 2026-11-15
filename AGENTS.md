@@ -2,7 +2,7 @@
 
 Read README.md, docs/WAN_00_Master_Handoff.md, docs/CONTRACT.md and your assigned issue. Verify the repository, branch and baseline commit before editing. Source ownership is listed in docs/WORKSTREAMS.md.
 
-The product self-hosts Wan on rented GPU infrastructure. Paid generation APIs are outside the approved architecture. Prepare production adapters using fictional fixtures. GPU spending requires a project-specific dollar ceiling and runtime envelope. The current allocation is unset. Keep secrets in environment or service secret storage, and keep model weights and user media outside Git.
+The product self-hosts Wan on rented GPU infrastructure. Paid generation APIs are outside the approved architecture. Prepare production adapters using fictional fixtures. GPU spending requires a project-specific dollar ceiling and runtime envelope. John approved the first trial on November 15, 2026: $5 total, 1,800 seconds from admission, one five-second shot and one attempt. The approved envelope in deployment/first-render-proposal.json allocates $4 to the Pod and $1 to separately tracked storage. Do not request the same numeric approval again. This does not verify infrastructure or install runtime authority. Keep secrets in environment or service secret storage, and keep model weights and user media outside Git.
 
 Use isolated branches and reviewable pull requests. Coordinate shared contract changes through an issue naming affected consumers. Preserve existing accepted takes and timeline revisions. Namespace every asset and job by project and check ownership at server entry points. Persist job state outside the GPU. Reconcile ambiguous provider creation before retrying and track cleanup independently from rendering.
 

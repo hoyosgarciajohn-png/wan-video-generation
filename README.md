@@ -26,4 +26,4 @@ Install FFmpeg, including ffprobe, through your operating system package manager
 
 The 0.1.0 schema and complete fictional project live under `contracts/` and `fixtures/`. The previous starter ZIP is an archived draft. Use this repository as the current source for implementations.
 
-The [build/hosting review and first-render proposal](deployment/FIRST_RENDER_PROPOSAL.md) records the remaining host evidence, Runpod sign-in requirement and unapproved $5 / 30-minute / one-attempt envelope. No spending approval or live activation is implied.
+The [build/hosting review and first-render proposal](deployment/FIRST_RENDER_PROPOSAL.md) records the remaining host evidence, verified Runpod connection and owner-approved $5 / 30-minute / one-attempt envelope. Build, hosting and runtime authority remain unverified; live execution is not enabled.
