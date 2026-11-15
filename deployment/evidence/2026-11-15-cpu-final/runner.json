@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-11-15T23:17:52.672906+00:00",
+  "target": "cpu",
+  "source_commit": "a5af75b5da18bb668a8334b6418333dec2f5dc77",
+  "run_id": "43773935725",
+  "run_attempt": "1",
+  "status": "PASS",
+  "removed_unused_sdks": [],
+  "required_free_bytes": 6442450944,
+  "docker_endpoint": "unix:///var/run/docker.sock",
+  "docker_root": "/var/lib/docker",
+  "free_bytes_before": 16965591040,
+  "free_bytes_after": 16965591040,
+  "memory_bytes": 8154017792
+}
