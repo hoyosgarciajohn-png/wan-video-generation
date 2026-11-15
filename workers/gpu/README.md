@@ -34,7 +34,7 @@ docker run --rm --network none \
   wan-worker:b01 fixture --output-root /outputs --result /outputs/container-result.json
 ```
 
-Record the final built image digest and build log before B01 acceptance. The current host has no Docker/Podman/BuildKit executable or CUDA GPU, so image build and runtime import verification remain pending. Dependency resolution and image digest lookup succeeded. Reproducibility covers pinned build inputs. GPU bitwise determinism requires measurement on the target host.
+Record the final built image digest and build log before B01 acceptance. The current host has no Docker/Podman or CUDA GPU. A subsequent local attempt installed checksum-verified BuildKit 0.35.0, but its required internal Unix socket was denied by the host. Image build and runtime import verification remain pending. The exact attempt is recorded in `evidence/BUILD_ATTEMPT.md`. Dependency resolution and image digest lookup succeeded. Reproducibility covers pinned build inputs. GPU bitwise determinism requires measurement on the target host.
 
 ## Model and duration profile
 
