@@ -22,7 +22,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
-          'live_approvals','live_reservations','live_job_links'}
+          'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings'}
 DB_NAME = 'database.sqlite'
 
 
@@ -187,10 +187,11 @@ def _inspect_real_jobs(db, names, projects):
 
 
 def _inspect_live_admission(db, names, projects):
-    """Restore only never-dispatched released history; signature keys are external."""
+    """Restore released or fully settled history; signing keys remain external."""
     tables = {'live_approvals','live_reservations','live_job_links'}
     if not names & tables:
-        return
+        require(not names & {'live_billing_events','live_execution_bindings'}, 'Orphan live execution schema')
+        return set()
     require(tables <= names, 'Incomplete live admission schema')
     from services.controller.live_admission import GRANT_FIELDS, configuration_hash
     from services.controller.real_jobs import RealJobBridge
@@ -224,7 +225,7 @@ def _inspect_live_admission(db, names, projects):
     seen = set()
     for batch_id, owner, project, approval, raw, reserved, state in db.execute(
             'SELECT batch,owner,project,approval,request,reserved_cents,state FROM live_reservations'):
-        require(approval in approvals and approvals[approval][:2] == (owner,project) and state == 'released' and
+        require(approval in approvals and approvals[approval][:2] == (owner,project) and state in ('released','settled') and
                 type(reserved) is int and 0 < reserved <= approvals[approval][2]['approved_cents'],
                 'Live reservation is unresolved or has invalid ownership')
         request = json.loads(raw)
@@ -232,15 +233,62 @@ def _inspect_live_admission(db, names, projects):
                 'Live reservation receipt mismatch')
         require('pod_batches' in names, 'Live lifecycle missing')
         pod = db.execute('SELECT project,state,cleanup,pod_id,snapshot FROM pod_batches WHERE id=?',(batch_id,)).fetchone()
-        require(pod and tuple(pod[:4]) == (project,'canceled','confirmed',None), 'Live job may have dispatched')
+        require(pod and pod[0] == project and pod[1] in ('succeeded','failed','canceled') and pod[2] == 'confirmed',
+                'Live resource cleanup is unresolved')
         link = db.execute('SELECT owner,project,approval,config_hash,dispatch_state FROM live_job_links WHERE batch=?',(batch_id,)).fetchone()
-        require(link and tuple(link) == (owner,project,approval,approvals[approval][3],'disabled'), 'Live authority link mismatch')
+        require(link and tuple(link[:4]) == (owner,project,approval,approvals[approval][3]) and link[4] in ('disabled','attempted'),
+                'Live authority link mismatch')
+        events = (db.execute('SELECT id,owner,project,kind,amount_cents,envelope FROM live_billing_events WHERE batch=? ORDER BY rowid',
+                            (batch_id,)).fetchall() if 'live_billing_events' in names else [])
+        spent, settlements = 0, 0
+        for event_id, event_owner, event_project, kind, delta, raw_event in events:
+            envelope = json.loads(raw_event)
+            require(isinstance(envelope, dict) and set(envelope) == {'key_id','payload','signature'} and
+                    isinstance(envelope['key_id'], str) and hex_hash(envelope['signature']), 'Invalid billing envelope')
+            receipt = envelope['payload']
+            require(isinstance(receipt, dict) and set(receipt) == {'id','owner','project','batch','kind','amount_cents','bill_reference','valid_until','provider_resource_id','currency'} and
+                    (event_owner,event_project) == (owner,project) and
+                    (receipt['id'],receipt['owner'],receipt['project'],receipt['batch'],receipt['kind'],receipt['provider_resource_id'],receipt['currency']) ==
+                    (event_id,owner,project,batch_id,kind,pod[3],'USD') and kind in ('charge','settlement') and
+                    type(delta) is int and delta >= 0 and type(receipt['amount_cents']) is int and
+                    0 <= receipt['amount_cents'] <= 2**53-1 and isinstance(receipt['bill_reference'], str) and bool(receipt['bill_reference']),
+                    'Billing receipt scope or amount mismatch')
+            timestamp(receipt['valid_until'])
+            if kind == 'settlement':
+                require(settlements == 0 and receipt['amount_cents'] >= spent and delta == receipt['amount_cents']-spent,
+                        'Invalid cumulative live settlement')
+                settlements += 1
+            else:
+                require(pod[3] is not None and delta == receipt['amount_cents'], 'Invalid live charge')
+            spent += delta
+        require((state == 'released' and not events) or (state == 'settled' and settlements == 1),
+                'Live released/settled history lacks matching final evidence')
         batch = next((b for b in projects[project]['batches'] if b['id'] == batch_id),None)
         require(batch and batch['execution_mode'] == 'runpod' and batch['model_profile'] == LOCK['profile'] and
-                (batch['state'],batch['cleanup_state'],batch['provider_resource_id']) == ('canceled','confirmed',None) and
-                batch['budget'] == dict(currency='USD',approved_cents=approvals[approval][2]['approved_cents'],reserved_cents=0,spent_cents=0),
-                'Released live canonical record mismatch')
-        require(not any(a['batch_id'] == batch_id for a in projects[project]['attempts']), 'Live worker activity cannot be restored by admission-only recovery')
+                (batch['state'],batch['cleanup_state'],batch['provider_resource_id']) == tuple(pod[1:4]) and
+                batch['budget'] == dict(currency='USD',approved_cents=approvals[approval][2]['approved_cents'],reserved_cents=0,spent_cents=spent),
+                'Closed live canonical record mismatch')
+        binding = (db.execute('SELECT credential,host_envelope FROM live_execution_bindings WHERE batch=?',(batch_id,)).fetchone()
+                   if 'live_execution_bindings' in names else None)
+        if link[4] == 'disabled':
+            require(pod[3] is None and pod[1] == 'canceled' and spent == 0 and binding is None and
+                    not any(a['batch_id'] == batch_id for a in projects[project]['attempts']), 'Undispatched history contains execution evidence')
+        else:
+            require(state == 'settled' and binding and 'worker_credentials' in names, 'Dispatched live history is not settled or bound')
+            credential = db.execute('SELECT owner,project,batch FROM worker_credentials WHERE id=?',(binding[0],)).fetchone()
+            require(credential and tuple(credential) == (owner,project,batch_id), 'Execution credential scope mismatch')
+            host = json.loads(binding[1])
+            require(isinstance(host,dict) and set(host) == {'key_id','payload','signature'} and hex_hash(host['signature']) and
+                    isinstance(host['key_id'],str) and bool(host['key_id']) and isinstance(host['payload'],dict) and
+                    set(host['payload']) == {'owner','project','config_hash','source_sha256','build_manifest_sha256','valid_until','worker_endpoint','storage_id'} and
+                    host['payload']['source_sha256'] == approvals[approval][2]['source_sha256'] and
+                    hex_hash(host['payload']['build_manifest_sha256']) and
+                    host['payload']['worker_endpoint'] == approvals[approval][2]['profile']['worker_endpoint'] and
+                    host['payload']['storage_id'] == approvals[approval][2]['profile']['storage_id'] and
+                    host['payload'].get('owner') == owner and
+                    host['payload'].get('project') == project and host['payload'].get('config_hash') == approvals[approval][3],
+                    'Execution host binding mismatch')
+            timestamp(host['payload']['valid_until'])
         frozen = json.loads(pod[4])
         require(frozen.get('mode') == 'live_pending' and frozen.get('config_hash') == approvals[approval][3] and
                 all(frozen['canonical_batch'][k] == batch[k] for k in
@@ -248,6 +296,10 @@ def _inspect_live_admission(db, names, projects):
                 'Live immutable snapshot mismatch')
         seen.add(batch_id)
     require(seen == {row[0] for row in db.execute('SELECT batch FROM live_job_links')}, 'Unmatched live authority link')
+    for table in ('live_billing_events','live_execution_bindings'):
+        if table in names:
+            require({row[0] for row in db.execute('SELECT batch FROM '+table)} <= seen, 'Orphan live execution history')
+    return seen
 
 
 def _inspect(db):
@@ -302,6 +354,7 @@ def _inspect(db):
             if state == 'completed':
                 require(any(a['id'] == asset_id for a in projects[project_id]['assets']), 'Completed upload asset unavailable')
     linked_test_jobs = _inspect_real_jobs(db, names, projects)
+    linked_live_jobs = _inspect_live_admission(db, names, projects)
     if 'worker_credentials' in names:
         for token_hash, owner, project_id, batch_id, worker, expires, revoked in db.execute(
                 'SELECT token_hash,owner,project,batch,worker,expires,revoked FROM worker_credentials'):
@@ -310,14 +363,13 @@ def _inspect(db):
             batch = next((b for b in projects[project_id]['batches'] if b['id'] == batch_id), None)
             require(batch and ((batch['execution_mode'] == 'fixture' and
                     all(batch['budget'][key] == 0 for key in ('approved_cents','reserved_cents','spent_cents'))) or
-                    batch_id in linked_test_jobs), 'Worker credential batch has no valid fixture/test binding')
+                    batch_id in linked_test_jobs or batch_id in linked_live_jobs), 'Worker credential batch has no valid authority binding')
             require(isinstance(token_hash, str) and len(token_hash) == 64 and
                     all(c in '0123456789abcdef' for c in token_hash) and
                     isinstance(worker, str) and bool(worker) and revoked in (0, 1),
                     'Invalid worker credential')
             timestamp(expires)
     _inspect_budget(db, names, projects)
-    _inspect_live_admission(db, names, projects)
     return assets
 
 

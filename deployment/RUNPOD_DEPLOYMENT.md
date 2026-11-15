@@ -81,11 +81,12 @@ The reviewed GPU image's entrypoint is `python -m workers.gpu.cli`. Its eventual
 CMD arguments for one attempt are:
 
 ```text
-worker --output-root /worker/output --input-root /worker/inputs --weights /models --result /worker/result.json
+worker --output-root /worker --weights /models --result /worker/result.json --claim-wait-seconds 60
 ```
 
-These arguments describe the existing worker interface; they are not a launch
-command. The host still needs verified mounts, scoped credentials and live queue
+The live execution coordinator requires this exact command. It permits bounded
+startup polling for successful empty claims; the wait does not extend the original
+job deadline. These arguments alone are not a launch command. The host still needs verified mounts, scoped credentials and live queue
 authority. Do not add `--allow-local-http` to a cloud deployment.
 
 ## Cost and recovery controls

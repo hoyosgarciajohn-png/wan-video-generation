@@ -123,3 +123,22 @@ solver, CPU T5/offload and unknown real cost. They do **not** import the officia
 Wan package, load checkpoint bytes, prove its API compatibility, execute CUDA or
 establish image quality. Actual image build/import and one-shot inference gates
 remain pending.
+
+## Bounded claim startup wait
+
+The reviewed live launcher uses the fixed worker arguments
+`worker --output-root /worker --weights /models --result /worker/result.json --claim-wait-seconds 60`.
+This handles the short interval between provider startup and the controller
+making the admitted job claimable. It polls only successful, authenticated empty
+claims, every two seconds by default. Authorization failures, transport errors
+and other API failures terminate immediately rather than retrying an ambiguous
+operation. A saved claim journal bypasses polling and preserves existing replay.
+
+Without `--claim-wait-seconds`, behavior remains one immediate claim. The wait
+option accepts 0 through 120 seconds; `--claim-poll-seconds` accepts 0.1 through
+10 seconds. A monotonic deadline stops new polls; a request already in flight
+retains the HTTP client's existing timeout. Empty expiry writes the normal idle
+result and exits. SIGTERM interrupts waiting. The controller's independently
+enforced total runtime includes startup wait and must exceed the launcher's
+60-second setting. Exiting the worker does not itself stop provider billing;
+provider cleanup remains the controller's responsibility.
