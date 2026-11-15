@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.7 | November 15, 2026 | Owner: John Hoyos
+Version 1.8 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -35,7 +35,7 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Prepare hosted storage/deployment and Runpod lifecycle/budget integration, including storage quotas/backups, hosted identity and a buildable pinned Wan runtime. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
+Prepare hosted storage/deployment and Runpod lifecycle/budget integration, including storage quotas/offsite retention, hosted identity and a buildable pinned Wan runtime. Local backup/restore is now rehearsed; the staging container remains unbuilt. The local authenticated synthetic workflow now covers upload → render → review → timeline → export → protected MP4 download; see docs/MEDIA_COMMANDS_V1.md. Full hosted B05 and native browser acceptance remain open. No deployment or GPU spend has occurred. B06 GPU rental still requires a project dollar ceiling and runtime envelope.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -94,3 +94,32 @@ Podman and buildctl are absent here; no container build was performed. Full host
 B05, native browser and creative acceptance remain open. No deployment or GPU spend.
 
 Previous publication: [media controls PR #22](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/22) merged at `57e7cb9e226565cc5b67bbb1be2661544615fff5`.
+
+## Recovery and staging preparation checkpoint
+
+A checked local backup now captures a consistent SQLite snapshot and every
+referenced immutable media object, with manifest checksums and completion markers.
+Restore refuses nonempty destinations, traversal and linked files. Recovery
+preserves accepted takes, reviews, timeline revisions and completed exports;
+incomplete uploads abort, interrupted attempts are fenced, and queued exports
+resume from frozen inputs. The source installation is unchanged.
+
+The 93-test Python root suite passes, including an independent recovery of an
+actual synthetic project, resumed worker/export processing, full MP4 decoding,
+corruption/path checks and refusal to overwrite an existing restore. Deployment
+source adds a loopback-only staging host, external secret/state preparation, health
+checks and shutdown handling. Runtime packaging now includes the shared validator;
+restored database paths can be selected explicitly rather than opening empty state.
+Eight staging tests also pass, including recovered-project HTTP access and SIGTERM.
+Static artifact/runtime source imports, Compose YAML parsing and six target wheel
+hashes are verified; this does not establish a container build.
+See docs/BACKUP_RESTORE.md and docs/DEPLOYMENT_READINESS.md.
+
+Next: build and smoke-test the CPU staging image on a compatible Docker host,
+complete native browser acceptance, decide hosted identity/storage and implement
+storage quotas/offsite retention, then finish lifecycle/budget wiring and the
+pinned Wan runtime. Container images have not been built here; Docker/Podman/
+buildctl are absent. Full hosted B05 and real Wan/GPU generation remain unverified.
+No deployment, provider requests or GPU spending occurred.
+
+Previous publication: [larger soundtrack uploads PR #23](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/23) merged at `cbd300fe74fc8a2f47e8b1c69cfe1273414e2467`.

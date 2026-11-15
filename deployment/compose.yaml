@@ -1,0 +1,35 @@
+# Local staging only. Do not change the published interface to 0.0.0.0.
+services:
+  studio:
+    image: wan-studio-local:staging
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    platform: linux/amd64
+    user: "${WAN_UID:?Run deployment/prepare.py}:${WAN_GID:?Run deployment/prepare.py}"
+    ports:
+      - "127.0.0.1:${WAN_PORT:-8080}:8080"
+    environment:
+      WAN_STUDIO_ORIGIN: "http://127.0.0.1:${WAN_PORT:-8080}"
+      WAN_STUDIO_TOKEN_FILE: /run/wan-secrets/tokens.json
+      WAN_STUDIO_DATABASE: "${WAN_DATABASE_PATH:-}"
+      WAN_STUDIO_ASSETS: "${WAN_ASSETS_PATH:-}"
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - type: bind
+        source: ${WAN_STATE_DIR:?External state directory required}
+        target: /data
+      - type: bind
+        source: ${WAN_TOKEN_FILE:?External token file required}
+        target: /run/wan-secrets/tokens.json
+        read_only: true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    stop_grace_period: 130s
+    restart: "no"
