@@ -1,0 +1,44 @@
+{
+  "contract_version": "0.1.0",
+  "asset": {
+    "id": "output-attempt-1",
+    "project_id": "fictional-project",
+    "owner_id": "fictional-owner",
+    "kind": "video",
+    "object_key": "projects/fictional-project/attempts/attempt-1/output.mp4",
+    "mime_type": "video/mp4",
+    "bytes": 2935,
+    "sha256": "9b31987878fcebf661af8f7e13a6370aaaa27131809a3c4eb9fddb2f5ebf8b25",
+    "duration_ms": 2000
+  },
+  "media": {
+    "duration_ms": 2000,
+    "width": 320,
+    "height": 180,
+    "frame_rate": {
+      "numerator": 24,
+      "denominator": 1
+    }
+  },
+  "take": {
+    "id": "take-attempt-1",
+    "project_id": "fictional-project",
+    "attempt_id": "attempt-1",
+    "shot_id": "shot-1",
+    "asset_id": "output-attempt-1",
+    "committed_at": "2026-11-15T15:19:19.453321Z",
+    "duration_ms": 2000,
+    "width": 320,
+    "height": 180,
+    "frame_rate": {
+      "numerator": 24,
+      "denominator": 1
+    }
+  },
+  "metrics": {
+    "mode": "fixture",
+    "gpu_peak_allocated_bytes": null,
+    "cost_cents": 0,
+    "render_and_verify_seconds": 0.3041265130013926
+  }
+}
