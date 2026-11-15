@@ -4,6 +4,8 @@ A private foundation for self-hosted Wan production using temporary Runpod GPU P
 
 The local integration checkpoint includes the storyboard fixture UI, durable fixture controller, Wan worker source, CPU exporter and QA checks. See [integration evidence and remaining gates](docs/B05_INTEGRATION_CHECKPOINT.md). The [connected Studio checkpoint](docs/STUDIO_API_V1.md) adds local authenticated project persistence and protected media reads. [Connected fixture render commands](docs/RENDER_COMMANDS_V1.md) now submit, cancel and review actual synthetic worker outputs. [Protected uploads and timeline/export controls](docs/MEDIA_COMMANDS_V1.md) complete the local synthetic workflow through MP4 download. Durable chunk uploads support WAV/MP3 tracks up to 128 MiB; see [upload protocol](docs/UPLOADS_V1.md). [Checked local recovery](docs/BACKUP_RESTORE.md) and [staging preparation](docs/DEPLOYMENT_READINESS.md) are available. [Budget/lifecycle rehearsals](docs/BUDGET_ORCHESTRATION.md) use only the built-in fake provider; they cannot dispatch Runpod. [Scoped remote worker transfer](docs/WORKER_TRANSPORT.md) now supports separate controller/worker storage roots for fixture batches, with expiring credentials and replay-safe completion. Hosted identity/storage, real paid dispatch and production deployment remain pending.
 
+The [first real Wan run checklist](deployment/FIRST_WAN_RUN.md) records the concrete host, image, model, budget and unfinished real-admission requirements. Supplying a GPU alone does not enable the fixture-only controller.
+
 ## Start
 
 Read [the master handoff](docs/WAN_00_Master_Handoff.md), [architecture](docs/ARCHITECTURE.md), [shared contract](docs/CONTRACT.md), and [workstream assignments](docs/WORKSTREAMS.md).

@@ -115,3 +115,43 @@ then connect the verified transport to real Wan execution and approved lifecycle
 dispatch. The remote fixture bridge is implemented; production TLS, storage quotas,
 orphan retention and hosting remain open. No cloud deployment, GPU allocation or
 spending occurred.
+
+## First real-run readiness checkpoint
+
+A fresh host audit found no container daemon/tools, NVIDIA device/runtime or
+installed Wan/PyTorch stack. Standard daemon sockets are absent and a local Unix
+socket bind is denied. No compatible compute-host connection was available.
+Static inspection found no evidenced Docker pin/import defect to change; image
+build and CUDA gates remain UNVERIFIED. See deployment/FIRST_WAN_RUN.md.
+
+The next owner decisions are concrete: identify an existing approved Linux amd64
+Docker build host (or choose a host provisioned separately), specify the first
+project's dollar ceiling, maximum elapsed runtime and retry allowance, and choose
+the HTTPS controller/persistent storage location. Runpod credentials must then be
+provided through protected secret handling, never pasted into the handoff.
+
+Those inputs do not finish the software. WorkerTransport still admits only
+zero-cost fixture batches and the coordinator still accepts only the fake provider.
+Real Wan admission must connect server-side budget reservation, model/image policy,
+scoped credentials, provider reconciliation and independent cleanup. Supplying a
+GPU URL or deleting the fixture guard is not an acceptable substitute.
+
+Further local fixture code cannot demonstrate actual Wan image compatibility,
+creative quality, VRAM demand or billed cost. The next meaningful acceptance step
+requires the host/owner prerequisites, remaining real-admission implementation and
+an observed capped one-shot benchmark. No GPU, cloud deployment or spending was
+started during this readiness review. Full hosted B05 and B06 remain open.
+
+The offline preflight now binds non-secret run intent to current source/model
+hashes and checks supplied build logs, image identity and fixture bytes for local
+consistency. Missing or fabricated PASS-only evidence remains invalid. Owner
+attestation files are consistency inputs, not authenticated spending authority.
+Saved reports are write-once and detect changed bytes or source; neither their
+hashes nor the report can authorize execution. Both readiness and execution flags
+remain false, including when every supplied input is internally consistent.
+
+Validation for this checkpoint: 121 Python root tests pass, including ten new
+preflight/review cases; eight build-verifier tests and the shared contract pass.
+The checked-in docs/REAL_RUN_PREFLIGHT.json was generated with empty owner inputs
+and verifies against current source. All nine gates remain missing or blocked.
+See docs/REAL_RUN_PREFLIGHT.md for evidence limits and exact plan fields.
