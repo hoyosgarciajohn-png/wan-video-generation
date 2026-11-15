@@ -1,6 +1,7 @@
 // From apps/studio: node --import tsx ../../scripts/check_studio_client.mjs
 // Actual TypeScript client + Python HTTP server. No browser or cloud is implied.
 import assert from 'node:assert/strict';
+import { File } from 'node:buffer';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtemp, rm, readFile, writeFile } from 'node:fs/promises';
@@ -47,11 +48,17 @@ try {
   clearTimeout(timer);
   assert.ok(port > 0);
   let cookie = '';
+  let interruptChunk = true;
   const browserLikeTransport = async (path, init) => {
     const headers = { ...init.headers, Origin: origin, ...(cookie ? { Cookie: cookie } : {}) };
     const response = await fetch(`http://127.0.0.1:${port}${path}`, { ...init, headers });
     const setCookie = response.headers.get('set-cookie');
     if (setCookie) cookie = setCookie.split(';')[0];
+    if (interruptChunk && path.endsWith('/chunks/1') && response.ok) {
+      interruptChunk = false;
+      await response.arrayBuffer();
+      throw new Error('Synthetic lost chunk response');
+    }
     return response;
   };
   const client = new StudioClient(browserLikeTransport);
@@ -76,10 +83,16 @@ try {
   assert.equal(loaded.projects[0].bundle.project.owner_id, 'client-owner');
   assert.equal(loaded.projects[0].bundle.takes.length, 0);
   const projectId = loaded.projects[0].bundle.project.id;
-  const audio = await readFile(join(root, 'fixtures/media/audio.wav'));
-  const upload = { kind: 'upload', projectId, name: 'Synthetic soundtrack.wav', mime_type: 'audio/wav',
-    data_base64: audio.toString('base64'), expected_revision: loaded.revision,
+  const audioPath = join(directory, 'large-synthetic.wav');
+  await promisify(execFile)('ffmpeg', ['-nostdin', '-v', 'error', '-f', 'lavfi',
+    '-i', 'sine=frequency=440:sample_rate=48000:duration=55', '-c:a', 'pcm_s16le', audioPath]);
+  const audio = await readFile(audioPath);
+  assert.ok(audio.length > 4 * 1024 * 1024);
+  const upload = { kind: 'upload-file', projectId,
+    file: new File([audio], 'Synthetic soundtrack.wav', { type: 'audio/wav' }), expected_revision: loaded.revision,
     idempotency_key: 'actual-client-audio-1' };
+  await assert.rejects(client.command(upload));
+  assert.ok(upload.uploadId);
   loaded = await client.command(upload);
   const uploaded = loaded.projects[0].bundle.assets.find((asset) => asset.kind === 'audio');
   assert.ok(uploaded);
@@ -147,7 +160,7 @@ try {
   await promisify(execFile)('ffmpeg', ['-v', 'error', '-xerror', '-i', finalPath, '-f', 'null', '-']);
   await client.logout();
   await assert.rejects(client.load(), (error) => error.code === 401);
-  console.log('PASS: actual StudioClient upload/render/review/timeline/export/download/decode/replay/logout over local HTTP');
+  console.log('PASS: actual StudioClient >4MiB chunk upload/lost-response resume/render/review/timeline/export/download/decode/replay/logout over local HTTP');
 } finally {
   clearTimeout(timer);
   lines.close();

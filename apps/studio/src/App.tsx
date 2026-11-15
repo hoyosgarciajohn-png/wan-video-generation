@@ -40,10 +40,7 @@ export function App({
     workspace: Workspace;
     owner: string;
     onChange: (workspace: Workspace) => void;
-    upload?: (
-      projectId: string,
-      data: { name: string; mime_type: string; data_base64: string },
-    ) => Promise<void>;
+    upload?: (projectId: string, file: File) => Promise<void>;
     assemble?: (projectId: string, audioAssetId: string | null) => void;
     exportTimeline?: (
       projectId: string,

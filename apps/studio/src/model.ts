@@ -30,6 +30,7 @@ export function errorMessage(error: unknown): string {
       {
         401: "Sign in again to access this project.",
         404: "This project or item is unavailable.",
+        410: "This upload expired or was canceled. Select the file again to start a new upload.",
         409: "A newer version is available. Reload before saving your changes.",
         422: "Check the fields and project duration. Use references from this project.",
         507: "Browser storage is full or unavailable. Your last saved version is retained.",

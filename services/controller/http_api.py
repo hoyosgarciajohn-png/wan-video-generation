@@ -22,6 +22,7 @@ from services.controller.commands import RenderCommands
 from services.controller.runner import FixtureRunner
 from services.controller.media_commands import MediaCommands
 from services.controller.export_runner import ExportRunner
+from services.controller.uploads import ResumableUploads, CHUNK_SIZE
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -29,6 +30,8 @@ MAX_UPLOAD_BODY = 6 * 1024 * 1024
 
 
 def body_limit(path):
+    if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/uploads/[a-f0-9]{32}/chunks/[0-9]+", path):
+        return CHUNK_SIZE
     return MAX_UPLOAD_BODY if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/assets", path) else MAX_BODY
 
 
@@ -60,6 +63,7 @@ class StudioAPI:
         self.studio, self.origin, self.clock = studio, origin, clock
         self.commands = RenderCommands(studio)
         self.media_commands = MediaCommands(studio)
+        self.uploads = ResumableUploads(studio)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -95,14 +99,16 @@ class StudioAPI:
                 raise HTTPError(403)
             if len(body) > body_limit(path):
                 raise HTTPError(413)
+            chunk_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/uploads/([a-f0-9]{32})/chunks/([0-9]+)', path)
+            raw_chunk = method == 'PUT' and chunk_match is not None
             # No cross-origin requests, even on session establishment. Custom header
             # + JSON content type excludes form posts; no CORS preflight is granted.
             if method not in ('GET', 'HEAD'):
                 if headers.get('Origin') != self.origin or headers.get('X-WAN-Request') != 'studio':
                     raise HTTPError(403)
-                if headers.get('Content-Type', '').split(';')[0] != 'application/json':
+                if headers.get('Content-Type', '').split(';')[0] != ('application/octet-stream' if raw_chunk else 'application/json'):
                     raise HTTPError(415)
-            value = json.loads(body) if body else {}
+            value = {} if raw_chunk else (json.loads(body) if body else {})
             if not isinstance(value, dict):
                 raise HTTPError(422)
             if path == '/v1/studio/session':
@@ -135,6 +141,25 @@ class StudioAPI:
                     return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
                 raise HTTPError(405)
             owner = self.owner(headers)
+            upload_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/uploads(?:/([a-f0-9]{32})(?:/(finish))?)?', path)
+            if chunk_match or upload_match:
+                try:
+                    if chunk_match:
+                        if method != 'PUT':
+                            raise HTTPError(405)
+                        return Reply(200, self.uploads.chunk(owner, chunk_match[1], chunk_match[2], int(chunk_match[3]), body))
+                    project_id, upload_id, action = upload_match.groups()
+                    if upload_id is None and method == 'POST':
+                        return Reply(200, self.uploads.begin(owner, project_id, value))
+                    if upload_id and action == 'finish' and method == 'POST':
+                        return Reply(200, self.uploads.finish(owner, project_id, upload_id, value))
+                    if upload_id and action is None and method == 'GET':
+                        return Reply(200, self.uploads.get(owner, project_id, upload_id))
+                    if upload_id and action is None and method == 'DELETE':
+                        return Reply(200, self.uploads.abort(owner, project_id, upload_id))
+                    raise HTTPError(405)
+                except KeyError:
+                    raise HTTPError(404)
             media_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/(assets|timelines|exports)', path)
             if media_match:
                 if method != 'POST':

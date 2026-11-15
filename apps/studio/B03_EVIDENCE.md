@@ -152,3 +152,29 @@ authenticated download link attributes. DOM transport tests use controlled
 responses and do not establish native file-dialog/media decoding or browser
 acceptance. Command Center owns separate actual HTTP and exporter verification.
 No paid resources or external mutations were performed by this workstream.
+
+## Larger resumable uploads — November 15, 2026
+
+Connected References now accepts WAV/MP3 soundtracks up to 128 MiB (images remain
+1 MiB). It passes the File directly to a resumable client command and immediately
+locks creator edits. Begin returns an upload identity, GET returns verified chunk
+receipts, PUT sends raw binary slices of at most 1 MiB, and finish sends the client
+SHA-256 chunk manifest. WebCrypto hashes only individual slices. No full-file
+arrayBuffer or base64 string is created, and no new dependency was introduced.
+The original File, session ID and idempotency key survive ambiguous network errors
+and session-expiry reauthentication in the same open tab. Server-committed chunks
+are verified and skipped on retry; completed finish replay returns the existing
+asset. Changed prefixes fail closed, expired uploads show a restart message, and
+pending transfers activate beforeunload protection. Refresh/close resume is not
+implemented: reselecting after losing tab memory starts a new session. Server
+sessions expire after 24 hours.
+
+Checks: 16 model/client tests and 17 DOM tests pass; production build/TypeScript,
+formatting and diff checks pass. The new client regression transfers a 5 MiB-plus
+fixture, forbids whole-file reads, loses responses after a committed chunk and
+finish, and confirms one begin and no duplicated chunks. Additional cases verify
+prefix mismatch, expiry, oversize rejection before requests, immediate editor
+lock, File identity preservation and reauthentication resume. DOM HTTP responses
+are controlled; separate Command Center/QA TCP tests establish actual service
+integration. Browser/native media acceptance remains pending. No paid resources
+or external mutations were performed by this workstream.

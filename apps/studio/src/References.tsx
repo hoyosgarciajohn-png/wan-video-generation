@@ -13,11 +13,7 @@ export function References({
 }: {
   project: StudioProject;
   allowImport?: boolean;
-  upload?: (data: {
-    name: string;
-    mime_type: string;
-    data_base64: string;
-  }) => Promise<void>;
+  upload?: (file: File) => Promise<void>;
   edit: (change: Edit, message: string) => void;
   report: (error: unknown) => void;
 }) {
@@ -37,23 +33,19 @@ export function References({
       if (
         (!image && !audio) ||
         file.size < 1 ||
-        file.size > (image ? 1024 * 1024 : 4 * 1024 * 1024)
+        file.size > (image ? 1024 * 1024 : (upload ? 128 : 4) * 1024 * 1024)
       )
         throw new StudioError(422);
+      if (upload) {
+        await upload(file);
+        return;
+      }
       const data = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(String(reader.result));
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
-      if (upload) {
-        await upload({
-          name: file.name,
-          mime_type: file.type === "audio/x-wav" ? "audio/wav" : file.type,
-          data_base64: data.slice(data.indexOf(",") + 1),
-        });
-        return;
-      }
       let duration: number | null = null;
       if (image)
         await new Promise<void>((resolve, reject) => {
@@ -110,7 +102,7 @@ export function References({
       <h2 id="refs-heading">References and source material</h2>
       <p className="muted">
         {upload
-          ? "Upload PNG, JPEG or WebP images up to 1 MiB, or WAV/MP3 audio up to 4 MiB. The server verifies media bytes. Image references can be stored for future Wan workflows; current synthetic renders do not support them."
+          ? "Upload PNG, JPEG or WebP images up to 1 MiB, or WAV/MP3 audio up to 128 MiB in resumable 1 MiB chunks. Keep this tab open to resume an interrupted transfer. The server verifies media bytes. Image references can be stored for future Wan workflows; current synthetic renders do not support them."
           : allowImport
             ? "Reuse character and location images across shots. Images up to 1 MB and audio up to 4 MB are saved in this browser for the rehearsal."
             : "Review server references and edit their names or your creative brief. Use Save to server to persist changes."}
