@@ -18,3 +18,7 @@ The backend controller, deployed authentication, GPU inference, paid billing, pr
 Runpod compute charges incurred during B00 are $0 and Runpod resources created are zero. The tested fixture has a two-second blue clip and matching synthetic audio. These checks establish the foundation and fixtures. Real GPU timing, image quality, controller durability and hosted lifecycle remain for their owning batches.
 
 Publication and workstream branch confirmation are recorded in [B00 issue 1](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/1). The merged foundation PR identifies the exact baseline commit.
+
+## Publication confirmed
+
+PR #11 merged at `c9c364ab3f68cfca24489715ab0cd8419d0d4f60`. Issue #1 is closed. The five branches in WORKSTREAMS.md were created from that commit. B01–B04 and QA preparation are ready. Their actual execution is tracked in issues #2–#6.
