@@ -23,6 +23,7 @@ from services.controller.runner import FixtureRunner
 from services.controller.media_commands import MediaCommands
 from services.controller.export_runner import ExportRunner
 from services.controller.uploads import ResumableUploads, CHUNK_SIZE
+from services.controller.worker_transport import WorkerTransport, MAX_ARTIFACT_BYTES, IDENTIFIER
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -30,6 +31,8 @@ MAX_UPLOAD_BODY = 6 * 1024 * 1024
 
 
 def body_limit(path):
+    if re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', path):
+        return MAX_ARTIFACT_BYTES
     if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/uploads/[a-f0-9]{32}/chunks/[0-9]+", path):
         return CHUNK_SIZE
     return MAX_UPLOAD_BODY if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/assets", path) else MAX_BODY
@@ -64,6 +67,7 @@ class StudioAPI:
         self.commands = RenderCommands(studio)
         self.media_commands = MediaCommands(studio)
         self.uploads = ResumableUploads(studio)
+        self.workers = WorkerTransport(studio.control)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -91,6 +95,47 @@ class StudioAPI:
             self.sessions[token] = (value[0], now, value[2])
             return value[0]
 
+    def _worker_headers(self, headers):
+        if headers.get('Host') not in self.allowed_hosts or headers.get('Origin') or headers.get('Sec-Fetch-Site') == 'cross-site':
+            raise HTTPError(403)
+
+    def _worker_dispatch(self, method, path, headers, body):
+        self._worker_headers(headers)
+        authorization = headers.get('Authorization')
+        download = re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/inputs/({IDENTIFIER})', path)
+        if download:
+            if method != 'GET':
+                raise HTTPError(405)
+            file, asset = self.workers.download(authorization, download[1], headers.get('X-WAN-Lease-ID'), download[2])
+            return Reply(200, headers={'Content-Type': asset['mime_type'], 'X-WAN-SHA256': asset['sha256'],
+                         'Content-Security-Policy': "default-src 'none'; sandbox"}, file=file, length=asset['bytes'])
+        if method != 'POST':
+            raise HTTPError(405)
+        if headers.get('Content-Type', '').split(';')[0] != 'application/json':
+            raise HTTPError(415)
+        payload = json.loads(body) if body else {}
+        result = self.workers.call(authorization, path[len('/v1/worker/'):], payload)
+        return Reply(204 if result is None else 200, result)
+
+    def worker_upload(self, method, path, headers, stream, length):
+        try:
+            self._worker_headers(headers)
+            match = re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', path)
+            if not match or method != 'PUT':
+                raise HTTPError(405)
+            if headers.get('Content-Type', '').split(';')[0] != 'video/mp4':
+                raise HTTPError(415)
+            result = self.workers.upload(headers.get('Authorization'), match[1], headers.get('X-WAN-Lease-ID'),
+                                         headers.get('X-WAN-SHA256'), length, stream)
+            return Reply(200, result)
+        except (HTTPError, ValueError) as error:
+            status = getattr(error, 'status', 422)
+            return Reply(status, {'error': status})
+        except (KeyError, PermissionError):
+            return Reply(404, {'error': 404})
+        except Exception:
+            return Reply(503, {'error': 503})
+
     def dispatch(self, method, path, headers, body=b'', peer='local'):
         try:
             if headers.get('Host') not in self.allowed_hosts:
@@ -99,6 +144,8 @@ class StudioAPI:
                 raise HTTPError(403)
             if len(body) > body_limit(path):
                 raise HTTPError(413)
+            if path.startswith('/v1/worker/'):
+                return self._worker_dispatch(method, path, headers, body)
             chunk_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/uploads/([a-f0-9]{32})/chunks/([0-9]+)', path)
             raw_chunk = method == 'PUT' and chunk_match is not None
             # No cross-origin requests, even on session establishment. Custom header
@@ -266,14 +313,19 @@ def make_server(api, address=('127.0.0.1', 8787)):
                     size = int(lengths[0]) if lengths else 0
                     if not 0 <= size <= body_limit(self.path):
                         raise ValueError()
-                    body = self.rfile.read(size)
-                    if len(body) != size:
-                        raise ValueError()
-                    reply = api.dispatch(self.command, self.path, self.headers, body, self.client_address[0])
+                    if re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', self.path):
+                        # Worker outputs stream to a bounded stage, never into one HTTP body allocation.
+                        self.close_connection = True
+                        reply = api.worker_upload(self.command, self.path, self.headers, self.rfile, size)
+                    else:
+                        body = self.rfile.read(size)
+                        if len(body) != size:
+                            raise ValueError()
+                        reply = api.dispatch(self.command, self.path, self.headers, body, self.client_address[0])
                 except (ValueError, TimeoutError):
                     reply = Reply(413, {'error': 413})
                     self.close_connection = True
-            data = json.dumps(reply.data, separators=(',', ':'), allow_nan=False).encode()
+            data = b'' if reply.status == 204 else json.dumps(reply.data, separators=(',', ':'), allow_nan=False).encode()
             self.send_response(reply.status)
             for key, value in {'Content-Type': 'application/json', 'Cache-Control': 'no-store',
                                'X-Content-Type-Options': 'nosniff', **reply.headers}.items():

@@ -1,14 +1,16 @@
 """One-attempt executable. A controller starts another worker when policy permits."""
 import argparse
 import copy
+import fcntl
 from datetime import timedelta
 import json
 import os
 import signal
+import sys
 from pathlib import Path
 
-from .client import WorkerClient
-from .common import ROOT, atomic_json, require, stamp, utcnow
+from .client import WorkerClient, WorkerAPIError
+from .common import ROOT, atomic_json, require, stamp, utcnow, sync_dir
 from .worker import run_once
 
 
@@ -57,6 +59,29 @@ def stop_worker(signum, frame):
     raise SystemExit(128 + signum)
 
 
+def remote_run(client, output_root, result_path, *, input_root=None, weights=None):
+    output_root = Path(output_root)
+    output_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    claim_journal = output_root / 'worker-claim.json'
+    with (output_root / 'worker-session.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if claim_journal.exists():
+            saved = json.loads(claim_journal.read_text())
+            require(saved.get('binding') == client.binding, 'Worker journal credential/origin mismatch')
+            claim = saved['claim']
+        else:
+            claim = client.claim()
+            if claim is None:
+                atomic_json(result_path, {'status': 'idle', 'contract_version': '0.1.0'})
+                return
+            atomic_json(claim_journal, {'binding': client.binding, 'claim': claim})
+        result = run_once(claim, client, output_root, input_root=input_root or output_root / 'inputs', weights=weights)
+        atomic_json(result_path, result)
+        claim_journal.unlink()
+        sync_dir(output_root)
+
+
+
 def main():
     signal.signal(signal.SIGTERM, stop_worker)
     parser = argparse.ArgumentParser()
@@ -65,21 +90,25 @@ def main():
     parser.add_argument('--input-root', type=Path)
     parser.add_argument('--weights', type=Path)
     parser.add_argument('--result', required=True, type=Path)
+    parser.add_argument('--allow-local-http', action='store_true', help='Development only: allow HTTP on 127.0.0.1 or localhost')
     args = parser.parse_args()
     if args.mode == 'fixture':
         claim = fixture_claim()
         client = FixtureClient(claim, args.output_root)
     else:
-        client = WorkerClient(os.environ['WAN_WORKER_API_URL'], os.environ['WAN_WORKER_TOKEN'])
-        claim = client.claim()
-        if claim is None:
-            atomic_json(args.result, {'status': 'idle', 'contract_version': '0.1.0'})
-            return
+        client = WorkerClient(os.environ['WAN_WORKER_API_URL'], os.environ['WAN_WORKER_TOKEN'], allow_local_http=args.allow_local_http)
+        remote_run(client, args.output_root, args.result, input_root=args.input_root, weights=args.weights)
+        print('PASS: worker operation completed under contract 0.1.0')
+        return
     result = run_once(claim, client, args.output_root, input_root=args.input_root, weights=args.weights)
     atomic_json(args.result, result)
     print('PASS: durable output completed under contract 0.1.0')
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f'Worker operation failed (API status {error.status})' if isinstance(error, WorkerAPIError) else 'Worker operation failed; retained journals require reconciliation', file=sys.stderr)
+        raise SystemExit(1) from None
 

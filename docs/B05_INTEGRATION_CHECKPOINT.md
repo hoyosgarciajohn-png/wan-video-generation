@@ -85,3 +85,33 @@ Manual image verification prepares distinct UNVERIFIED gates and executes nothin
 by default. No CI, container builds, CUDA inference or deployment were activated.
 Host build/smoke, explicit real spend/runtime approval, securely provisioned provider
 credentials, and the remote worker/storage bridge remain required before B06.
+
+## Separate-process fixture worker checkpoint
+
+The authenticated worker bridge now streams scoped inputs and MP4 artifacts between
+separate controller and worker filesystem roots. Trusted operators issue credentials
+bound to one owner/project/batch/worker with expiry and revocation; no public Studio
+credential-issuance route exists. The transport accepts only zero-cost fixture batches.
+Lost claim/upload/completion responses can be reconciled with durable worker journals
+and immutable receipts while the same credential remains valid. Backup snapshots
+revoke worker credentials without changing the live source.
+
+Independent actual TCP tests run a staging controller subprocess and a worker CLI
+subprocess, verify separately stored checksummed media, fully decode the result and
+prove replay creates one take. Scope, lease, corruption, expiry and restored-token
+checks pass. Review also fixed expiry during media probing: authorization is checked
+inside the database transaction and again before commit, so no expired completion
+can publish a take. MP4 probing forces the MOV demuxer with file/pipe protocols.
+
+Validation: 111 Python root tests, 24 worker tests and 16 staging/build-verifier
+tests pass; contract and artifact/runtime-source checks pass. See
+docs/WORKER_TRANSPORT.md and workers/gpu/README.md. These are local synthetic
+checks, not CUDA inference or live Runpod evidence. Container image builds, hosted
+B05/native-browser acceptance and creative Wan acceptance remain unverified.
+
+Next: build/smoke the pinned images on a compatible Docker host, obtain the explicit
+project GPU ceiling/runtime envelope and securely provision Runpod credentials,
+then connect the verified transport to real Wan execution and approved lifecycle
+dispatch. The remote fixture bridge is implemented; production TLS, storage quotas,
+orphan retention and hosting remain open. No cloud deployment, GPU allocation or
+spending occurred.

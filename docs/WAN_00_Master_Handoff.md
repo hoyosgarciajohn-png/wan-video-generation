@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.9 | November 15, 2026 | Owner: John Hoyos
+Version 1.10 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -153,3 +153,35 @@ remote worker/storage bridge. Native browser/hosted B05 and real Wan creative
 acceptance remain open. No live provider allocation, GPU spending or deployment.
 
 Previous publication: [backup/staging PR #24](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/24) merged at `61be611f0df205436dcbad77fe629ebf7d84b9b4`.
+
+## Separate-process fixture worker checkpoint
+
+The authenticated worker bridge now streams scoped inputs and MP4 artifacts between
+separate controller and worker filesystem roots. Trusted operators issue credentials
+bound to one owner/project/batch/worker with expiry and revocation; no public Studio
+credential-issuance route exists. The transport accepts only zero-cost fixture batches.
+Lost claim/upload/completion responses can be reconciled with durable worker journals
+and immutable receipts while the same credential remains valid. Backup snapshots
+revoke worker credentials without changing the live source.
+
+Independent actual TCP tests run a staging controller subprocess and a worker CLI
+subprocess, verify separately stored checksummed media, fully decode the result and
+prove replay creates one take. Scope, lease, corruption, expiry and restored-token
+checks pass. Review also fixed expiry during media probing: authorization is checked
+inside the database transaction and again before commit, so no expired completion
+can publish a take. MP4 probing forces the MOV demuxer with file/pipe protocols.
+
+Validation: 111 Python root tests, 24 worker tests and 16 staging/build-verifier
+tests pass; contract and artifact/runtime-source checks pass. See
+docs/WORKER_TRANSPORT.md and workers/gpu/README.md. These are local synthetic
+checks, not CUDA inference or live Runpod evidence. Container image builds, hosted
+B05/native-browser acceptance and creative Wan acceptance remain unverified.
+
+Next: build/smoke the pinned images on a compatible Docker host, obtain the explicit
+project GPU ceiling/runtime envelope and securely provision Runpod credentials,
+then connect the verified transport to real Wan execution and approved lifecycle
+dispatch. The remote fixture bridge is implemented; production TLS, storage quotas,
+orphan retention and hosting remain open. No cloud deployment, GPU allocation or
+spending occurred.
+
+Previous publication: [budget/build gates PR #25](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/25) merged at `a3ceceeb1e7e38329fdbaf58ea6e601f4a1105ae`.

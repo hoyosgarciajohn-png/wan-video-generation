@@ -137,7 +137,8 @@ def validate_claim(claim):
 
 def probe(path, settings, frames):
     result = json.loads(subprocess.check_output([
-        'ffprobe', '-v', 'error', '-show_streams', '-show_format', '-of', 'json', str(path)
+        'ffprobe', '-v', 'error', '-protocol_whitelist', 'file,pipe', '-f', 'mov',
+        '-show_streams', '-show_format', '-of', 'json', str(path)
     ], text=True, timeout=30))
     videos = [s for s in result['streams'] if s['codec_type'] == 'video']
     require(len(videos) == 1 and len(result['streams']) == 1, 'Requires one silent video stream')

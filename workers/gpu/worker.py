@@ -134,6 +134,22 @@ def complete(client, claim, manifest):
     return take
 
 
+def publish(client, claim, manifest, destination, journal):
+    upload = getattr(client, 'upload', None)
+    if upload is None:
+        return
+    saved = json.loads(journal.read_text())
+    expected = {key: manifest['asset'][key] for key in ('bytes', 'sha256', 'object_key')}
+    if saved.get('uploaded') == expected:
+        return
+    receipt = upload(claim['attempt'], manifest, destination)
+    require(receipt == expected, 'Artifact upload receipt mismatch')
+    # Confirm remote durable bytes before completion; completion may already commit
+    # before its response is lost, so retries must not require a still-active upload lease.
+    saved['uploaded'] = receipt
+    atomic_json(journal, saved)
+
+
 def run_once(claim, client, output_root, *, input_root=None, weights=None, interval=5):
     validate_claim(claim)
     a, p = claim['attempt'], claim['project']
@@ -148,12 +164,17 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
             require(saved['identity'] == identity(claim), 'Attempt replay conflict')
             if destination.exists():
                 verify_manifest(claim, saved['manifest'], destination)
+                publish(client, claim, saved['manifest'], destination, journal)
                 take = complete(client, claim, saved['manifest'])
                 return {'contract_version': '0.1.0', **saved['manifest'], 'take': take,
                         'metrics': saved['metrics']}
         with Lease(client, claim, interval) as lease:
             start = time.monotonic()
             try:
+                if claim['input_assets'] and hasattr(client, 'download_inputs'):
+                    require(input_root is not None, 'Local input directory required')
+                    client.download_inputs(claim, input_root)
+                    lease.check()
                 with tempfile.TemporaryDirectory(prefix='render-', dir=destination.parent) as work:
                     local = Path(work) / 'output.mp4'
                     lease.progress = 0.1
@@ -190,6 +211,7 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
             # Keep completion outside render failure handling to preserve ambiguous success.
             lease.check()
             lease.progress = 0.95
+            publish(client, claim, manifest, destination, journal)
             take = complete(client, claim, manifest)
             return {'contract_version': '0.1.0', **manifest, 'take': take, 'metrics': metrics}
 
