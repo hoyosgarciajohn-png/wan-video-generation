@@ -13,7 +13,10 @@ COPY fixtures /app/fixtures
 COPY workers/gpu /app/workers/gpu
 RUN python /app/workers/gpu/install_source.py
 RUN python -c "import sys, torch; assert sys.version_info[:2] == (3, 11); assert torch.__version__.split('+')[0] == '2.8.0'; assert torch._C._GLIBCXX_USE_CXX11_ABI"
-RUN PYTHONPATH=/opt/wan python -c "import flash_attn; from wan import WanTI2V"
+# Wan's T5 class default initializes CUDA during import. A CPU builder must not
+# import Wan or pretend a CUDA device exists. Check native library linking and
+# source syntax here; actual Wan/CUDA import belongs to the real GPU trial.
+RUN python -c "import flash_attn, compileall; assert compileall.compile_dir('/opt/wan/wan', quiet=1)"
 ENV WAN_SOURCE=/opt/wan HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 IMAGEIO_FFMPEG_EXE=/usr/local/bin/ffmpeg PYTHONDONTWRITEBYTECODE=1
 ENTRYPOINT ["python", "-m", "workers.gpu.cli"]
 
