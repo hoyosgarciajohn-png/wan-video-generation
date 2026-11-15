@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "purpose": "operator worksheet; not a provider request or launch authorization",
+  "execution_enabled": false,
+  "owner_id": null,
+  "project_id": null,
+  "provider_api": "https://api.runpod.io/v2",
+  "build": {
+    "host_reference": null,
+    "verification_directory": null,
+    "registry_image_digest": null,
+    "registry_credential_reference": null
+  },
+  "placement": {
+    "gpu_catalog_id": null,
+    "gpu_count": 1,
+    "data_center_id": null,
+    "cloud": "SECURE"
+  },
+  "storage": {
+    "model_volume_id": null,
+    "model_volume_data_center_id": null,
+    "verified_model_manifest_reference": null,
+    "model_mount": "/models",
+    "worker_journal_volume_id": null,
+    "worker_mount": "/worker",
+    "container_disk_gb": null,
+    "durable_controller_assets_reference": null,
+    "retention_days": null
+  },
+  "controller": {
+    "https_origin": null,
+    "database_reference": null,
+    "independent_watchdog_host_reference": null,
+    "watchdog_interval_seconds": null,
+    "cleanup_alert_destination": null
+  },
+  "approval": {
+    "authenticated_approval_reference": null,
+    "currency": "USD",
+    "total_cap_cents": null,
+    "max_runtime_seconds": null,
+    "max_attempts": null,
+    "storage_and_transfer_allowance_cents": null
+  },
+  "secrets": {
+    "controller_runpod_api_key_reference": null,
+    "batch_worker_token_reference": null
+  }
+}

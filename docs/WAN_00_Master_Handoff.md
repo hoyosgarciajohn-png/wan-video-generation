@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.12 | November 15, 2026 | Owner: John Hoyos
+Version 1.13 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -264,3 +264,35 @@ No cloud resources, deployment, CI, model download or GPU spending occurred.
 Validation: 130 Python root tests and 29 worker tests pass; contract and static/runtime-source artifact checks pass. The empty-input preflight was regenerated against the final source and remains non-executable with all nine gates missing or blocked.
 
 Previous publication: [real-run preflight PR #27](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/27) merged at `df0be05f79e730b585c4695ed32a2ebbfe005f33`.
+
+## Runpod v2 adapter and deployment preparation checkpoint
+
+The provider adapter now uses Runpod v2 request/response shapes, explicit scoped
+resource identity and complete paginated inventory. It requires an explicitly
+supplied transport; constructing it does not enable network access. Launch-profile
+validation requires an immutable image reference and constrained GPU/storage/port
+configuration. This validates request shape, not actual availability or permission.
+
+Independent mocked-HTTP lifecycle tests preserve liability after ambiguous creation
+and transient inventory/deletion failures. Reconciliation never repeats the POST.
+Cleanup requires checked resource absence and a complete inventory; after restart,
+a persisted resource ID also requires trusted expected-name binding. Wrong or
+unbound identities cannot be deleted. No provider response bodies or environment
+values are returned to lifecycle callers.
+
+See deployment/RUNPOD_DEPLOYMENT.md and its configuration worksheet. Owner budget,
+runtime, host, image and storage fields remain empty. The worksheet cannot authorize
+a launch. The provider adapter is not automatically connected to production
+dispatch: authenticated live admission/approval and a reviewed provider factory
+remain outstanding, along with actual image builds, host/TLS/storage acceptance
+and the capped real Wan benchmark. Independent cleanup must operate outside the
+GPU; worker exit does not prove termination and retained volumes may keep billing.
+
+No real provider call, cloud resource, CI run, deployment, model download or GPU
+spending occurred. Previous worker evidence remains 29 passing tests; worker source
+was unchanged in this batch. Full hosted B05 and actual Wan compatibility remain
+unverified.
+
+Validation: 140 Python root tests pass, including ten focused adapter tests and three independent mocked-HTTP lifecycle tests. Shared contract and static/runtime-source artifact checks pass. The regenerated preflight verifies current source and remains PLAN_ONLY with execution disabled.
+
+Previous publication: [canonical job bridge PR #28](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/28) merged at `9c6f6d5e7164139126adeb1dd5d8925b398522ee`.
