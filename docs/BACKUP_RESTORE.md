@@ -149,3 +149,14 @@ All copied live approvals are revoked in the backup snapshot. Original source
 authority remains unchanged. Restoring with the same installed key cannot replay
 an old envelope to clear that revocation or create a new reservation. Recovery
 requires fresh, separately authorized grants.
+
+## Settled execution history
+
+Backups now also retain terminal live jobs after confirmed resource cleanup and
+explicit signed final settlement. Validation checks exact owner/project/resource
+receipts, cumulative settlement deltas, subsequent late charges, frozen launch and
+host bindings, worker credential scope and canonical budget totals. Unsettled or
+uncertain liabilities still prevent backup. Older admission-only databases remain
+supported without an execution-binding table. All restored grants and worker
+credentials remain revoked; keys stay external. Current pinned-model validation
+remains conservative, so migrating old-model history requires separate review.

@@ -17,7 +17,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 ROOT = Path(__file__).resolve().parents[2]
 FIELDS = {'project_id','owner_id','batch_id','worker_id','provider','region','gpu_type','gpu_count',
           'image_ref','worker_endpoint','runtime_seconds','reservation_cents','worker_ttl_seconds','storage','pod'}
-CRITICAL = ('services/controller/live_admission.py','services/controller/http_api.py','services/controller/preflight.py','services/controller/service.py',
+CRITICAL = ('services/controller/live_execution.py','services/controller/live_billing.py','services/controller/live_admission.py','services/controller/http_api.py','services/controller/preflight.py','services/controller/service.py',
             'services/controller/worker_transport.py','services/controller/orchestration.py',
             'services/controller/budget.py','services/controller/real_jobs.py','services/controller/lifecycle.py','services/controller/runpod.py',
             'deployment/build_verify.py','deployment/container_smoke.py')
@@ -213,7 +213,7 @@ def evaluate_plan(intent, *, build_evidence=None, approval=None, now=None):
     else:
         gate('owner_attestation', 'MISSING_OR_INVALID', 'John must choose the specific project, maximum dollar budget and runtime window after reviewing the exact intent; no live approval has been inferred.')
     for name, action in (
-        ('live_admission_not_implemented', 'Source now verifies installed signed owner authority and atomically queues live jobs with separate reservations; provision actual operator trust and owner cap/runtime, then implement reviewed live worker/provider dispatch and billing settlement. No live transport is enabled.'),
+        ('live_admission_not_implemented', 'Source now verifies installed signed owner authority and atomically queues live jobs with separate reservations; provision actual operator trust and owner cap/runtime, then install and independently validate the gated live worker/provider coordinator, watchdog and signed billing reconciler. No live transport is installed.'),
         ('real_worker_bridge_not_implemented', 'Canonical real-profile lifecycle/worker/storage wiring exists only behind an explicit synthetic test authority. Implement authenticated live activation with verified build/config evidence; default WorkerTransport still rejects non-fixture batches.'),
         ('host_storage_acceptance_unverified', 'Select and verify a durable controller/storage host, real TLS endpoint, owner-scoped output retention and disaster recovery; an HTTPS string is not deployment evidence.'),
         ('registry_weights_gpu_unverified', 'Verify registry access to the exact digest, every locked model file on the selected volume, CUDA inference and measured cold/warm behavior on the selected GPU.'),

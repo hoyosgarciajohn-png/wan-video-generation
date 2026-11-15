@@ -2,7 +2,7 @@
 
 No real approval, signing key, host acceptance or spending limit has been created
 for John. This document describes the trust setup required before using the new
-admission source. Production dispatch remains disabled.
+admission source. The default host remains unconfigured. Optional guarded execution requires separately installed transport, credentials and verified owner/build/host prerequisites; none was installed for John.
 
 ## Two separate identity checks
 
@@ -64,10 +64,11 @@ It does not contact Runpod or run a worker. The public fixture routes and
 simulation-only ledger retain their existing meaning. Never translate a simulated
 approval into a real grant by changing a mode field.
 
-Keep an admitted job blocked until its independently reviewed production
-execution path can enforce the grant, current budget, deadline, verified build,
-host/storage acceptance, scoped credentials and independent cleanup. This batch
-does not remove those launch gates. It does not prove real Wan compatibility,
+The callable execution path now enforces the grant, current budget, deadline,
+verified build, signed host/storage acceptance and scoped credentials before
+dispatch. Those checks do not deploy the independent cleanup monitor or provide
+actual owner authority. Keep the host unconfigured until the operational
+prerequisites are reviewed. It does not prove real Wan compatibility,
 actual costs or human creative acceptance.
 
 Before the first permitted launch, review the specific release and resource

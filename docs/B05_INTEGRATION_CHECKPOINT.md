@@ -257,3 +257,36 @@ cannot run Wan or spend. No real provider calls, deployment, keys for John, GPU
 activity or spending occurred. Full hosted B05 and actual Wan acceptance stay open.
 
 Validation: 151 Python root tests pass, including eight focused admission cases and three independent TCP/recovery cases. Shared contract and expanded static/runtime-source artifact checks pass. The regenerated preflight verifies final source hashes and keeps all nine gates missing or blocked. Prior worker evidence is unchanged-source; no CUDA or provider execution was performed.
+
+## Guarded execution and signed billing checkpoint
+
+Trusted LiveExecution source now connects signed admission to Runpod v2 creation,
+scoped remote work, verified take completion, cleanup and a separate live billing
+ledger. Dispatch rechecks installed owner/source/build/host/configuration evidence,
+current project liabilities and bounded bootstrap credentials inside the durable
+queued-to-provisioning transition. The default host has no transport, account key
+or actual authority installed. No real owner grant or spending terms were created.
+
+A worker starting during POST waits on authenticated empty claims until durable
+resource reconciliation. The bounded startup wait does not extend the deadline.
+Unknown creation reconciles without another POST or token rotation. Cleanup uses
+frozen identity and remains available after owner-key revocation, expiry or current
+model/source changes. Worker tokens and active leases still fence work.
+
+Signed billing receipts bind exact owner/project/batch/resource and record either
+incremental charges or final cumulative settlement. Cleanup alone cannot settle.
+Late charges survive settlement and block further admission/launch if they exhaust
+the cap; newer grants do not reset historical spending. This is delegated receipt
+enforcement, not automatic Runpod invoice retrieval or a provider hard stop. It
+does not automatically cancel an active job upon a newly observed overrun.
+
+Independent tests generated actual synthetic 25-frame 1280x704 H.264 output, verified
+its scoped upload/take/replay, retried failed cleanup, settled fictional charges,
+recorded a late overrun and restored fully decoded media with revoked authority.
+Tests used fictional signatures, mocked build evidence and mocked HTTP; none
+establish actual Wan/GPU compatibility.
+
+See docs/LIVE_EXECUTION.md and deployment/LIVE_BILLING_OPERATIONS.md. Actual owner
+cap/runtime, operator trust, build/registry/GPU proof, HTTPS/storage, deployed
+independent watchdog and provider billing reconciliation remain operational gates.
+No cloud calls, live resources, deployment, keys for John or spending occurred.

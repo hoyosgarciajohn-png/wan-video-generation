@@ -27,7 +27,8 @@ class WorkerTransport:
     def __init__(self, control, *, real_jobs=None):
         if real_jobs is not None:
             from services.controller.real_jobs import RealJobBridge
-            require(type(real_jobs) is RealJobBridge and real_jobs.control is control, 'Invalid server job authority')
+            from services.controller.live_execution import LiveExecution
+            require(type(real_jobs) in (RealJobBridge, LiveExecution) and real_jobs.control is control, 'Invalid server job authority')
         self.real_jobs = real_jobs
         self.control = control
         with control.transaction() as db:
@@ -46,7 +47,7 @@ class WorkerTransport:
             raise WorkerAccessError(403)
         try:
             self.real_jobs.authorize_scope(db, owner, project, batch['id'])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, PermissionError):
             raise WorkerAccessError(403) from None
 
     def issue(self, owner, project, batch_id, worker_id, *, ttl_seconds=300):

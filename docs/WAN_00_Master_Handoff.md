@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.14 | November 15, 2026 | Owner: John Hoyos
+Version 1.15 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. Project-specific budget ceiling, hosted storage vendor, and release dates are pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -335,3 +335,40 @@ activity or spending occurred. Full hosted B05 and actual Wan acceptance stay op
 Validation: 151 Python root tests pass, including eight focused admission cases and three independent TCP/recovery cases. Shared contract and expanded static/runtime-source artifact checks pass. The regenerated preflight verifies final source hashes and keeps all nine gates missing or blocked. Prior worker evidence is unchanged-source; no CUDA or provider execution was performed.
 
 Previous publication: [Runpod v2 preparation PR #29](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/29) merged at `851b594ecba321d810153b0bde7a2d542ea202ef`.
+
+## Guarded execution and signed billing checkpoint
+
+Trusted LiveExecution source now connects signed admission to Runpod v2 creation,
+scoped remote work, verified take completion, cleanup and a separate live billing
+ledger. Dispatch rechecks installed owner/source/build/host/configuration evidence,
+current project liabilities and bounded bootstrap credentials inside the durable
+queued-to-provisioning transition. The default host has no transport, account key
+or actual authority installed. No real owner grant or spending terms were created.
+
+A worker starting during POST waits on authenticated empty claims until durable
+resource reconciliation. The bounded startup wait does not extend the deadline.
+Unknown creation reconciles without another POST or token rotation. Cleanup uses
+frozen identity and remains available after owner-key revocation, expiry or current
+model/source changes. Worker tokens and active leases still fence work.
+
+Signed billing receipts bind exact owner/project/batch/resource and record either
+incremental charges or final cumulative settlement. Cleanup alone cannot settle.
+Late charges survive settlement and block further admission/launch if they exhaust
+the cap; newer grants do not reset historical spending. This is delegated receipt
+enforcement, not automatic Runpod invoice retrieval or a provider hard stop. It
+does not automatically cancel an active job upon a newly observed overrun.
+
+Independent tests generated actual synthetic 25-frame 1280x704 H.264 output, verified
+its scoped upload/take/replay, retried failed cleanup, settled fictional charges,
+recorded a late overrun and restored fully decoded media with revoked authority.
+Tests used fictional signatures, mocked build evidence and mocked HTTP; none
+establish actual Wan/GPU compatibility.
+
+See docs/LIVE_EXECUTION.md and deployment/LIVE_BILLING_OPERATIONS.md. Actual owner
+cap/runtime, operator trust, build/registry/GPU proof, HTTPS/storage, deployed
+independent watchdog and provider billing reconciliation remain operational gates.
+No cloud calls, live resources, deployment, keys for John or spending occurred.
+
+Validation: 158 Python root tests passed in 37.387 seconds on the corrected source; 36 worker tests passed. Shared contract and expanded isolated runtime-source imports passed. The final source-bound preflight remains PLAN_ONLY with all nine gates missing or blocked.
+
+Previous publication: [authenticated admission PR #30](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/30) merged at `6238c8c1e0076f87bf55f82ccaa4349055361235`.

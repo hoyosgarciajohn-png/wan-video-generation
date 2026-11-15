@@ -13,6 +13,7 @@ import re
 from uuid import uuid4
 
 from services.controller.budget import cents
+from services.controller.live_billing import initialize as initialize_billing, totals as billing_totals
 from services.controller.lifecycle import Lifecycle
 from services.controller.real_jobs import RealJobBridge
 from services.controller.runpod import validate_launch_profile
@@ -89,6 +90,7 @@ class LiveAdmission:
         self._build_evidence = build_evidence
         self._lifecycle = Lifecycle(self.control.db_path, _DisarmedProvider())
         with self.control.transaction() as db:
+            initialize_billing(db)
             db.execute('''CREATE TABLE IF NOT EXISTS live_approvals (
                 id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL,
                 envelope TEXT NOT NULL, created TEXT NOT NULL, revoked INTEGER NOT NULL DEFAULT 0)''')
@@ -190,9 +192,8 @@ class LiveAdmission:
                 latest = db.execute('SELECT id FROM live_approvals WHERE owner=? AND project=? ORDER BY rowid DESC LIMIT 1',
                                     (owner, project)).fetchone()[0]
                 require(latest == grant['id'], 'Approval is not current')
-                committed = db.execute("SELECT COALESCE(SUM(reserved_cents),0) FROM live_reservations WHERE owner=? AND project=? AND state='reserved'",
-                                       (owner, project)).fetchone()[0]
-                require(committed + request['reservation_cents'] <= grant['approved_cents'], 'Insufficient live budget')
+                balance = billing_totals(db, owner, project)
+                require(balance['spent_cents'] + balance['reserved_cents'] + request['reservation_cents'] <= grant['approved_cents'], 'Insufficient live budget')
                 now = self.control.clock()
                 deadline = math.floor(now.timestamp()) + request['runtime_seconds']
                 require(request['runtime_seconds'] <= grant['max_runtime_seconds'] and deadline <= timestamp(grant['valid_until']).timestamp(),
@@ -252,19 +253,24 @@ class LiveAdmission:
             db.execute("UPDATE live_reservations SET state='released' WHERE batch=?", (batch_id,))
             return self._status(db, owner, project, batch_id)
 
-    def prepare_provider(self, owner, project, approval_id, host_envelope):
+    def verify_execution_evidence(self, db, owner, project, approval_id, host_envelope):
         """Verify prerequisites; intentionally cannot return a spending-capable provider."""
+        self.control._load(db, owner, project)
+        grant, config_hash = self._approval(db, owner, project, approval_id)
+        require(self._build_evidence is not None, 'Verified build evidence is not installed')
+        evidence = _build(self._build_evidence, grant['profile']['image_ref'])
+        host = _verify(host_envelope, self._host_keys, HOST_DOMAIN, owner)
+        require(set(host) == {'owner','project','config_hash','source_sha256','build_manifest_sha256','valid_until','worker_endpoint','storage_id'},
+                'Exact host acceptance evidence required')
+        require(host['owner'] == owner and host['project'] == project and host['config_hash'] == config_hash and
+                host['source_sha256'] == grant['source_sha256'] and
+                host['build_manifest_sha256'] == evidence['manifest_sha256'] and
+                host['worker_endpoint'] == grant['profile']['worker_endpoint'] and host['storage_id'] == grant['profile']['storage_id'] and
+                timestamp(host['valid_until']) > self.control.clock(), 'Host acceptance does not match approved execution')
+        return grant, host
+
+    def prepare_provider(self, owner, project, approval_id, host_envelope):
+        """Legacy planning API never installs a transport; use trusted LiveExecution."""
         with self.control.transaction() as db:
-            self.control._load(db, owner, project)
-            grant, config_hash = self._approval(db, owner, project, approval_id)
-            require(self._build_evidence is not None, 'Verified build evidence is not installed')
-            evidence = _build(self._build_evidence, grant['profile']['image_ref'])
-            host = _verify(host_envelope, self._host_keys, HOST_DOMAIN, owner)
-            require(set(host) == {'owner','project','config_hash','source_sha256','build_manifest_sha256','valid_until','worker_endpoint','storage_id'},
-                    'Exact host acceptance evidence required')
-            require(host['owner'] == owner and host['project'] == project and host['config_hash'] == config_hash and
-                    host['source_sha256'] == grant['source_sha256'] and
-                    host['build_manifest_sha256'] == evidence['manifest_sha256'] and
-                    host['worker_endpoint'] == grant['profile']['worker_endpoint'] and host['storage_id'] == grant['profile']['storage_id'] and
-                    timestamp(host['valid_until']) > self.control.clock(), 'Host acceptance does not match approved execution')
+            self.verify_execution_evidence(db, owner, project, approval_id, host_envelope)
         raise AuthorityError('Live worker dispatch is not installed; no provider transport can be returned')

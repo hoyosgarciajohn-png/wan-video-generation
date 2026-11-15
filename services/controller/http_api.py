@@ -205,9 +205,15 @@ class StudioAPI:
                     if method == 'POST' and collection == 'approvals' and action == 'revoke' and value == {}:
                         return Reply(200, self.live_admission.revoke(owner, project_id, record_id))
                     if method == 'POST' and collection == 'batches' and action == 'cancel' and value == {}:
-                        return Reply(200, self.live_admission.cancel(owner, project_id, record_id))
+                        from services.controller.live_execution import LiveExecution
+                        executor = self.workers.real_jobs
+                        operation = executor.cancel if type(executor) is LiveExecution else self.live_admission.cancel
+                        return Reply(200, operation(owner, project_id, record_id))
                     if method == 'GET' and collection == 'batches' and record_id and action is None:
-                        return Reply(200, self.live_admission.status(owner, project_id, record_id))
+                        from services.controller.live_execution import LiveExecution
+                        executor = self.workers.real_jobs
+                        operation = executor.status if type(executor) is LiveExecution else self.live_admission.status
+                        return Reply(200, operation(owner, project_id, record_id))
                 except KeyError:
                     raise HTTPError(404)
                 raise HTTPError(405)
