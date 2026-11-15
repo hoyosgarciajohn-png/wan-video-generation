@@ -1,7 +1,7 @@
 # Wan Video Generation · Parallel implementation chats
-Version 1.1 | November 15, 2026
+Version 1.2 | November 15, 2026
 
-Keep this conversation as **WAN Command Center**. Open four implementation chats in the same project for B01–B04 and a fifth QA chat for independent acceptance work. Give each chat the master handoff, repository link once confirmed, and the prompt below. QA can draft its fixtures and matrix from day one. The Command Center owns integration and dispatch.
+Keep this conversation as **WAN Command Center**. Open four implementation chats in the same project for B01–B04 and a fifth QA chat for independent acceptance work. Give each chat the master handoff, confirmed repository link below, and the prompt below. QA can draft its fixtures and matrix from day one. The Command Center owns integration and dispatch.
 
 ## Shared opening instructions
 Read WAN_00_Master_Handoff.md, the project guide and repository AGENTS.md. Verify repository and baseline commit. Work on an assigned branch and issue. Use the versioned shared contract and fictional test data. Surface interface changes before adopting them. Record evidence using the master handoff template. Paid rendering requires the approved project cap. Production deployment requires owner approval.
@@ -24,3 +24,21 @@ Read WAN_00_Master_Handoff.md, the project guide and repository AGENTS.md. Verif
 ## Repository coordination
 
 Canonical implementation and fixture records are in https://github.com/hoyosgarciajohn-png/wan-video-generation. Read docs/CONTRACT.md, contracts/ and fixtures/ at the B00 baseline. The earlier WAN_B00_Starter.zip remains an archived draft. The complete issue and branch mapping is in docs/WORKSTREAMS.md.
+
+## Start now
+
+Repository https://github.com/hoyosgarciajohn-png/wan-video-generation
+
+Baseline `c9c364ab3f68cfca24489715ab0cd8419d0d4f60` from merged PR #11. B00 is complete.
+
+| Workstream | Issue | Branch |
+|---|---|---|
+| GPU | [#2](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/2) | `work/b01-gpu` |
+| Backend | [#3](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/3) | `work/b02-backend` |
+| Studio | [#4](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/4) | `work/b03-studio` |
+| Media | [#5](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/5) | `work/b04-media` |
+| QA preparation | [#6](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/6) | `work/b05-qa` |
+
+Paste into each existing workstream chat
+
+> Start your assigned issue from the repository and baseline above. Read AGENTS.md and docs/WORKSTREAMS.md, use your assigned branch, implement the issue with fictional automated checks, and return a PR plus evidence to the Command Center. B00 is complete. QA starts with preparation while B01–B04 proceed.

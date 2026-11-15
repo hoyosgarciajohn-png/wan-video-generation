@@ -1,5 +1,5 @@
 # Wan Video Generation · Render workflow and contracts
-Version 1.1 | Contract 0.1.0 baseline
+Version 1.2 | Contract 0.1.0 baseline
 
 ## Creator workflow
 Create project → import song or script → create scenes and shots → attach reusable references → approve a render batch → review takes → replace selected shots as needed → assemble timeline → mix audio → export MP4. The timeline persists while the GPU is off. Accepted take references are immutable unless an editor explicitly replaces them.
@@ -26,3 +26,7 @@ Use the same six shots across runs: a beat-driven music shot, two continuity sho
 ## Repository coordination
 
 Canonical implementation and fixture records are in https://github.com/hoyosgarciajohn-png/wan-video-generation. Read docs/CONTRACT.md, contracts/ and fixtures/ at the B00 baseline. The earlier WAN_B00_Starter.zip remains an archived draft. The complete issue and branch mapping is in docs/WORKSTREAMS.md.
+
+## Published baseline
+
+Contract 0.1.0 is published at `c9c364ab3f68cfca24489715ab0cd8419d0d4f60` through [PR #11](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/11). Fourteen local tests and synthetic media checks passed. The complete schema includes separate review records and historical timeline revisions. Runtime enforcement remains assigned to B01–B04.
