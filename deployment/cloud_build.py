@@ -57,7 +57,7 @@ def preflight(target, output):
                 if Path(path).is_symlink():
                     raise ValueError('Refusing to remove a linked SDK directory')
                 if Path(path).is_dir():
-                    subprocess.run(['sudo', 'rm', '-rf', '--', path], check=True, timeout=120)
+                    subprocess.run(['sudo', 'rm', '-rf', '--', path], check=True, timeout=300)
                     report['removed_unused_sdks'].append(path)
                 if shutil.disk_usage(docker_root).free >= MIN_DISK[target]:
                     break

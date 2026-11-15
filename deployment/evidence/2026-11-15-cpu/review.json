@@ -1,0 +1,22 @@
+{
+  "reviewed_at": "2026-11-15T23:05:24.302376+00:00",
+  "run_id": 43772264998,
+  "artifact_id": 14184507441,
+  "artifact_zip_sha256": "7867dec60b9b444f2d91b5ce73c0e4fd7cd42ab1677926ba282a573085c01b18",
+  "source_commit": "18bbdfdcbe266d11db48b6f21cfa9441775cf5c3",
+  "source_inventory_matches_current_checkout": true,
+  "context_and_smoke_helper_hashes": "PASS",
+  "command_exit_codes_and_log_hashes": "PASS",
+  "image_identity": "PASS",
+  "fixture_checksum": "PASS",
+  "downloaded_fixture_decode": "PASS",
+  "ffprobe": {
+    "codec": "h264",
+    "width": 320,
+    "height": 180,
+    "frame_rate": "24/1",
+    "frames": 48,
+    "duration_seconds": 2
+  },
+  "assurance": "Observed cloud build and offline smoke checks only; no registry image or GPU inference."
+}
