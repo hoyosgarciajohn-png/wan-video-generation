@@ -1,0 +1,118 @@
+{
+  "issue": "https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/6",
+  "scope": "B05 preparation using fictional data",
+  "recorded_at": "2026-11-15T15:15:05.993219+00:00",
+  "source_commit": "c9c364ab3f68cfca24489715ab0cd8419d0d4f60",
+  "branch": "work/b05-qa",
+  "working_tree_changes_before_run": "?? tests/integration/",
+  "contract_version": "0.1.0",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "jsonschema": "4.26.0"
+  },
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/3ca0d57d76cb/wan-video-generation/.venv/bin/python",
+        "scripts/validate_contract.py",
+        "--media-root",
+        "fixtures"
+      ],
+      "started_at": "2026-11-15T15:15:06.106153+00:00",
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: shared contract and record invariants\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/workspace/scratch/3ca0d57d76cb/wan-video-generation/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "started_at": "2026-11-15T15:15:06.875993+00:00",
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "test_empty_or_skipped_discovery_cannot_pass (integration.test_evidence.EvidenceReportingTests.test_empty_or_skipped_discovery_cannot_pass) ... ok\ntest_failed_command_is_preserved (integration.test_evidence.EvidenceReportingTests.test_failed_command_is_preserved) ... ok\ntest_missing_executable_and_timeout_are_failures (integration.test_evidence.EvidenceReportingTests.test_missing_executable_and_timeout_are_failures) ... ok\ntest_successful_discovery_records_count (integration.test_evidence.EvidenceReportingTests.test_successful_discovery_records_count) ... ok\ntest_failed_attempt_retry_cannot_receive_a_committed_take (integration.test_preparation.IntegrationPreparationTests.test_failed_attempt_retry_cannot_receive_a_committed_take) ... ok\ntest_foreign_assets_cannot_be_grafted_by_rewriting_project_id (integration.test_preparation.IntegrationPreparationTests.test_foreign_assets_cannot_be_grafted_by_rewriting_project_id) ... ok\ntest_foreign_references_are_rejected_across_component_boundaries (integration.test_preparation.IntegrationPreparationTests.test_foreign_references_are_rejected_across_component_boundaries) ... ok\ntest_missing_and_partial_uploads_fail_media_verification (integration.test_preparation.IntegrationPreparationTests.test_missing_and_partial_uploads_fail_media_verification) ... ok\ntest_music_film_and_cartoon_timeline_boundaries (integration.test_preparation.IntegrationPreparationTests.test_music_film_and_cartoon_timeline_boundaries) ... ok\ntest_replacement_preserves_old_take_and_export_revision (integration.test_preparation.IntegrationPreparationTests.test_replacement_preserves_old_take_and_export_revision) ... ok\ntest_retry_with_expired_lease_cannot_commit (integration.test_preparation.IntegrationPreparationTests.test_retry_with_expired_lease_cannot_commit) ... ok\ntest_symlink_cannot_escape_media_root (integration.test_preparation.IntegrationPreparationTests.test_symlink_cannot_escape_media_root) ... ok\ntest_synthetic_sources_decode_completely_without_mutation (integration.test_preparation.IntegrationPreparationTests.test_synthetic_sources_decode_completely_without_mutation) ... ok\ntest_two_project_fixtures_validate_with_scoped_media (integration.test_preparation.IntegrationPreparationTests.test_two_project_fixtures_validate_with_scoped_media) ... ok\ntest_budget_types_and_cost_envelope (test_contract.ContractTests.test_budget_types_and_cost_envelope) ... ok\ntest_complete_fixture_and_media (test_contract.ContractTests.test_complete_fixture_and_media) ... ok\ntest_corrupt_media_and_traversal_are_rejected (test_contract.ContractTests.test_corrupt_media_and_traversal_are_rejected) ... ok\ntest_cross_project_and_owner_references_are_rejected (test_contract.ContractTests.test_cross_project_and_owner_references_are_rejected) ... ok\ntest_export_tracks_timeline_revision_and_output (test_contract.ContractTests.test_export_tracks_timeline_revision_and_output) ... ok\ntest_frozen_revision_and_attempt_configuration (test_contract.ContractTests.test_frozen_revision_and_attempt_configuration) ... ok\ntest_historical_timeline_revision_and_approval_are_preserved (test_contract.ContractTests.test_historical_timeline_revision_and_approval_are_preserved) ... ok\ntest_render_success_can_have_unconfirmed_cleanup (test_contract.ContractTests.test_render_success_can_have_unconfirmed_cleanup) ... ok\ntest_take_link_and_lease (test_contract.ContractTests.test_take_link_and_lease) ... ok\ntest_timeline_approval_trim_duration_and_project_limit (test_contract.ContractTests.test_timeline_approval_trim_duration_and_project_limit) ... ok\ntest_ambiguous_create_is_discoverable (test_fake_provider.FakeProviderTests.test_ambiguous_create_is_discoverable) ... ok\ntest_blind_retry_exposes_duplicate_allocations (test_fake_provider.FakeProviderTests.test_blind_retry_exposes_duplicate_allocations) ... ok\ntest_failed_delete_preserves_resource_until_retry (test_fake_provider.FakeProviderTests.test_failed_delete_preserves_resource_until_retry) ... ok\ntest_repeated_delete_succeeds (test_fake_provider.FakeProviderTests.test_repeated_delete_succeeds) ... ok\n\n----------------------------------------------------------------------\nRan 28 tests in 2.312s\n\nOK\n",
+      "tests_run": 28
+    },
+    {
+      "command": [
+        "ffmpeg",
+        "-version"
+      ],
+      "started_at": "2026-11-15T15:15:09.740651+00:00",
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers\nbuilt with gcc 14 (Debian 14.2.0-19)\nconfiguration: --prefix=/usr --extra-version=0+deb13u1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --disable-libmfx --disable-omx --enable-gnutls --enable-libaom --enable-libass --enable-libbs2b --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libglslang --enable-libgme --enable-libgsm --enable-libharfbuzz --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-openal --enable-opencl --enable-opengl --disable-sndio --enable-libvpl --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-ladspa --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-libjack --enable-libpulse --enable-librabbitmq --enable-librist --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libx264 --enable-libzmq --enable-libzvbi --enable-lv2 --enable-sdl2 --enable-libplacebo --enable-librav1e --enable-pocketsphinx --enable-librsvg --enable-libjxl --enable-shared\nlibavutil      59. 39.100 / 59. 39.100\nlibavcodec     61. 19.101 / 61. 19.101\nlibavformat    61.  7.103 / 61.  7.103\nlibavdevice    61.  3.100 / 61.  3.100\nlibavfilter    10.  5.100 / 10.  5.100\nlibswscale      8.  3.100 /  8.  3.100\nlibswresample   5.  3.100 /  5.  3.100\nlibpostproc    58.  3.100 / 58.  3.100\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "ffprobe",
+        "-version"
+      ],
+      "started_at": "2026-11-15T15:15:09.908909+00:00",
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "ffprobe version 7.1.5-0+deb13u1 Copyright (c) 2007-2026 the FFmpeg developers\nbuilt with gcc 14 (Debian 14.2.0-19)\nconfiguration: --prefix=/usr --extra-version=0+deb13u1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --disable-libmfx --disable-omx --enable-gnutls --enable-libaom --enable-libass --enable-libbs2b --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libglslang --enable-libgme --enable-libgsm --enable-libharfbuzz --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-openal --enable-opencl --enable-opengl --disable-sndio --enable-libvpl --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-ladspa --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-libjack --enable-libpulse --enable-librabbitmq --enable-librist --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libx264 --enable-libzmq --enable-libzvbi --enable-lv2 --enable-sdl2 --enable-libplacebo --enable-librav1e --enable-pocketsphinx --enable-librsvg --enable-libjxl --enable-shared\nlibavutil      59. 39.100 / 59. 39.100\nlibavcodec     61. 19.101 / 61. 19.101\nlibavformat    61.  7.103 / 61.  7.103\nlibavdevice    61.  3.100 / 61.  3.100\nlibavfilter    10.  5.100 / 10.  5.100\nlibswscale      8.  3.100 /  8.  3.100\nlibswresample   5.  3.100 /  5.  3.100\nlibpostproc    58.  3.100 / 58.  3.100\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "started_at": "2026-11-15T15:15:10.023204+00:00",
+      "status": "PASS",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "b05_integration_status": "BLOCKED",
+  "remaining_evidence": [
+    "Merged B01\u2013B04 and exact deployed staging revision",
+    "Authenticated creator journey through simulated render, review, timeline and playable export",
+    "Runtime project isolation, concurrency, crash recovery, stale leases and cleanup watchdog",
+    "B06 approved spend/runtime envelope, GPU benchmark and provider billing/deletion evidence",
+    "Live-owner creative acceptance and B07\u2013B09 release/recovery evidence"
+  ],
+  "resources_for_this_run": {
+    "gpu_resources_created": 0,
+    "gpu_resources_active": 0,
+    "provider_requests": 0,
+    "incurred_cents": 0,
+    "currency": "USD"
+  },
+  "source_hashes": {
+    "scripts/validate_contract.py": "180835b18d6c7944bd10c370bf1244ef5dbe61d8298ca6601bbaab4a8fd633e6",
+    "src/wan_platform/__init__.py": "f8b172a40da641074620414640842dfdffe961fc3601bd7cc1c4cca6e740a7d7",
+    "src/wan_platform/fake_provider.py": "1f418eb54c21a82e0a6eb1017f798415d2ae3953a05983404c256954c9bee9ad",
+    "tests/integration/__init__.py": "97e58a681ce158b94aba459055221f776933bec9c1281afd8266c66b23d82e56",
+    "tests/integration/fixtures.py": "7e8bcadf39dbb261d5afb590f16b43e1dfb67d0feb422b8a3ff768f42f86e558",
+    "tests/integration/run_checks.py": "1a227914bc29d6393262d3612524a6506b1e87297417ef259bcb729011c01394",
+    "tests/integration/test_evidence.py": "ed181f47406729a0221f8a1268f49357d7899d8baf4ec4f9babeaba20da55881",
+    "tests/integration/test_preparation.py": "a2a2d9a1f17c9e39f235e749dce53dad21df11d7dc383a485be325a9484e991a",
+    "tests/test_contract.py": "d28b6fe0571cc6a999cc5b94b657f5ff14760c75e290f03ecae97f5dd4078e61",
+    "tests/test_fake_provider.py": "9a4b33d9642320d117570bcc09f2258cd37512460b0864cc0b1701368a2c8cd6"
+  },
+  "preparation_status": "PASS",
+  "publication_verification": {
+    "tested_code_commit": "570a0aa335ae604250e9628974c36f77e5b46a40",
+    "method": "Every Python file SHA-256 recorded during execution matches the committed blob. Canonical schema and media fixtures retain their verified B00 blobs.",
+    "verified_python_file_count": 10,
+    "documentation_added_after_run": [
+      "tests/integration/README.md",
+      "tests/integration/MATRIX.md"
+    ]
+  }
+}
+

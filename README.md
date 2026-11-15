@@ -2,7 +2,7 @@
 
 A private foundation for self-hosted Wan production using temporary Runpod GPU Pods. Target projects are music videos up to 5 minutes and short films and cartoons up to 30 minutes.
 
-B00 supplies the shared contract, fictional media, a process-local fake GPU provider, validation commands, architecture and workstream assignments. Application services, authentication, real inference and deployment are scheduled in later batches.
+The local integration checkpoint includes the storyboard fixture UI, durable fixture controller, Wan worker source, CPU exporter and QA checks. See [integration evidence and remaining gates](docs/B05_INTEGRATION_CHECKPOINT.md). Hosted authentication, Studio/backend transport, paid GPU dispatch and production deployment remain pending.
 
 ## Start
 
