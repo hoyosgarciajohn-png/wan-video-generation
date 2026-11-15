@@ -1,8 +1,20 @@
 # Wan Video Generation · Master handoff
-Version 1.19 | November 15, 2026 | Owner: John Hoyos
+Version 1.20 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
+
+## Current Command Center checkpoint
+Cloud builds are implemented and verified: CPU run 43773935725 and Wan worker
+image run 43774509988 passed build/identity/offline smoke/fixture checks. Evidence
+is retained in the repository and summarized in deployment/CLOUD_BUILD_RECORD.md.
+No Docker Desktop installation is needed. The worker image loads Torch and
+FlashAttention and checks Wan source syntax; actual Wan CUDA import, model
+weights and inference remain unverified. Images are not yet published. Next:
+private registry publication/pull, then controller HTTPS/storage, independent
+watchdog and installed authority for the already-approved $5 / 30-minute trial.
+No Runpod resources or paid builder were created. Historical entries below are
+chronological; this checkpoint is the current build status.
 
 ## Ownership and source of truth
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
@@ -435,3 +447,32 @@ checks now import actual Torch/FlashAttention and compile Wan source syntax;
 mock or upstream patch is used. Two targeted syntax checks and seven preflight
 checks pass. The source-bound offline plan is refreshed but remains disarmed.
 Actual successful GPU image evidence still awaits the corrected build.
+
+## Cloud build batch complete
+
+CPU run 43773935725 and Wan worker image run 43774509988 succeeded. The final
+source contexts, helper/verifier, command logs, immutable image identities and
+fixture output checksums were reviewed after downloading the actual artifacts.
+Both synthetic clips fully decoded as H.264, 320x180, 24 fps, 48 frames/two seconds.
+Final evidence lives in deployment/evidence/2026-11-15-cpu-final and gpu-final.
+
+The GPU image loads Torch 2.8.0+cu128/FlashAttention and compiles 28 Wan source
+files without executing Wan. Wan's GPU-only import remains explicitly unverified;
+no CUDA mock or upstream patch was introduced. No model weights were downloaded.
+The offline plan's current source binding is verified and still disarmed.
+Validation: four cloud guards, two source-syntax checks and seven affected
+preflight checks passed; actual cloud builds add separate evidence. Prior broad
+controller/worker suites were not repeated without relevant behavior changes.
+
+The final build used a temporary PR-opened workflow because the browser connection
+timed out. PR #40 is closed without merging; main remains manual-only, one build
+at a time, 35-minute job ceiling and one-day bounded artifacts. PRs #34–39 contain
+the cloud setup and observed fixes. No billing limit or subscription was changed.
+The existing $0 paid Actions budget and included allowance were checked before
+dispatch; no final post-run invoice is claimed. No Runpod resource was created.
+
+The images existed on disposable runners and were not published. Next recipient:
+Command Center for private registry publication and authenticated pull evidence,
+then HTTPS controller/durable storage, independent watchdog and actual installed
+authority. The owner-approved $5 / 1,800-second / one-attempt trial remains unused.
+Automated application Runpod bill collection remains pending. Contract 0.1.0.

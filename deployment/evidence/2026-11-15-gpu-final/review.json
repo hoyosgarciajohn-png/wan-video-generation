@@ -1,0 +1,23 @@
+{
+  "reviewed_at": "2026-11-15T23:29:51.600361+00:00",
+  "run_id": 43774509988,
+  "artifact_id": 14185762263,
+  "artifact_zip_sha256": "b0645debf932476b135e2f54dd455444935bb46f3392ce931648756342d9d640",
+  "source_commit": "423d1fdcab7dedc442714079b5a591bbf78095ec",
+  "reviewed_main_source": "f6c8ab126b9c0311f8c4c6a7c3aee53f289af45c",
+  "source_inventory_matches_current_checkout": true,
+  "context_and_smoke_helper_hashes": "PASS",
+  "command_exit_codes_and_log_hashes": "PASS",
+  "image_identity": "PASS",
+  "fixture_checksum": "PASS",
+  "downloaded_fixture_decode": "PASS",
+  "ffprobe": {
+    "codec": "h264",
+    "width": 320,
+    "height": 180,
+    "frame_rate": "24/1",
+    "frames": 48,
+    "duration_seconds": 2
+  },
+  "assurance": "Actual container build and CPU-only library/source/fixture checks; Wan CUDA import, weights, inference, registry publication and hosting remain unverified."
+}

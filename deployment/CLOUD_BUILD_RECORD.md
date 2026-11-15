@@ -36,10 +36,9 @@ A local image content ID is not an available registry digest.
 
 ## Next deployment work
 
-1. Finish the GPU image build and offline imports/fixture verification.
-2. Publish the verified image privately, capture its registry digest, and verify
+1. Publish the verified image privately, capture its registry digest, and verify
    an authenticated pull. Keep credentials out of source and evidence.
-3. Verify controller HTTPS, durable storage, independent watchdog and actual
+2. Verify controller HTTPS, durable storage, independent watchdog and actual
    installed authority before using the approved $5 / 1,800-second / one-attempt
    Runpod trial. The trial has not been used.
 
@@ -62,3 +61,23 @@ unverified. No CUDA monkeypatch, upstream source change or fake device is used.
 Two targeted tests prove source checking does not execute import-time GPU code
 and rejects broken/missing source. Seven preflight tests also pass. The offline
 source-bound plan was regenerated and remains disarmed with all nine gates open.
+
+## Accepted cloud checkpoint
+
+- Corrected CPU: [run 43773935725](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43773935725), all four image/identity/runtime/fixture gates PASS.
+- Wan worker image: [run 43774509988](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43774509988), all four offline gates PASS; actual Torch/FlashAttention import and 28 Wan Python source files compiled. Wan CUDA import remains UNVERIFIED_REQUIRES_GPU.
+- Both downloaded artifacts passed source/context/helper, command log, image identity and fixture checksum review. Both two-second synthetic H.264 clips were fully decoded. Final evidence is in `deployment/evidence/2026-11-15-{cpu,gpu}-final`.
+- GPU run 43773913410 was stopped at capacity on a smaller runner before image build; PR #39 adds the unused Haskell SDK fallback without lowering the 40 GiB floor. The successful final runner had 40.68 GiB free before needing that fallback. Future runners still must pass the guard.
+- The browser connection timed out before the last manual dispatch. A temporary PR-opened workflow ran the same reviewed source through the connected repository controls. PR #40 was closed without merging; main retains only manual dispatch.
+
+CPU source checkout: `a5af75b5da18bb668a8334b6418333dec2f5dc77`. GPU checkout:
+`423d1fdcab7dedc442714079b5a591bbf78095ec` (PR #40 synthetic merge ref). Their
+allowlisted image inputs and verifier/helper match the final reviewed main source.
+Images were discarded with the temporary runners; publication and authenticated
+pull remain the next task. No paid builder, Runpod Pod, storage volume, model
+download, GPU render or production deployment was created.
+
+At the pre-dispatch billing review, $4.91 included compute and 0.5 GB artifact
+allowance remained, with $0 billable Actions usage and an existing $0 paid budget.
+Only small artifacts were retained for one day. These are allowance observations,
+not a finalized post-run bill. No billing limit, plan or subscription was changed.

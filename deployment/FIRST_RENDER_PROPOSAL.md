@@ -155,3 +155,14 @@ Additional sources checked November 15, 2026:
 
 - https://docs.runpod.io/serverless/workers/github-integration
 - https://www.runpod.io/blog/runpod-weld-build-images-on-your-pod
+
+## Cloud build acceptance
+
+The previously missing build host is now verified for container builds: GitHub
+Actions built and checked the CPU and Wan worker images. See CLOUD_BUILD_RECORD.md
+and BUILD_GATE_STATUS.json for actual runs, image IDs and retained evidence.
+Wan imports CUDA eagerly, so CPU builders verify actual Torch/FlashAttention
+loading and Wan source syntax; GPU-side Wan import remains unverified. Images
+have not been published. HTTPS controller/storage, independent watchdog, registry
+pull and installed runtime authority remain pending. The existing $5 / 1,800-second
+/ one-attempt approval is unchanged and unused.

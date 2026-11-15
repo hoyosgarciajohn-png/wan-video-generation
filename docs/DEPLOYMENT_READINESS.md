@@ -141,3 +141,12 @@ disposable Linux amd64 Docker host, bounded runtime and evidence collection.
 See deployment/BUILD_VERIFICATION.md for account allowance and capacity checks.
 Only observed run artifacts may close image gates; cloud build setup does not
 close registry, HTTPS, storage, watchdog, owner-authority or CUDA gates.
+
+## Observed cloud build acceptance
+
+CPU run 43773935725 and Wan worker image run 43774509988 passed actual image build,
+immutable image inspection and offline smoke/fixture checks. Retained logs and
+source/output checksums were verified; both synthetic clips were fully decoded.
+See deployment/CLOUD_BUILD_RECORD.md. Wan CUDA import/inference, model weights,
+registry publication/pull, production HTTP/storage and watchdog remain open.
+This supersedes earlier no-build statements for the image gates only.
