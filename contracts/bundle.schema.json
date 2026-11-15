@@ -1,0 +1,825 @@
+{
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "const": "0.1.0"
+    },
+    "project": {
+      "$ref": "#/$defs/project"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "minItems": 0
+    },
+    "shots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/shot"
+      },
+      "minItems": 0
+    },
+    "batches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/batch"
+      },
+      "minItems": 0
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attempt"
+      },
+      "minItems": 0
+    },
+    "takes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/take"
+      },
+      "minItems": 0
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/review"
+      },
+      "minItems": 0
+    },
+    "timelines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/timeline"
+      },
+      "minItems": 0
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/export"
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "contract_version",
+    "project",
+    "assets",
+    "shots",
+    "batches",
+    "attempts",
+    "takes",
+    "reviews",
+    "timelines",
+    "exports"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wan:contract:0.1.0",
+  "$defs": {
+    "frame_rate": {
+      "type": "object",
+      "properties": {
+        "numerator": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "additionalProperties": false
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frame_rate": {
+          "$ref": "#/$defs/frame_rate"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "steps": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "frame_rate",
+        "seed",
+        "steps"
+      ],
+      "additionalProperties": false
+    },
+    "model_profile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checkpoint_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code_revision": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "checkpoint_ref",
+        "code_revision"
+      ],
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "music_video",
+            "short_film",
+            "cartoon"
+          ]
+        },
+        "runtime_limit_ms": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "owner_id",
+        "title",
+        "kind",
+        "runtime_limit_ms"
+      ],
+      "additionalProperties": false
+    },
+    "asset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "audio",
+            "video"
+          ]
+        },
+        "object_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mime_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "duration_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "owner_id",
+        "kind",
+        "object_key",
+        "mime_type",
+        "bytes",
+        "sha256",
+        "duration_ms"
+      ],
+      "additionalProperties": false
+    },
+    "shot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "scene_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference_asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+          },
+          "minItems": 0
+        },
+        "target_duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "settings": {
+          "$ref": "#/$defs/settings"
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "scene_id",
+        "revision",
+        "prompt",
+        "reference_asset_ids",
+        "target_duration_ms",
+        "settings"
+      ],
+      "additionalProperties": false
+    },
+    "shot_snapshot": {
+      "type": "object",
+      "properties": {
+        "shot_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference_asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+          },
+          "minItems": 0
+        },
+        "target_duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "settings": {
+          "$ref": "#/$defs/settings"
+        }
+      },
+      "required": [
+        "shot_id",
+        "revision",
+        "prompt",
+        "reference_asset_ids",
+        "target_duration_ms",
+        "settings"
+      ],
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "const": "USD"
+        },
+        "approved_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reserved_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "spent_cents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "currency",
+        "approved_cents",
+        "reserved_cents",
+        "spent_cents"
+      ],
+      "additionalProperties": false
+    },
+    "batch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution_mode": {
+          "enum": [
+            "fixture",
+            "runpod"
+          ]
+        },
+        "model_profile": {
+          "$ref": "#/$defs/model_profile"
+        },
+        "shot_snapshots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/shot_snapshot"
+          },
+          "minItems": 1
+        },
+        "budget": {
+          "$ref": "#/$defs/budget"
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deadline_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "provisioning",
+            "rendering",
+            "succeeded",
+            "failed",
+            "canceled"
+          ]
+        },
+        "cleanup_state": {
+          "enum": [
+            "pending",
+            "confirmed",
+            "failed"
+          ]
+        },
+        "provider_resource_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "idempotency_key",
+        "execution_mode",
+        "model_profile",
+        "shot_snapshots",
+        "budget",
+        "approved_at",
+        "deadline_at",
+        "state",
+        "cleanup_state",
+        "provider_resource_id"
+      ],
+      "additionalProperties": false
+    },
+    "attempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "batch_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "shot_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "shot_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "worker_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "lease_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "lease_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "settings": {
+          "$ref": "#/$defs/settings"
+        },
+        "model_profile": {
+          "$ref": "#/$defs/model_profile"
+        },
+        "state": {
+          "enum": [
+            "claimed",
+            "running",
+            "succeeded",
+            "failed",
+            "canceled"
+          ]
+        },
+        "failure_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "batch_id",
+        "shot_id",
+        "shot_revision",
+        "worker_id",
+        "lease_id",
+        "lease_expires_at",
+        "started_at",
+        "completed_at",
+        "settings",
+        "model_profile",
+        "state",
+        "failure_reason"
+      ],
+      "additionalProperties": false
+    },
+    "take": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "shot_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frame_rate": {
+          "$ref": "#/$defs/frame_rate"
+        },
+        "committed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "attempt_id",
+        "shot_id",
+        "asset_id",
+        "duration_ms",
+        "width",
+        "height",
+        "frame_rate",
+        "committed_at"
+      ],
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "take_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "decision": {
+          "enum": [
+            "approved",
+            "rejected"
+          ]
+        },
+        "decided_by": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "take_id",
+        "decision",
+        "decided_by",
+        "decided_at"
+      ],
+      "additionalProperties": false
+    },
+    "timeline_item": {
+      "type": "object",
+      "properties": {
+        "take_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "source_in_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_out_ms": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "take_id",
+        "source_in_ms",
+        "source_out_ms"
+      ],
+      "additionalProperties": false
+    },
+    "audio_item": {
+      "type": "object",
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "source_in_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_out_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeline_start_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "asset_id",
+        "source_in_ms",
+        "source_out_ms",
+        "timeline_start_ms"
+      ],
+      "additionalProperties": false
+    },
+    "export_profile": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frame_rate": {
+          "$ref": "#/$defs/frame_rate"
+        },
+        "container": {
+          "const": "mp4"
+        },
+        "video_codec": {
+          "const": "h264"
+        },
+        "audio_codec": {
+          "const": "aac"
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "frame_rate",
+        "container",
+        "video_codec",
+        "audio_codec"
+      ],
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/timeline_item"
+          },
+          "minItems": 1
+        },
+        "audio": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/audio_item"
+          },
+          "minItems": 0
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "revision",
+        "duration_ms",
+        "items",
+        "audio",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "timeline_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "timeline_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "profile": {
+          "$ref": "#/$defs/export_profile"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "rendering",
+            "succeeded",
+            "failed",
+            "canceled"
+          ]
+        },
+        "output_asset_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "timeline_id",
+        "timeline_revision",
+        "profile",
+        "state",
+        "output_asset_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "title": "WAN shared project bundle v0.1.0"
+}
