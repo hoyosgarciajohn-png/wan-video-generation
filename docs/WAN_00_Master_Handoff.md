@@ -414,3 +414,16 @@ usage blocking. No account limits or plan were changed. Four targeted fictional
 checks and workflow syntax/restriction checks passed. Actual build evidence
 remains pending until a manual run completes; see deployment/BUILD_VERIFICATION.md.
 The approved Runpod trial remains unused and no new numeric approval is needed.
+
+Cloud CPU verification succeeded in run 43772264998 on reviewed source
+`18bbdfdcbe266d11db48b6f21cfa9441775cf5c3`: actual image build/identity, static
+HTTP/auth check and worker fixture all passed. Downloaded evidence hashes and
+full H.264 decoding passed (320x180, 48 frames, two seconds). Evidence is retained
+in deployment/evidence/2026-11-15-cpu; the image was not published.
+
+The first GPU host check (run 43772384860) stopped before Docker build because
+34.69 GiB free remained after unused SDK cleanup, below the 40 GiB minimum.
+The bounded cleanup list now also includes unused Java and CodeQL SDKs; the
+minimum is preserved. GPU image and inference gates remain unverified pending
+the corrected run. PR #34 added the workflow; PR #35 corrected GitHub runner
+context validation before the first build. No Runpod resources were used.

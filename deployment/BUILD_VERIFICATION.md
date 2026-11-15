@@ -23,7 +23,7 @@ One target runs at a time. Each job has a 35-minute outer timeout and the actual
 build/check command has a 30-minute timeout plus a 30-second termination grace.
 The runner must have a local Unix Docker socket, x86_64 architecture, at least
 6 GiB RAM and 6 GiB free Docker disk for CPU or 40 GiB for GPU. The GPU check may
-remove only five listed unused SDK directories on the disposable GitHub-hosted
+remove only seven listed unused SDK directories on the disposable GitHub-hosted
 VM to meet the disk threshold. It never prunes Docker data or user workspaces.
 Capacity failure stops before pulling layers.
 
