@@ -8,6 +8,8 @@ The [first real Wan run checklist](deployment/FIRST_WAN_RUN.md) records the conc
 
 The [Runpod deployment worksheet](deployment/RUNPOD_DEPLOYMENT.md) covers the v2 provider adapter, durable storage, independent cleanup and remaining activation prerequisites. The adapter is not connected to production dispatch.
 
+[Signed admission source](docs/LIVE_ADMISSION.md) now verifies installed owner authority and atomically saves queued jobs with separate reservations. The optional service is not installed by the default staging host; live worker/provider execution remains disabled.
+
 ## Start
 
 Read [the master handoff](docs/WAN_00_Master_Handoff.md), [architecture](docs/ARCHITECTURE.md), [shared contract](docs/CONTRACT.md), and [workstream assignments](docs/WORKSTREAMS.md).

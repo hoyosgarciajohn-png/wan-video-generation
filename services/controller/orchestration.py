@@ -109,6 +109,6 @@ class SimulationCoordinator:
     def watchdog(self):
         """Trusted system entry point; run independently of the render worker."""
         with self.control.transaction() as db:
-            require(not db.execute('SELECT id FROM pod_batches WHERE id NOT IN (SELECT batch FROM budget_reservations)').fetchone(),
-                    'This simulation database contains unmanaged lifecycle rows')
-        return self.lifecycle.watchdog(self.control.clock().timestamp())
+            batches = {row[0] for row in db.execute(
+                "SELECT r.batch FROM budget_reservations r JOIN budget_approvals a ON a.id=r.approval WHERE a.mode='simulation'")}
+        return self.lifecycle.watchdog(self.control.clock().timestamp(), batch_ids=batches)

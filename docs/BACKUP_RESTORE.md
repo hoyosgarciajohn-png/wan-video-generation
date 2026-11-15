@@ -137,3 +137,15 @@ restored installations require newly issued trusted-operator credentials. Restor
 rejects a snapshot containing an active worker credential. Existing credential hashes
 remain historical records, not usable restored capabilities. The separate-process
 bridge integration test verifies both source continuity and restored rejection.
+
+## Live admission history
+
+Only released, never-dispatched live admission history can be backed up: its
+canonical batch must be canceled, cleanup confirmed, resource ID absent and
+dispatch link disabled, with no worker attempts. Any outstanding reservation or
+evidence of dispatch prevents backup. Signed envelopes and their configuration
+bindings are retained as historical records; signing keys are never stored here.
+All copied live approvals are revoked in the backup snapshot. Original source
+authority remains unchanged. Restoring with the same installed key cannot replay
+an old envelope to clear that revocation or create a new reservation. Recovery
+requires fresh, separately authorized grants.

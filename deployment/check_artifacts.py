@@ -62,7 +62,7 @@ def check_runtime_imports():
                     shutil.copy2(source, output)
         environment = dict(os.environ)
         environment.pop('PYTHONPATH', None)
-        subprocess.run([sys.executable, '-s', '-c', 'from deployment.local_stage import create_server; from services.controller.runner import FixtureRunner; from services.controller.export_runner import ExportRunner; from services.controller.budget import BudgetLedger; from services.controller.lifecycle import Lifecycle; from services.controller.orchestration import SimulationCoordinator'], cwd=stage, env=environment, check=True, capture_output=True)
+        subprocess.run([sys.executable, '-s', '-c', 'from deployment.local_stage import create_server; from services.controller.runner import FixtureRunner; from services.controller.export_runner import ExportRunner; from services.controller.budget import BudgetLedger; from services.controller.lifecycle import Lifecycle; from services.controller.orchestration import SimulationCoordinator; from services.controller.backup import create_backup, restore_backup; from services.controller.live_admission import LiveAdmission'], cwd=stage, env=environment, check=True, capture_output=True)
 
 
 

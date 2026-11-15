@@ -220,3 +220,40 @@ was unchanged in this batch. Full hosted B05 and actual Wan compatibility remain
 unverified.
 
 Validation: 140 Python root tests pass, including ten focused adapter tests and three independent mocked-HTTP lifecycle tests. Shared contract and static/runtime-source artifact checks pass. The regenerated preflight verifies current source and remains PLAN_ONLY with execution disabled.
+
+## Signed admission source checkpoint — execution disabled
+
+An optional trusted LiveAdmission service now combines the authenticated Studio
+session owner with a domain-separated HMAC grant under a server-installed key
+bound to that owner. It verifies exact project/configuration/source, cap, runtime
+and expiry; caller JSON cannot choose the identity or trust key. Grant envelopes
+are immutable, revocation is sticky, and simulation records remain separate.
+No key, actual approval or spending limit was created for John. HMAC proves the
+installed key holder's delegated authority, not John's personal review.
+
+Admission atomically saves canonical queued job, frozen shot, live reservation,
+lifecycle row and authority link. Outstanding reservations across grants count
+against the project cap. Only provably never-dispatched jobs can cancel/release.
+The provider preparation gate checks separately signed host acceptance and build
+evidence, then still refuses to return a provider because live worker dispatch
+is not installed. There is no enable flag or public signing endpoint.
+
+Independent local TCP tests prove session/grant ownership, tamper rejection and
+replay/cancellation. Backup preserves only safe released history, rejects dispatch
+evidence and revokes copied approvals. The old signed grant cannot reactivate
+restored authority; source authority remains unchanged. Signing keys remain outside
+database and backup. Simulation cleanup is scoped to its own reservations so
+pending live admission cannot obstruct it.
+
+The standard CPU staging package does not install this optional admission service
+or contain the reviewed Git/source checkout it needs. Isolated source imports
+now include backup and live admission; they pass without claiming an image build.
+See docs/LIVE_ADMISSION.md and deployment/LIVE_APPROVAL_OPERATIONS.md.
+
+Next remains real operator trust provisioning and owner cap/runtime, verified
+image/build-host/HTTPS/storage evidence, live worker/provider launch authority,
+independent cleanup and actual usage/final-bill settlement. Queued admission alone
+cannot run Wan or spend. No real provider calls, deployment, keys for John, GPU
+activity or spending occurred. Full hosted B05 and actual Wan acceptance stay open.
+
+Validation: 151 Python root tests pass, including eight focused admission cases and three independent TCP/recovery cases. Shared contract and expanded static/runtime-source artifact checks pass. The regenerated preflight verifies final source hashes and keeps all nine gates missing or blocked. Prior worker evidence is unchanged-source; no CUDA or provider execution was performed.
