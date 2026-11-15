@@ -1,0 +1,203 @@
+{
+  "contract_version": "0.1.0",
+  "project": {
+    "id": "fictional-project",
+    "owner_id": "fictional-owner",
+    "title": "Fictional blue studio",
+    "kind": "music_video",
+    "runtime_limit_ms": 300000
+  },
+  "assets": [
+    {
+      "id": "asset-video",
+      "project_id": "fictional-project",
+      "owner_id": "fictional-owner",
+      "kind": "video",
+      "object_key": "media/clip.mp4",
+      "mime_type": "video/mp4",
+      "bytes": 2935,
+      "sha256": "ceccdca7ba79e1f94b3ee6dbede40840a4bbf6cc46c162dce87f41df676b96cc",
+      "duration_ms": 2000
+    },
+    {
+      "id": "asset-audio",
+      "project_id": "fictional-project",
+      "owner_id": "fictional-owner",
+      "kind": "audio",
+      "object_key": "media/audio.wav",
+      "mime_type": "audio/wav",
+      "bytes": 192078,
+      "sha256": "140fc5d7b4e429974baf0cea23377ce0645ab3002b4c8359d6c1e9e0fca3fb98",
+      "duration_ms": 2000
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-1",
+      "project_id": "fictional-project",
+      "scene_id": "scene-1",
+      "revision": 1,
+      "prompt": "A blue studio backdrop",
+      "reference_asset_ids": [],
+      "target_duration_ms": 2000,
+      "settings": {
+        "width": 320,
+        "height": 180,
+        "frame_rate": {
+          "numerator": 24,
+          "denominator": 1
+        },
+        "seed": 42,
+        "steps": 1
+      }
+    }
+  ],
+  "batches": [
+    {
+      "id": "batch-1",
+      "project_id": "fictional-project",
+      "idempotency_key": "fixture-batch-1",
+      "execution_mode": "fixture",
+      "model_profile": {
+        "id": "fixture-v1",
+        "revision": "1",
+        "checkpoint_ref": "fictional:no-model",
+        "code_revision": "fixture-generator-v1"
+      },
+      "shot_snapshots": [
+        {
+          "shot_id": "shot-1",
+          "revision": 1,
+          "prompt": "A blue studio backdrop",
+          "reference_asset_ids": [],
+          "target_duration_ms": 2000,
+          "settings": {
+            "width": 320,
+            "height": 180,
+            "frame_rate": {
+              "numerator": 24,
+              "denominator": 1
+            },
+            "seed": 42,
+            "steps": 1
+          }
+        }
+      ],
+      "budget": {
+        "currency": "USD",
+        "approved_cents": 0,
+        "reserved_cents": 0,
+        "spent_cents": 0
+      },
+      "approved_at": "2026-11-15T14:00:00Z",
+      "deadline_at": "2026-11-15T14:10:00Z",
+      "state": "succeeded",
+      "cleanup_state": "confirmed",
+      "provider_resource_id": "fake-pod-1"
+    }
+  ],
+  "attempts": [
+    {
+      "id": "attempt-1",
+      "project_id": "fictional-project",
+      "batch_id": "batch-1",
+      "shot_id": "shot-1",
+      "shot_revision": 1,
+      "worker_id": "fictional-worker",
+      "lease_id": "lease-1",
+      "lease_expires_at": "2026-11-15T14:02:00Z",
+      "started_at": "2026-11-15T14:00:01Z",
+      "completed_at": "2026-11-15T14:00:03Z",
+      "settings": {
+        "width": 320,
+        "height": 180,
+        "frame_rate": {
+          "numerator": 24,
+          "denominator": 1
+        },
+        "seed": 42,
+        "steps": 1
+      },
+      "model_profile": {
+        "id": "fixture-v1",
+        "revision": "1",
+        "checkpoint_ref": "fictional:no-model",
+        "code_revision": "fixture-generator-v1"
+      },
+      "state": "succeeded",
+      "failure_reason": null
+    }
+  ],
+  "takes": [
+    {
+      "id": "take-1",
+      "project_id": "fictional-project",
+      "attempt_id": "attempt-1",
+      "shot_id": "shot-1",
+      "asset_id": "asset-video",
+      "duration_ms": 2000,
+      "width": 320,
+      "height": 180,
+      "frame_rate": {
+        "numerator": 24,
+        "denominator": 1
+      },
+      "committed_at": "2026-11-15T14:00:04Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "review-1",
+      "project_id": "fictional-project",
+      "take_id": "take-1",
+      "decision": "approved",
+      "decided_by": "fictional-owner",
+      "decided_at": "2026-11-15T14:00:05Z"
+    }
+  ],
+  "timelines": [
+    {
+      "id": "timeline-1",
+      "project_id": "fictional-project",
+      "revision": 1,
+      "duration_ms": 2000,
+      "items": [
+        {
+          "take_id": "take-1",
+          "source_in_ms": 0,
+          "source_out_ms": 2000
+        }
+      ],
+      "audio": [
+        {
+          "asset_id": "asset-audio",
+          "source_in_ms": 0,
+          "source_out_ms": 2000,
+          "timeline_start_ms": 0
+        }
+      ],
+      "created_at": "2026-11-15T14:00:06Z"
+    }
+  ],
+  "exports": [
+    {
+      "id": "export-1",
+      "project_id": "fictional-project",
+      "timeline_id": "timeline-1",
+      "timeline_revision": 1,
+      "profile": {
+        "width": 320,
+        "height": 180,
+        "frame_rate": {
+          "numerator": 24,
+          "denominator": 1
+        },
+        "container": "mp4",
+        "video_codec": "h264",
+        "audio_codec": "aac"
+      },
+      "state": "queued",
+      "output_asset_id": null
+    }
+  ]
+}

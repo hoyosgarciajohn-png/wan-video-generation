@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+dist/
+coverage/
+.pytest_cache/
+models/
+weights/
+outputs/
+*.safetensors
+*.ckpt
