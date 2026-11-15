@@ -27,7 +27,6 @@ jobs:
     timeout-minutes: 35
     env:
       BUILD_TARGET: ${{ inputs.target }}
-      EVIDENCE_ROOT: ${{ runner.temp }}/wan-cloud
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Check out exact source without persisted credentials
@@ -36,17 +35,17 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
       - name: Verify runner capacity
-        run: python3 deployment/cloud_build.py preflight --target "$BUILD_TARGET" --output "$EVIDENCE_ROOT"
+        run: python3 deployment/cloud_build.py preflight --target "$BUILD_TARGET" --output "$RUNNER_TEMP/wan-cloud"
       - name: Build and run offline container checks
         run: |
           timeout --signal=TERM --kill-after=30s 30m \
             python3 deployment/build_verify.py --target "$BUILD_TARGET" \
-              --output "$EVIDENCE_ROOT/build" --execute
+              --output "$RUNNER_TEMP/wan-cloud/build" --execute
       - name: Preserve bounded evidence
         if: always()
         env:
           VERIFICATION_OUTCOME: ${{ job.status }}
-        run: python3 deployment/cloud_build.py archive --target "$BUILD_TARGET" --output "$EVIDENCE_ROOT"
+        run: python3 deployment/cloud_build.py archive --target "$BUILD_TARGET" --output "$RUNNER_TEMP/wan-cloud"
       - name: Upload verification evidence for one day
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
