@@ -190,3 +190,33 @@ and a supervised capped GPU benchmark. John has not supplied real spending terms
 No cloud resources, deployment, CI, model download or GPU spending occurred.
 
 Validation: 130 Python root tests and 29 worker tests pass; contract and static/runtime-source artifact checks pass. The empty-input preflight was regenerated against the final source and remains non-executable with all nine gates missing or blocked.
+
+## Runpod v2 adapter and deployment preparation checkpoint
+
+The provider adapter now uses Runpod v2 request/response shapes, explicit scoped
+resource identity and complete paginated inventory. It requires an explicitly
+supplied transport; constructing it does not enable network access. Launch-profile
+validation requires an immutable image reference and constrained GPU/storage/port
+configuration. This validates request shape, not actual availability or permission.
+
+Independent mocked-HTTP lifecycle tests preserve liability after ambiguous creation
+and transient inventory/deletion failures. Reconciliation never repeats the POST.
+Cleanup requires checked resource absence and a complete inventory; after restart,
+a persisted resource ID also requires trusted expected-name binding. Wrong or
+unbound identities cannot be deleted. No provider response bodies or environment
+values are returned to lifecycle callers.
+
+See deployment/RUNPOD_DEPLOYMENT.md and its configuration worksheet. Owner budget,
+runtime, host, image and storage fields remain empty. The worksheet cannot authorize
+a launch. The provider adapter is not automatically connected to production
+dispatch: authenticated live admission/approval and a reviewed provider factory
+remain outstanding, along with actual image builds, host/TLS/storage acceptance
+and the capped real Wan benchmark. Independent cleanup must operate outside the
+GPU; worker exit does not prove termination and retained volumes may keep billing.
+
+No real provider call, cloud resource, CI run, deployment, model download or GPU
+spending occurred. Previous worker evidence remains 29 passing tests; worker source
+was unchanged in this batch. Full hosted B05 and actual Wan compatibility remain
+unverified.
+
+Validation: 140 Python root tests pass, including ten focused adapter tests and three independent mocked-HTTP lifecycle tests. Shared contract and static/runtime-source artifact checks pass. The regenerated preflight verifies current source and remains PLAN_ONLY with execution disabled.

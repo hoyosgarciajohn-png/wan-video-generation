@@ -6,6 +6,8 @@ The local integration checkpoint includes the storyboard fixture UI, durable fix
 
 The [first real Wan run checklist](deployment/FIRST_WAN_RUN.md) records the concrete host, image, model, budget and unfinished real-admission requirements. A trusted test-only pinned-profile bridge now rehearses reservation through verified completion and cleanup; default execution remains disarmed. Supplying a GPU alone does not enable live execution.
 
+The [Runpod deployment worksheet](deployment/RUNPOD_DEPLOYMENT.md) covers the v2 provider adapter, durable storage, independent cleanup and remaining activation prerequisites. The adapter is not connected to production dispatch.
+
 ## Start
 
 Read [the master handoff](docs/WAN_00_Master_Handoff.md), [architecture](docs/ARCHITECTURE.md), [shared contract](docs/CONTRACT.md), and [workstream assignments](docs/WORKSTREAMS.md).
