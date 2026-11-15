@@ -45,22 +45,23 @@ model storage and GPU capacity are separate requirements. Preserve room for imag
 layers, build cache, model files, output and temporary files; the model size alone
 is not a safe disk allocation.
 
-## Software blocker before remote Wan execution
+## Live source is implemented; installation remains blocked
 
-`services/controller/worker_transport.py` rejects non-fixture/nonzero-budget jobs
-by default. A trusted server may explicitly install `RealJobBridge.for_testing`,
-which accepts only the built-in fake provider and durable simulated authority.
-It links canonical pinned-profile batches to reservation, lifecycle, scoped
-credentials and verified completion, but is not live activation. Therefore renting
-a GPU and setting the worker URL will not make the product render Wan jobs.
+PR #31 connects the trusted `LiveAdmission` and `LiveExecution` path with signed
+owner/host/build evidence, scoped worker transport, independent cleanup operations
+and delegated billing receipts. The default staging host does not install those
+services, transport or authority. Renting a GPU or setting a worker URL therefore
+does not activate the product. See `docs/LIVE_EXECUTION.md`.
 
-The next implementation must add a separately reviewed live-provider factory,
-authenticated approval and provider/configuration binding to the rehearsed
-admission/lifecycle/credential path. Do not remove the fixture guard to bypass this work. Token
-expiry must cover the bounded operation and recovery window, or credential
-rotation/recovery must be implemented: the existing worker journal binds to the
-same credential and fails closed after rotation. Model verification currently
-runs in each inference process and belongs in the runtime budget.
+The optional services still require a reviewed source checkout, verified image and
+host configuration, real owner approval, private trust roots and an independent
+scheduler. Do not bypass the default fixture guard. Token expiry must cover the
+bounded operation and recovery window; the worker journal binds to the original
+credential and fails closed after rotation. Checkpoint verification runs in each
+inference process and belongs in the runtime budget.
+
+Current host findings and the unapproved $5 / 30-minute / one-attempt proposal are
+in `FIRST_RENDER_PROPOSAL.md`. No numeric owner approval has been recorded.
 
 The worker transport caps an MP4 at 32 MiB. The first benchmark must verify output
 size fits; changing this cap requires a coordinated server/client review.
@@ -75,7 +76,7 @@ size fits; changing this cap requires a coordinated server/client review.
    `python -m workers.gpu.weights download /models` in the built image. This is
    an explicit future 34.2 GB download, not an operation run in this workspace.
    Verify all files before the GPU billing window where possible.
-3. Complete the real-execution admission/provider work above. Validate the
+3. Install and verify the reviewed live services and authority described above. Validate the
    chosen TLS controller and secret injection without printing tokens. Use
    writable private mounts for worker output/journals and reference cache;
    model weights are read-only during inference.

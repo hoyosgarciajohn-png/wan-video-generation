@@ -57,10 +57,10 @@ and accepted media must never exist solely on the temporary Pod.
 3. Deploy and verify the controller's durable storage, HTTPS and recovery.
    The existing loopback staging Compose file is not a public deployment recipe.
    Preserve its binding; do not expose the development server to the Internet.
-4. Complete a separately reviewed live admission/authority factory. Bind the
+4. Install the reviewed optional live admission/execution services and authority. Bind the
    exact image, model, placement, scope, budget reservation and deadline to the
    canonical job. Never reuse simulation approvals or test links as live authority.
-   The provider adapter alone does not supply this factory.
+   The provider adapter alone does not install these services or authority.
 5. Provision the Runpod API key only to the trusted controller/cleanup service.
    Issue the worker a short-lived token scoped to its batch. Inject that token as
    `WAN_WORKER_TOKEN`, with `WAN_WORKER_API_URL` set to the verified controller
@@ -95,8 +95,8 @@ Terminate temporary compute after verified completion or deadline/cancellation.
 Retained model/journal volumes may continue to incur storage charges; identify
 their owner and retention separately. Do not delete a shared model volume during
 Pod cleanup. Account for cold start, model verification, failed attempts, upload,
-cleanup delay and retained storage in the approved cost scope. No current hourly
-price or real per-clip cost has been established by these fictional checks.
+cleanup delay and retained storage in the approved cost scope. Public hourly planning rates and a proposed first-trial envelope are recorded in
+`FIRST_RENDER_PROPOSAL.md`; actual account quotes and per-clip cost remain unverified.
 
 On an ambiguous create response, reconcile the original scoped request; never
 blindly resubmit. On delete timeout, retain cleanup liability and check again.
