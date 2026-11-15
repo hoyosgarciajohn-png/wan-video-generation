@@ -39,6 +39,15 @@ export function App({
     workspace: Workspace;
     owner: string;
     onChange: (workspace: Workspace) => void;
+    clean?: boolean;
+    onEditing?: () => void;
+    submit?: (projectId: string, shots: string[], key: string) => void;
+    cancel?: (projectId: string, batchId: string) => void;
+    review?: (
+      projectId: string,
+      takeId: string,
+      decision: "approved" | "rejected",
+    ) => void;
   };
 } = {}) {
   const [startup] = useState(() => {
@@ -52,6 +61,7 @@ export function App({
     }
   });
   const [state, setState] = useState(startup.state);
+  const baseline = useRef(startup.state);
   const current = useRef(state);
   current.current = state;
   const [projectId, setProjectId] = useState(
@@ -88,6 +98,13 @@ export function App({
     addEventListener("storage", listener);
     return () => removeEventListener("storage", listener);
   }, []);
+  useEffect(() => {
+    if (connected?.clean && connected.workspace !== current.current) {
+      baseline.current = connected.workspace;
+      current.current = connected.workspace;
+      setState(connected.workspace);
+    }
+  }, [connected?.workspace, connected?.clean]);
   function commit(change: (next: Workspace) => void, message: string) {
     if (locked) return false;
     try {
@@ -96,7 +113,7 @@ export function App({
       if (connected) {
         // Multiple local edits are one server transaction/revision on explicit save.
         for (const draft of next.projects) {
-          const original = startup.state.projects.find(
+          const original = baseline.current.projects.find(
             (p) => p.bundle.project.id === draft.bundle.project.id,
           );
           for (const shot of draft.bundle.shots) {
@@ -225,11 +242,23 @@ export function App({
           </button>
           <p className="muted small">
             {connected
-              ? "Connected editing saves metadata only. Server rendering and take approval controls will be added separately."
+              ? "Server fixture rendering uses synthetic clips with no GPU rental. Save edits before rendering or reviewing takes."
               : "Fixture outputs use the supplied two-second blue clip. Your planned shot durations remain editable."}
           </p>
         </aside>
-        <main id="workspace" tabIndex={-1}>
+        <main
+          id="workspace"
+          tabIndex={-1}
+          onInputCapture={(event) => {
+            const input = event.target as HTMLInputElement;
+            if (
+              input.type === "checkbox" &&
+              input.getAttribute("aria-label")?.startsWith("Select ")
+            )
+              return;
+            connected?.onEditing?.();
+          }}
+        >
           <div className="page-title">
             <div>
               <p className="eyebrow">{labels[project.bundle.project.kind]}</p>
@@ -483,7 +512,10 @@ export function App({
                     <span>{selected.length} shots selected</span>
                     <button
                       className="primary"
-                      disabled={Boolean(connected) || !selected.length}
+                      disabled={
+                        (connected ? !connected.clean : false) ||
+                        !selected.length
+                      }
                       onClick={() => {
                         setBatchKey(crypto.randomUUID());
                         dialog.current?.showModal();
@@ -528,7 +560,7 @@ export function App({
                 <h2>Render batches</h2>
                 <p className="muted">
                   {connected
-                    ? "Server execution history is read-only here. Rendering controls are not connected yet."
+                    ? "Server fixture batches render synthetic clips automatically. Save edits before submitting or canceling a batch."
                     : "Advance each fictional batch to rehearse progress and failure recovery."}
                 </p>
                 {[...project.bundle.batches].reverse().map((b) => (
@@ -562,6 +594,17 @@ export function App({
                         </p>
                       ))}
                     </details>
+                    {connected &&
+                      !["succeeded", "failed", "canceled"].includes(
+                        b.state,
+                      ) && (
+                        <button
+                          disabled={!connected.clean}
+                          onClick={() => connected.cancel?.(projectId, b.id)}
+                        >
+                          Cancel server batch
+                        </button>
+                      )}
                     {!connected &&
                       ["queued", "rendering", "provisioning"].includes(
                         b.state,
@@ -694,14 +737,20 @@ export function App({
                           <button
                             className="primary"
                             disabled={
-                              Boolean(connected) ||
+                              (connected ? !connected.clean : false) ||
                               project.selectedTakes[t.shot_id] === t.id
                             }
                             onClick={() =>
-                              edit(
-                                (p) => reviewTake(p, t.id, "approved"),
-                                "Take accepted. Prior takes and timeline revisions retained.",
-                              )
+                              connected
+                                ? connected.review?.(
+                                    projectId,
+                                    t.id,
+                                    "approved",
+                                  )
+                                : edit(
+                                    (p) => reviewTake(p, t.id, "approved"),
+                                    "Take accepted. Prior takes and timeline revisions retained.",
+                                  )
                             }
                           >
                             {project.selectedTakes[t.shot_id]
@@ -710,14 +759,21 @@ export function App({
                           </button>
                           <button
                             disabled={
-                              Boolean(connected) ||
-                              project.selectedTakes[t.shot_id] === t.id
+                              connected
+                                ? !connected.clean
+                                : project.selectedTakes[t.shot_id] === t.id
                             }
                             onClick={() =>
-                              edit(
-                                (p) => reviewTake(p, t.id, "rejected"),
-                                "Take rejected for future selection.",
-                              )
+                              connected
+                                ? connected.review?.(
+                                    projectId,
+                                    t.id,
+                                    "rejected",
+                                  )
+                                : edit(
+                                    (p) => reviewTake(p, t.id, "rejected"),
+                                    "Take rejected for future selection.",
+                                  )
                             }
                           >
                             Reject take
@@ -742,6 +798,13 @@ export function App({
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            if (connected) {
+              connected.submit?.(projectId, [...selected], batchKey);
+              dialog.current?.close();
+              setSelected([]);
+              setTab("Render batches");
+              return;
+            }
             if (
               commit((next) => {
                 approveBatch(
@@ -776,7 +839,11 @@ export function App({
             Approval captures these prompts, references and settings. Subsequent
             edits create new shot revisions.
           </p>
-          <p>Each fixture output is the supplied two-second blue clip.</p>
+          <p>
+            {connected
+              ? "The server renders silent synthetic test clips at the requested duration, up to five seconds. Reference images are unsupported; no Wan model or GPU is used."
+              : "Each fixture output is the supplied two-second blue clip."}
+          </p>
           <div className="actions">
             <button className="primary" disabled={locked}>
               Approve batch

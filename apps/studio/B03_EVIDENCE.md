@@ -103,3 +103,24 @@ The previously observed Chromium execution restriction still limits browser
 acceptance. No GPU resources or paid services are used.
 
 Session expiry preserves unsaved edits as a separate in-memory downloadable JSON draft, retained across reauthentication. The editor is hidden without an authenticated owner. A beforeunload handler protects unsaved edits and retained recovery drafts; regression coverage verifies downloaded draft contents after reauthentication.
+
+## Connected render and review commands — November 15, 2026
+
+Added authenticated submit/cancel/review commands using the agreed project routes.
+These run server CPU fixture jobs, not local progress simulation or Wan inference.
+The interface explicitly describes the synthetic 1–5 second output constraint,
+zero GPU rental and unsupported references. Render/cancel/review actions require a
+clean saved workspace. A failed ambiguous command keeps its full original payload
+and idempotency key for an explicit retry. Polling refreshes active server jobs
+without remounting the editor or changing the current project/tab; it pauses for
+unsaved form input, applied edits, commands and conflicts. In-flight responses are
+ignored after edits begin. Backend take decisions and selected-take state replace
+local simulated approvals. Reference uploads and export commands remain pending.
+
+Checks: 13 model/client tests and 13 DOM tests pass. Added command payload/status
+coverage, exact ambiguous retry coverage, real timed polling tab preservation,
+in-flight polling-versus-edit regression, cancellation and take reject/reapprove
+through controlled server responses. Production build/TypeScript and formatting
+pass. Tests remain DOM emulation and mocked HTTP responses; the Command Center's
+separate actual client/server smoke evidence covers the real transport. Native
+browser and owner creative acceptance remain open. No paid resources created.

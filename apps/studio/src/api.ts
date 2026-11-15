@@ -2,6 +2,23 @@ import { StudioError, type Workspace } from "./model";
 import type { Project } from "./contract";
 
 type Envelope = { id: "default"; workspace: Workspace };
+export type StudioCommand =
+  | {
+      kind: "submit";
+      projectId: string;
+      shot_ids: string[];
+      expected_revision: number;
+      idempotency_key: string;
+    }
+  | { kind: "cancel"; projectId: string; batchId: string }
+  | {
+      kind: "review";
+      projectId: string;
+      takeId: string;
+      decision: "approved" | "rejected";
+      expected_revision: number;
+      idempotency_key: string;
+    };
 export class StudioClient {
   constructor(private readonly request: typeof fetch = fetch) {}
   private async call<T>(
@@ -58,6 +75,35 @@ export class StudioClient {
         kind,
         expected_revision,
       })
+    ).workspace;
+  }
+  async command(command: StudioCommand) {
+    const prefix = `projects/${encodeURIComponent(command.projectId)}`;
+    if (command.kind === "submit") {
+      const { shot_ids, expected_revision, idempotency_key } = command;
+      return (
+        await this.call<{ workspace: Workspace }>(`${prefix}/batches`, "POST", {
+          shot_ids,
+          expected_revision,
+          idempotency_key,
+        })
+      ).workspace;
+    }
+    if (command.kind === "cancel")
+      return (
+        await this.call<{ workspace: Workspace }>(
+          `${prefix}/batches/${encodeURIComponent(command.batchId)}/cancel`,
+          "POST",
+          {},
+        )
+      ).workspace;
+    const { decision, expected_revision, idempotency_key } = command;
+    return (
+      await this.call<{ workspace: Workspace }>(
+        `${prefix}/takes/${encodeURIComponent(command.takeId)}/review`,
+        "POST",
+        { decision, expected_revision, idempotency_key },
+      )
     ).workspace;
   }
   async save(workspace: Workspace) {

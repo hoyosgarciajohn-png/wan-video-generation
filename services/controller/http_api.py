@@ -18,6 +18,8 @@ from jsonschema.exceptions import ValidationError
 from services.controller.service import ControlService
 from services.controller.studio import StudioWorkspace, StudioConflict
 from workers.gpu.common import scoped
+from services.controller.commands import RenderCommands
+from services.controller.runner import FixtureRunner
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -49,6 +51,7 @@ class StudioAPI:
                              for t, o in tokens.items()):
             raise ValueError('Provision at least one 32-character token and owner identity')
         self.studio, self.origin, self.clock = studio, origin, clock
+        self.commands = RenderCommands(studio)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -124,6 +127,21 @@ class StudioAPI:
                     return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
                 raise HTTPError(405)
             owner = self.owner(headers)
+            command_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/(batches|takes)(?:/([A-Za-z0-9_-]+)/(cancel|review))?', path)
+            if command_match:
+                if method != 'POST':
+                    raise HTTPError(405)
+                project_id, collection, record_id, action = command_match.groups()
+                try:
+                    if collection == 'batches' and record_id is None:
+                        return Reply(200, self.commands.submit(owner, project_id, value))
+                    if collection == 'batches' and action == 'cancel':
+                        return Reply(200, self.commands.cancel(owner, project_id, record_id))
+                    if collection == 'takes' and action == 'review':
+                        return Reply(200, self.commands.review(owner, project_id, record_id, value))
+                except KeyError:
+                    raise HTTPError(404)
+                raise HTTPError(404)
             asset_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/assets/([A-Za-z0-9_-]+)/content', path)
             if asset_match and method == 'GET':
                 try:
@@ -249,13 +267,18 @@ def main():
     control = ControlService(args.database, args.assets)
     api = StudioAPI(StudioWorkspace(control), tokens, os.environ.get('WAN_STUDIO_ORIGIN', 'http://127.0.0.1:5173'))
     server = make_server(api, ('127.0.0.1', args.port))
+    stop = threading.Event()
+    worker = threading.Thread(target=FixtureRunner(control).serve, args=(stop,), daemon=True)
+    worker.start()
     print(f'WAN Studio local API on 127.0.0.1:{server.server_port}; paid dispatch disabled', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        stop.set()
         server.server_close()
+        worker.join(timeout=30)
 
 
 if __name__ == '__main__':
