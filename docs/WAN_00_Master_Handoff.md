@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.18 | November 15, 2026 | Owner: John Hoyos
+Version 1.19 | November 15, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -398,3 +398,19 @@ John replied “Yes you are approved” directly to the proposal for $5 total / 
 The Runpod GPU catalog returned `availability: NONE` for one RTX 4090 in Secure Cloud, Pod product, minimum CUDA 12.8. Its listed Secure rate was $0.89/hour. This is current availability evidence, not a reservation or render benchmark. Host/image/registry/controller/watchdog evidence remains absent. The approved decision record keeps execution disabled and verified infrastructure references null; no fabricated owner signature, host attestation or build proof was installed.
 
 Runpod's managed GitHub builder and experimental Weld route were reviewed as alternatives. Neither established a compatible, free, connected build host for the current Pod worker. See the updated first-render document for their constraints and sources. Command Center next needs a concrete build/hosting route before B01/B05 acceptance and B06 dispatch. Automated application billing remains open despite verified connector read access. No billable resource or actual render was started. Validation is limited to approval-record consistency, unchanged runtime source and documentation checks; previously passed fictional tests were not rerun.
+
+## Cloud build setup — November 15, 2026
+
+John approved keeping builds in the cloud. The manual-only GitHub Actions
+workflow selects one CPU/GPU target on Ubuntu 24.04, pins action revisions,
+uses read-only checkout credentials, limits jobs to 35 minutes and the build
+to 30 minutes, validates Docker/RAM/disk, and retains bounded evidence for one
+day. It cannot create Runpod resources or publish/deploy images. GPU capacity
+preparation removes only listed unused SDKs from the disposable hosted VM.
+
+Account billing observation: $4.91 included compute remaining, $0 billable
+Actions usage, 0 / 0.5 GB Actions storage, existing $0 Actions paid budget with
+usage blocking. No account limits or plan were changed. Four targeted fictional
+checks and workflow syntax/restriction checks passed. Actual build evidence
+remains pending until a manual run completes; see deployment/BUILD_VERIFICATION.md.
+The approved Runpod trial remains unused and no new numeric approval is needed.
