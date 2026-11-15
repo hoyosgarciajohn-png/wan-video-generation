@@ -104,3 +104,22 @@ Each attempt currently starts a fresh model process. Repeated runs measure a war
 
 B02 receives the client, transport envelope and durable filesystem requirements. QA/B05 receives the fictional smoke result and regression suite. The Command Center must retain B01 as open until a Docker-capable host builds the container and records its digest. B06 then needs integrated lifecycle verification and John's GPU budget/runtime envelope.
 
+
+## CPU audit of the real inference adapter
+
+For worker tests install `python -m pip install -r workers/gpu/requirements-test.txt`
+into the development environment. This adds the same Pillow version as the GPU
+image lock, without installing Torch or CUDA. The image already includes Pillow.
+
+Reference decoding now occurs before reading weights or constructing the model.
+Only PNG/JPEG/WebP, one frame and the exact frozen dimensions are accepted; the
+conditioning image becomes an independent RGB image. Incorrect dimensions,
+corrupt data and animation therefore fail before costly model allocation.
+
+`test_inference_adapter.py` checks the runpod-profile claim and the adapter's
+constructor/generate/save arguments using mocked Torch/Wan modules, plus actual
+Pillow reference decoding. These CPU tests preserve fixed frame rounding, seed,
+solver, CPU T5/offload and unknown real cost. They do **not** import the official
+Wan package, load checkpoint bytes, prove its API compatibility, execute CUDA or
+establish image quality. Actual image build/import and one-shot inference gates
+remain pending.

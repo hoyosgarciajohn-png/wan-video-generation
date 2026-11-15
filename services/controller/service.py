@@ -122,13 +122,15 @@ class ControlService:
     def _batch(bundle, batch_id):
         return next(b for b in bundle['batches'] if b['id'] == batch_id)
 
-    def worker_client(self, owner_id, project_id, batch_id, worker_id, *, authorize=None):
+    def worker_client(self, owner_id, project_id, batch_id, worker_id, *, authorize=None, synchronize=None):
         """Trusted host issues this capability only after authenticating its worker."""
         if not worker_id:
             raise PermissionError('Worker identity required')
         with self.transaction() as db:
-            self._batch(self._load(db, owner_id, project_id), batch_id)
-        return WorkerClient(self, owner_id, project_id, batch_id, worker_id, authorize=authorize)
+            batch = self._batch(self._load(db, owner_id, project_id), batch_id)
+            if batch['execution_mode'] == 'runpod' and (authorize is None or synchronize is None):
+                raise ValueError('Real-profile workers require an installed server authority bridge')
+        return WorkerClient(self, owner_id, project_id, batch_id, worker_id, authorize=authorize, synchronize=synchronize)
 
     def _attempt(self, batch, snapshot, worker, now):
         return dict(id=uuid4().hex, project_id=batch['project_id'], batch_id=batch['id'],
@@ -173,6 +175,8 @@ class ControlService:
                     if existing:
                         snapshot = next(s for s in batch['shot_snapshots'] if s['shot_id'] == existing['shot_id'])
                         self._save(db, bundle)
+                        if client.synchronize is not None:
+                            client.synchronize(db, bundle, batch)
                         client.authorize(db)
                         return self._envelope(bundle, batch, existing, snapshot)
                     for snapshot in batch['shot_snapshots']:
@@ -187,6 +191,8 @@ class ControlService:
                         answer = self._envelope(bundle, batch, attempt, snapshot)
                         break
                 self._save(db, bundle)
+                if client.synchronize is not None:
+                    client.synchronize(db, bundle, batch)
                 client.authorize(db)
                 return answer
             attempt = next((a for a in bundle['attempts'] if a['id'] == supplied['id'] and
@@ -218,6 +224,8 @@ class ControlService:
             else:
                 raise ValueError('Unknown worker action')
             self._save(db, bundle)
+            if client.synchronize is not None:
+                client.synchronize(db, bundle, batch)
             client.authorize(db)
             return result
 
@@ -299,7 +307,8 @@ class ControlService:
 
 class WorkerClient:
     """Same callable transport surface as workers.gpu.client.WorkerClient."""
-    def __init__(self, service, owner, project, batch, worker, *, authorize=None):
+    def __init__(self, service, owner, project, batch, worker, *, authorize=None, synchronize=None):
+        self.synchronize = synchronize
         self.authorize = authorize or (lambda db: None)
         self.service, self.owner, self.project, self.batch, self.worker = service, owner, project, batch, worker
 

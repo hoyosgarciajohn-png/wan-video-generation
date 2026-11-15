@@ -10,8 +10,10 @@ issue real budget approval or deploy a public worker service.
 ## Credential boundary
 
 `WorkerTransport(control).issue(owner, project, batch, worker_id, ttl_seconds=300)`
-is a trusted Python/CLI operation. It validates project ownership and permits only
-canonical fixture batches with zero budgets. It returns a generated high-entropy
+is a trusted Python/CLI operation. By default it validates project ownership and
+permits only canonical fixture batches with zero budgets. A trusted test server may
+install the explicit synthetic authority described in [REAL_JOB_BRIDGE.md](REAL_JOB_BRIDGE.md)
+for linked real-profile rehearsal batches; there is no live authority factory. It returns a generated high-entropy
 bearer token once. SQLite stores only the token's SHA-256, the owner/project/batch/
 worker scope, expiry, revocation flag and creation time. The token cannot choose a
 different scope through a request body. A worker ID should identify one active

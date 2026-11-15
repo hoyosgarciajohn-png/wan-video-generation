@@ -19,7 +19,7 @@ FIELDS = {'project_id','owner_id','batch_id','worker_id','provider','region','gp
           'image_ref','worker_endpoint','runtime_seconds','reservation_cents','worker_ttl_seconds','storage','pod'}
 CRITICAL = ('services/controller/preflight.py','services/controller/service.py',
             'services/controller/worker_transport.py','services/controller/orchestration.py',
-            'services/controller/budget.py','services/controller/lifecycle.py','services/controller/runpod.py',
+            'services/controller/budget.py','services/controller/real_jobs.py','services/controller/lifecycle.py','services/controller/runpod.py',
             'deployment/build_verify.py','deployment/container_smoke.py')
 
 
@@ -214,7 +214,7 @@ def evaluate_plan(intent, *, build_evidence=None, approval=None, now=None):
         gate('owner_attestation', 'MISSING_OR_INVALID', 'John must choose the specific project, maximum dollar budget and runtime window after reviewing the exact intent; no live approval has been inferred.')
     for name, action in (
         ('live_admission_not_implemented', 'Implement and review an authenticated real approval verifier and transactional live queue/budget admission; SimulationCoordinator must remain fake-provider only.'),
-        ('real_worker_bridge_not_implemented', 'Implement and review the real-model lifecycle-to-attempt/credential/storage bridge; WorkerTransport currently rejects every non-fixture batch.'),
+        ('real_worker_bridge_not_implemented', 'Canonical real-profile lifecycle/worker/storage wiring exists only behind an explicit synthetic test authority. Implement authenticated live activation with verified build/config evidence; default WorkerTransport still rejects non-fixture batches.'),
         ('host_storage_acceptance_unverified', 'Select and verify a durable controller/storage host, real TLS endpoint, owner-scoped output retention and disaster recovery; an HTTPS string is not deployment evidence.'),
         ('registry_weights_gpu_unverified', 'Verify registry access to the exact digest, every locked model file on the selected volume, CUDA inference and measured cold/warm behavior on the selected GPU.'),
         ('billing_cleanup_acceptance_unverified', 'Implement authoritative provider usage/final-invoice ingestion, stable receipts and independently observed cleanup; budget estimates are not guaranteed dollar hard stops.'),

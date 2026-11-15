@@ -155,3 +155,38 @@ preflight/review cases; eight build-verifier tests and the shared contract pass.
 The checked-in docs/REAL_RUN_PREFLIGHT.json was generated with empty owner inputs
 and verifies against current source. All nine gates remain missing or blocked.
 See docs/REAL_RUN_PREFLIGHT.md for evidence limits and exact plan fields.
+
+## Disarmed canonical Wan-profile bridge checkpoint
+
+The queue-to-worker connection now has executable source: one transaction freezes
+the pinned model/shot profile, reserves fictional budget and links a canonical
+runpod-shaped batch to lifecycle state and durable test authority. Scoped verified
+completion commits its take and lifecycle terminal outcome together; independent
+cleanup and final billing remain separate. Restart and checked restore preserve
+settled history, while restored worker credentials remain revoked.
+
+The normal RealJobBridge constructor is disarmed. Its only enabled factory is
+for_testing with the exact built-in fake provider. Default public admission and
+worker transport remain fixture-only. Neither a preflight report, caller boolean
+nor simulated approval grants live authority. A trusted test server must explicitly
+install the bridge, and durable links identify every rehearsal as synthetic.
+
+Independent tests generated and fully decoded a real H.264 file with 25 frames at
+1280x704/24fps under the pinned profile's requested contract. Verified completion,
+replay, cleanup, fictional settlement, restart and recovered history pass. These
+pixels came from FFmpeg, not Wan. Deadline/cancellation fences pass; revocation
+blocks future admission/dispatch but does not implicitly cancel an already
+provisioned reservation. The existing documented cancellation policy is preserved.
+
+The worker now decodes and validates image references before expensive model
+startup. CPU-mocked adapter tests check invocation/profile arguments; they do not
+import real Wan, load weights or execute CUDA. See docs/REAL_JOB_BRIDGE.md and
+workers/gpu/README.md for exact boundaries.
+
+Remaining for live execution: authenticated owner approval with a specific dollar
+ceiling/runtime envelope, a separately reviewed live provider/configuration factory,
+actual built-image/host/storage evidence, authoritative billing and observed cleanup,
+and a supervised capped GPU benchmark. John has not supplied real spending terms.
+No cloud resources, deployment, CI, model download or GPU spending occurred.
+
+Validation: 130 Python root tests and 29 worker tests pass; contract and static/runtime-source artifact checks pass. The empty-input preflight was regenerated against the final source and remains non-executable with all nine gates missing or blocked.

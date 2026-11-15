@@ -1,8 +1,10 @@
 # First real Wan run: launch prerequisites
 
 Status on 2026-11-15: **BLOCKED; no image built and no Wan inference run.**
-This is an operator handoff, not a launch authorization. The existing remote
-worker integration renders CPU fixtures only. Passing that integration does not
+This is an operator handoff, not a launch authorization. The existing public remote
+worker integration renders CPU fixtures only. A separate trusted test bridge can
+rehearse pinned Wan-profile records with synthetic CPU-generated media and a fake
+provider; it has no live-provider factory. Passing that integration does not
 establish CUDA compatibility, creative quality or cost.
 
 ## Fresh host investigation
@@ -45,14 +47,16 @@ is not a safe disk allocation.
 
 ## Software blocker before remote Wan execution
 
-`services/controller/worker_transport.py` deliberately rejects batches whose
-execution mode is not `fixture`, and rejects nonzero approved/reserved/spent
-budgets. Current local orchestration uses a simulated provider. Therefore renting
+`services/controller/worker_transport.py` rejects non-fixture/nonzero-budget jobs
+by default. A trusted server may explicitly install `RealJobBridge.for_testing`,
+which accepts only the built-in fake provider and durable simulated authority.
+It links canonical pinned-profile batches to reservation, lifecycle, scoped
+credentials and verified completion, but is not live activation. Therefore renting
 a GPU and setting the worker URL will not make the product render Wan jobs.
 
-The next implementation must add a separately reviewed real execution admission
-path tied to the budget ledger and provider lifecycle, scoped credential issuance
-and reconciliation. Do not remove the fixture guard to bypass this work. Token
+The next implementation must add a separately reviewed live-provider factory,
+authenticated approval and provider/configuration binding to the rehearsed
+admission/lifecycle/credential path. Do not remove the fixture guard to bypass this work. Token
 expiry must cover the bounded operation and recovery window, or credential
 rotation/recovery must be implemented: the existing worker journal binds to the
 same credential and fails closed after rotation. Model verification currently

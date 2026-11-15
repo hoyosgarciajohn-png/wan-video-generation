@@ -24,7 +24,11 @@ class WorkerAccessError(ValueError):
 
 
 class WorkerTransport:
-    def __init__(self, control):
+    def __init__(self, control, *, real_jobs=None):
+        if real_jobs is not None:
+            from services.controller.real_jobs import RealJobBridge
+            require(type(real_jobs) is RealJobBridge and real_jobs.control is control, 'Invalid server job authority')
+        self.real_jobs = real_jobs
         self.control = control
         with control.transaction() as db:
             db.execute('''CREATE TABLE IF NOT EXISTS worker_credentials (
@@ -33,10 +37,17 @@ class WorkerTransport:
                 worker TEXT NOT NULL, expires TEXT NOT NULL,
                 revoked INTEGER NOT NULL DEFAULT 0, created TEXT NOT NULL)''')
 
-    @staticmethod
-    def _fixture(batch):
-        if batch['execution_mode'] != 'fixture' or any(batch['budget'][k] for k in ('approved_cents','reserved_cents','spent_cents')):
+    def _allowed_batch(self, db, owner, project, batch):
+        if batch['execution_mode'] == 'fixture':
+            if any(batch['budget'][k] for k in ('approved_cents','reserved_cents','spent_cents')):
+                raise WorkerAccessError(403)
+            return
+        if self.real_jobs is None:
             raise WorkerAccessError(403)
+        try:
+            self.real_jobs.authorize_scope(db, owner, project, batch['id'])
+        except (KeyError, ValueError):
+            raise WorkerAccessError(403) from None
 
     def issue(self, owner, project, batch_id, worker_id, *, ttl_seconds=300):
         """Trusted host/CLI only; return plaintext once and persist only its SHA256."""
@@ -45,7 +56,7 @@ class WorkerTransport:
         with self.control.transaction() as db:
             bundle = self.control._load(db, owner, project)
             batch = self.control._batch(bundle, batch_id)
-            self._fixture(batch)
+            self._allowed_batch(db, owner, project, batch)
             now = self.control.clock()
             expiry = now + timedelta(seconds=ttl_seconds)
             # Tokens may outlive a render deadline briefly to reconcile a completion
@@ -76,7 +87,7 @@ class WorkerTransport:
             principal = dict(zip(('owner','project','batch','worker','expires','revoked'), row))
             try:
                 bundle = self.control._load(db, principal['owner'], principal['project'])
-                self._fixture(self.control._batch(bundle, principal['batch']))
+                self._allowed_batch(db, principal['owner'], principal['project'], self.control._batch(bundle, principal['batch']))
             except (KeyError, StopIteration):
                 raise WorkerAccessError(401) from None
             return principal
@@ -102,12 +113,15 @@ class WorkerTransport:
         if (row is None or row[5] or timestamp(row[4]) <= self.control.clock() or
                 tuple(row[:4]) != tuple(principal[k] for k in ('owner','project','batch','worker'))):
             raise WorkerAccessError(401)
+        bundle = self.control._load(db, principal['owner'], principal['project'])
+        self._allowed_batch(db, principal['owner'], principal['project'], self.control._batch(bundle, principal['batch']))
 
     def call(self, authorization, route, payload):
         require(isinstance(payload, dict), 'JSON object required')
         principal = self.principal(authorization)
         client = self.control.worker_client(principal['owner'], principal['project'], principal['batch'], principal['worker'],
-                     authorize=lambda db: self._credential_fence(db, authorization, principal))
+                     authorize=lambda db: self._credential_fence(db, authorization, principal),
+                     synchronize=self.real_jobs.synchronize if self.real_jobs is not None else None)
         if route == 'claim':
             require(not payload, 'Claim body must be empty')
             return client.claim()

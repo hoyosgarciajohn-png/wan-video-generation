@@ -54,7 +54,7 @@ class Reply:
 
 
 class StudioAPI:
-    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic):
+    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic, real_jobs=None):
         parsed = urlsplit(origin)
         if (parsed.scheme not in ('http', 'https') or not parsed.netloc or
                 parsed.path or parsed.query or parsed.fragment or parsed.username or
@@ -67,7 +67,7 @@ class StudioAPI:
         self.commands = RenderCommands(studio)
         self.media_commands = MediaCommands(studio)
         self.uploads = ResumableUploads(studio)
-        self.workers = WorkerTransport(studio.control)
+        self.workers = WorkerTransport(studio.control, real_jobs=real_jobs)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
