@@ -1,0 +1,51 @@
+name: Publish private Wan worker
+run-name: Publish private worker · ${{ github.sha }}
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wan-container-verification
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      packages: write
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify runner capacity
+        run: python3 deployment/cloud_build.py preflight --target gpu --output "$RUNNER_TEMP/wan-cloud"
+      - name: Build and verify worker without GPU access
+        run: timeout --signal=TERM --kill-after=30s 30m python3 deployment/build_verify.py --target gpu --output "$RUNNER_TEMP/wan-cloud/build" --execute
+      - name: Publish privately and verify immutable registry identity
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: timeout --signal=TERM --kill-after=30s 17m python3 deployment/publish_image.py --output "$RUNNER_TEMP/wan-cloud"
+      - name: Preserve bounded evidence
+        if: always()
+        env:
+          VERIFICATION_OUTCOME: ${{ job.status }}
+        run: python3 deployment/cloud_build.py archive --target gpu --output "$RUNNER_TEMP/wan-cloud"
+      - name: Upload evidence for one day
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: wan-private-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/wan-cloud-evidence.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
