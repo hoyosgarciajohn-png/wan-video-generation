@@ -7,7 +7,7 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-expected_old_sha=8e07ba3e8dfb9a250424bb4c8607cd1cac36cfe6
+expected_old_sha=f918152c082aef61e451d05bb550cff7e578df88
 if [[ $old_sha != "$expected_old_sha" ]]; then
     printf 'Upgrade baseline mismatch: expected %s; observed %s\n' "$expected_old_sha" "$old_sha" >&2
     exit 1
