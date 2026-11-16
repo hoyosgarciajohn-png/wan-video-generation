@@ -1,9 +1,12 @@
 # Hosting and automatic cleanup
 
-Prepared November 15, 2026 (owner local date). **Not deployed.** The Runpod account
-has no Pods, a displayed balance of $0, and no container registry credential.
-The connected Vercel account has no matching WAN project. No compatible existing
-Linux controller host or approved recurring hosting expense has been established.
+Updated November 15, 2026 (owner local date). **Not deployed.** Runpod has $10
+prepaid credit, zero observed Pods, saved private registry credential wan-ghcr-pull,
+and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions;
+its Pod read access passed run 43784863537. No credential is installed on a
+controller. No compatible existing host or recurring hosting approval is established.
+DigitalOcean's console is at sign-in; existing resources and live capacity have
+not been inspected. See [the concrete hosting decision](HOSTING_DECISION.md).
 
 ## Selected deployment shape
 
@@ -70,7 +73,8 @@ with the exact owner/project scope, batch and original absolute deadline. Verify
 its `READY` record and exact provider name before dispatch. It cannot extend the
 30-minute envelope, create compute, or target other Pods. At the deadline it
 terminates matching Pods and keeps reconciling for five minutes for late creates.
-This workflow is prepared, not scheduled or running. No secret has been installed.
+The secret is installed and its read access is verified; the deadline workflow
+itself is not scheduled or running. Deletion and actual deadline handling remain unverified.
 Cancellation, an unavailable runner or provider outage can defeat this fallback;
 the primary monitor and external operational alerting remain necessary.
 
@@ -80,28 +84,54 @@ reservation is an admission limit, not a guaranteed provider hard billing stop.
 Authoritative bill retrieval, alert delivery and installed live authority remain
 unverified. Final billing must be reconciled before another trial.
 
-## Remaining owner/account inputs
+## Fresh-host installer
 
-| Input | Why needed | Scope |
-|---|---|---|
-| GHCR classic token with `read:packages` | Runpod private-image pull | Save directly in Runpod Container registry auth; do not paste into chat |
-| Application/cleanup Runpod credential | Services must operate after this chat ends | Private host secret and separate-host watchdog secret |
-| Existing compatible host, or new recurring hosting approval | HTTPS, persistent state and cleanup process | Separate from the $5 GPU trial |
-| Runpod credit funding | Account currently displays $0 | A top-up is not the same as the approved compute consumption cap |
+`install-services.sh` automates the final service/configuration installation on an
+approved **fresh dedicated Linux amd64/systemd host**. Before running it:
 
-No new host/subscription/top-up has been purchased. A low-cost candidate is
-Hetzner CX23 in Europe (2 vCPU, 4 GB, 40 GB): the official June 2026 adjustment
-lists **$6.49/month before IPv4, backups and tax**. Its product page currently
-reports unavailable capacity. Therefore this is a planning candidate, not a
-deployable quote. Prefer a compatible existing host; approve the final available
-host and total price before provisioning. Do not silently substitute ARM or a
-larger paid plan. Public references checked November 15 local / November 16 UTC:
+1. Install Python 3.11+, venv, Git, FFmpeg/ffprobe and the official Caddy package.
+   The package starts a default Caddy service; stop/disable that default service
+   on this new host so the dedicated WAN proxy can bind ports 80/443.
+2. Create the dedicated `wan` system user/group. Place the complete reviewed
+   checkout at `/opt/wan/current`, checked out to the exact merged release SHA.
+   Do not give the service user write access to source or the virtual environment.
+   Build Studio from package-lock with Node 22, preferably on the build host.
+   Copy verified build assets to apps/studio/dist. No live credential belongs in
+   the source checkout or cloud-init/user-data.
+3. Install the hash-locked hosting dependencies into `/opt/wan/venv`. Create
+   `/etc/wan` as root:wan mode 0750. Provision studio-tokens.json and runpod-token
+   there as root:wan mode 0640, via the approved secret transfer. The installer
+   issues no credentials and refuses to replace existing settings/state.
+4. Set the approved DNS hostname to this server; permit only 80/443 publicly and
+   restrict SSH to approved administration. Verify no other service uses 80/443.
+5. From `/opt/wan/current`, run as root:
+   `bash deployment/hosting/install-services.sh EXACT_REVIEWED_COMMIT APPROVED_HOSTNAME`.
 
-- https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/
-- https://www.hetzner.com/cloud/cost-optimized/
-- https://docs.pylonsproject.org/projects/waitress/en/stable/arguments.html
-- https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
-- https://docs.runpod.io/get-started/credentials
+The installer validates source, architecture, dependencies and private-secret
+permissions; initializes cleanup/admission/execution tables **with no keys or
+provider transport**; installs three systemd units; validates the dedicated Caddy
+configuration; and starts the controller, cleanup process and HTTPS proxy.
+Existing data/settings cause refusal; upgrades and restore use their own procedure.
+A partial installation failure requires inspection, not removal of retained data.
+It is source-prepared and syntax checked, not executed on a production host.
+
+`deployment.initialize_host` fixes an installation gap: the default web application
+did not create live cleanup tables. A fresh cleanup service would otherwise fail
+before its first sweep. Initialization is repeatable and preserves existing data;
+restored state still requires explicit database and assets paths. The default
+web app remains fixture-only, and no provider creation route is enabled.
+
+## Inputs still required
+
+- Host spending decision and account access; final capacity/price and tax must be
+  checked after sign-in before purchase. Existing suitable servers may avoid a
+  new charge but must be inspected for capacity and workload isolation first.
+- Approved hostname and DNS control; no domain purchase is included.
+- Host-side operator and cleanup credentials and installed live authority.
+- Off-host recovery arrangement, monitor acceptance, exact image pull and model setup.
+
+Funding, private-pull credential, and GitHub cleanup-secret creation are complete.
+Do not repeat those requests or rotate credentials implicitly.
 
 ## Acceptance record
 
@@ -113,3 +143,8 @@ refusal to create compute. These checks are not deployed-service evidence.
 Before launch record the real URL, TLS, persistent storage/restore evidence,
 monitor process/run IDs, fresh READY record, exact private digest pull, installed
 trust/configuration, model checksums and the approved one-attempt envelope.
+
+Two new fictional initialization checks pass: empty-schema cleanup without network
+or authority, repeat initialization with retained data, and restored-path refusal.
+The new installer and proxy/initializer bytes are part of the source-bound planning
+inventory. These checks do not establish a running service or shutdown acceptance.
