@@ -9,6 +9,41 @@ from .common import LOCK, atomic_json, require
 from .weights import verify
 
 
+def stage(name):
+    # Fixed labels only: never expose prompts, paths or raw exception messages.
+    print('WAN_STAGE:' + name, flush=True)
+
+
+class ObservedTextEncoder:
+    def __init__(self, encoder):
+        self.encoder = encoder
+
+    def __getattr__(self, name):
+        return getattr(self.encoder, name)
+
+    def __call__(self, *args, **kwargs):
+        stage('text_encode')
+        result = self.encoder(*args, **kwargs)
+        stage('generation')
+        return result
+
+
+def configure_memory(model, torch):
+    # The pinned upstream VAE defaults to float32. Use BF16 parameters and its
+    # own BF16 autocast context, rather than keeping FP32 decode activations.
+    # This candidate requires a new GPU validation; CPU mocks cannot prove fit.
+    model.vae.model.to(dtype=torch.bfloat16)
+    model.vae.dtype = torch.bfloat16
+    model.text_encoder = ObservedTextEncoder(model.text_encoder)
+    decode = model.vae.decode
+
+    def observed_decode(*args, **kwargs):
+        stage('video_decode')
+        return decode(*args, **kwargs)
+
+    model.vae.decode = observed_decode
+
+
 def reference_image(path, size):
     if not path:
         return None
@@ -38,22 +73,27 @@ def main(spec_path):
     from wan.configs import WAN_CONFIGS
     from wan.utils.utils import save_video
     require(torch.cuda.is_available(), 'CUDA GPU required')
+    require(torch.cuda.is_bf16_supported(), 'BF16 CUDA GPU required')
     require(torch.__version__.split('+')[0] == '2.8.0', 'Unexpected torch version')
     torch.cuda.reset_peak_memory_stats()
     start = time.monotonic()
-    print('WAN_STAGE:model_load', flush=True)
+    stage('model_load')
     model = wan.WanTI2V(config=WAN_CONFIGS['ti2v-5B'], checkpoint_dir=spec['weights'],
-                       device_id=0, rank=0, t5_cpu=True, convert_model_dtype=True)
+                       device_id=0, rank=0, t5_cpu=False, init_on_cpu=True,
+                       convert_model_dtype=True)
+    # Keep DiT on CPU until upstream generate() has encoded text on GPU and
+    # moved T5 back to CPU. Upstream offload_model=True implements that order.
+    configure_memory(model, torch)
     torch.cuda.synchronize()
     loaded = time.monotonic()
-    print('WAN_STAGE:generation', flush=True)
+    stage('generation')
     video = model.generate(s['prompt'], img=image, size=size, max_area=size[0]*size[1],
                            frame_num=spec['frames'], shift=5.0, sample_solver='unipc',
                            sampling_steps=50, guide_scale=5.0, seed=s['settings']['seed'],
                            offload_model=True)
     torch.cuda.synchronize()
     generated = time.monotonic()
-    print('WAN_STAGE:video_encode', flush=True)
+    stage('video_encode')
     save_video(tensor=video[None], save_file=spec['output'], fps=24, nrow=1,
                normalize=True, value_range=(-1, 1))
     atomic_json(Path(spec['output']).with_suffix('.metrics.json'), {
@@ -64,6 +104,7 @@ def main(spec_path):
         'torch_version': torch.__version__, 'cuda_version': torch.version.cuda,
         'model_profile': LOCK['profile'], 'cost_cents': None,
         'process_start': 'cold', 'attention_backend': 'flash-attention-2.8.3',
+        'memory_policy': 'sequential-gpu-text-bf16-vae-v1',
     })
 
 

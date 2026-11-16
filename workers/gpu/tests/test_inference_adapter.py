@@ -1,5 +1,7 @@
 """CPU-only invocation checks; mocks do not establish upstream/CUDA compatibility."""
 import copy
+import contextlib
+import io
 import json
 import os
 from pathlib import Path
@@ -12,7 +14,7 @@ from unittest.mock import Mock, patch
 from PIL import Image
 from workers.gpu.cli import fixture_claim
 from workers.gpu.common import LOCK, validate_claim
-from workers.gpu.inference import main, reference_image
+from workers.gpu.inference import main, reference_image, configure_memory
 
 
 class InferenceAdapterTests(unittest.TestCase):
@@ -32,12 +34,14 @@ class InferenceAdapterTests(unittest.TestCase):
                          image=None, output=str(self.root/'output.mp4'))
         self.spec_path = self.root/'spec.json'
 
-    def invoke(self, *, cuda=True):
+    def invoke(self, *, cuda=True, bf16=True):
         self.spec_path.write_text(json.dumps(self.spec))
-        gpu = SimpleNamespace(is_available=lambda:cuda, reset_peak_memory_stats=Mock(), synchronize=Mock(),
+        gpu = SimpleNamespace(is_available=lambda:cuda, is_bf16_supported=lambda:bf16,
+                              reset_peak_memory_stats=Mock(), synchronize=Mock(),
                               get_device_name=lambda _: 'mock device', max_memory_allocated=lambda:1,
                               max_memory_reserved=lambda:2)
-        torch = SimpleNamespace(cuda=gpu, __version__='2.8.0+cu128', version=SimpleNamespace(cuda='12.8'))
+        torch = SimpleNamespace(cuda=gpu, bfloat16='mock-bf16', __version__='2.8.0+cu128',
+                                version=SimpleNamespace(cuda='12.8'))
         video = Mock(); video.__getitem__ = Mock(return_value='mock tensor')
         model = Mock(); model.generate.return_value = video
         constructor, saver = Mock(return_value=model), Mock()
@@ -50,6 +54,10 @@ class InferenceAdapterTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'CUDA GPU required'):
                     main(self.spec_path)
                 constructor.assert_not_called()
+            elif not bf16:
+                with self.assertRaisesRegex(ValueError, 'BF16 CUDA GPU required'):
+                    main(self.spec_path)
+                constructor.assert_not_called()
             else:
                 main(self.spec_path)
                 verify.assert_called_once_with(self.spec['weights'])
@@ -58,8 +66,11 @@ class InferenceAdapterTests(unittest.TestCase):
     def test_real_profile_text_invocation_and_unbilled_metrics(self):
         validate_claim(self.claim)
         constructor, model, saver = self.invoke()
-        self.assertTrue(constructor.call_args.kwargs['t5_cpu'])
+        self.assertFalse(constructor.call_args.kwargs['t5_cpu'])
+        self.assertTrue(constructor.call_args.kwargs['init_on_cpu'])
         self.assertTrue(constructor.call_args.kwargs['convert_model_dtype'])
+        model.vae.model.to.assert_called_once_with(dtype='mock-bf16')
+        self.assertEqual(model.vae.dtype, 'mock-bf16')
         args = model.generate.call_args.kwargs
         self.assertEqual(args['frame_num'],49)
         self.assertEqual(args['size'],(1280,704))
@@ -71,6 +82,8 @@ class InferenceAdapterTests(unittest.TestCase):
         metrics=json.loads((self.root/'output.metrics.json').read_text())
         self.assertIsNone(metrics['cost_cents'])
         self.assertEqual(metrics['model_profile'],LOCK['profile'])
+        self.assertEqual(metrics['memory_policy'], 'sequential-gpu-text-bf16-vae-v1')
+        self.assertTrue(args['offload_model'])
 
     def test_reference_is_detached_rgb_before_model_invocation(self):
         path=self.root/'reference.png'
@@ -106,3 +119,23 @@ class InferenceAdapterTests(unittest.TestCase):
 
     def test_cuda_absence_blocks_constructor(self):
         self.invoke(cuda=False)
+
+    def test_bf16_absence_blocks_constructor(self):
+        self.invoke(bf16=False)
+
+    def test_phase_hooks_preserve_calls_and_identify_decode_failure(self):
+        encoder = Mock(return_value=['fictional context'])
+        decoder = Mock(side_effect=RuntimeError('private tensor diagnostics'))
+        model = SimpleNamespace(text_encoder=encoder,
+            vae=SimpleNamespace(model=Mock(), decode=decoder))
+        configure_memory(model, SimpleNamespace(bfloat16='mock-bf16'))
+        log = io.StringIO()
+        with contextlib.redirect_stdout(log):
+            self.assertIs(model.text_encoder.model, encoder.model)
+            self.assertEqual(model.text_encoder(['fictional prompt'], 'gpu'), ['fictional context'])
+            with self.assertRaises(RuntimeError):
+                model.vae.decode(['fictional latent'])
+        encoder.assert_called_once_with(['fictional prompt'], 'gpu')
+        decoder.assert_called_once_with(['fictional latent'])
+        self.assertEqual(log.getvalue().splitlines(),
+                         ['WAN_STAGE:text_encode','WAN_STAGE:generation','WAN_STAGE:video_decode'])
