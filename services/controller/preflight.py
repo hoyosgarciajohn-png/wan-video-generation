@@ -28,7 +28,7 @@ CRITICAL = ('services/controller/live_execution.py','services/controller/live_bi
             'deployment/hosting/install-services.sh','deployment/initialize_host.py',
             'deployment/hosting/cloud-install.sh','deployment/hosting/bootstrap-host.sh',
             'deployment/hosting/verify-host.sh','.github/workflows/install-controller.yml',
-            'deployment/hosting/upgrade-host.sh',
+            'deployment/hosting/upgrade-host.sh','deployment/host_acceptance.py',
             '.github/workflows/deadline-guard.yml')
 
 

@@ -6,7 +6,7 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access]
+        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery]
         default: inspect
         required: true
       host_fingerprint:
@@ -14,7 +14,7 @@ on:
         type: string
         required: false
       access_public_key:
-        description: RSA 3072 public key for sealed existing owner-token delivery (owner-access only)
+        description: Base64 RSA 3072 public PEM key for sealed existing owner-token delivery
         type: string
         required: false
 permissions:
