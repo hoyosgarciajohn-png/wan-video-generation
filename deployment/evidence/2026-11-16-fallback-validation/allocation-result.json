@@ -1,0 +1,138 @@
+{
+  "recorded_at": "2026-11-16T20:27:05.924Z",
+  "runtime_commit": "bef93c9e27ae6382695701e2e640852c78d79ab0",
+  "implementation_pr": 82,
+  "project": "project-ebb553f81bbb476fa94edae11feb48c1",
+  "batch": "4e87af47cce0477b8750b2e4681b722d",
+  "deadline": 1794861671,
+  "trial": "fallback",
+  "launch_run": 43949478736,
+  "launch_job": 133587835939,
+  "guard_run": 43947253491,
+  "guard_job": 133580091315,
+  "quote": {
+    "observed_at": 1794860665.295,
+    "data": {
+      "availability": "LOW",
+      "community": true,
+      "cudaVersions": [
+        {
+          "available": true,
+          "version": "13.2"
+        }
+      ],
+      "dataCenters": [
+        {
+          "availability": "LOW",
+          "id": "EUR-IS-2",
+          "name": "EUR-IS-2"
+        }
+      ],
+      "id": "NVIDIA L40S",
+      "manufacturer": "NVIDIA",
+      "maxCount": {
+        "community": 8,
+        "secure": 8
+      },
+      "memory": 48,
+      "minRam": 125,
+      "minVcpuCount": 16,
+      "name": "L40S",
+      "pool": "ADA_48_PRO",
+      "price": {
+        "community": 0.79,
+        "secure": 1.09,
+        "serverless": 1.89
+      },
+      "secure": true
+    }
+  },
+  "provider_responses": [
+    {
+      "at": "2026-11-16T20:24:48.1174377Z",
+      "kind": "http_error",
+      "http_status": 400,
+      "request_id": "req_26597215-3198-4b99-afd9-dbaea03cdce4",
+      "outcome": "rejected",
+      "title": "Bad Request",
+      "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."
+    },
+    {
+      "at": "2026-11-16T20:25:03.6657463Z",
+      "kind": "http_error",
+      "http_status": 400,
+      "request_id": "req_4a707063-db24-4961-8c1e-773663f310d2",
+      "outcome": "rejected",
+      "title": "Bad Request",
+      "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."
+    },
+    {
+      "at": "2026-11-16T20:25:19.0677100Z",
+      "kind": "http_error",
+      "http_status": 400,
+      "request_id": "req_96f87c71-32d7-4f43-8632-2c76e970d6a1",
+      "outcome": "rejected",
+      "title": "Bad Request",
+      "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."
+    }
+  ],
+  "final_status": {
+    "checked_at": 1794860719.5901895,
+    "batch": "4e87af47cce0477b8750b2e4681b722d",
+    "state": "failed",
+    "cleanup": "confirmed",
+    "pod": null,
+    "deadline": "2026-11-16T20:41:11Z",
+    "takes": 0,
+    "attempts": 0,
+    "failure_codes": [],
+    "billing": {
+      "status": "NO_POD_ID"
+    },
+    "reservation_state": "reserved",
+    "provider_create": {
+      "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again.",
+      "http_status": 400,
+      "kind": "http_error",
+      "outcome": "rejected",
+      "request_id": "req_96f87c71-32d7-4f43-8632-2c76e970d6a1",
+      "title": "Bad Request"
+    },
+    "allocation_requests": 3
+  },
+  "pod_inventory": {
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    },
+    "pods": []
+  },
+  "billing": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-16T21:00:00Z",
+        "startTime": "2026-11-16T20:00:00Z"
+      },
+      "recordCount": 0,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0,
+        "gpuAmount": 0,
+        "totalAmount": 0
+      },
+      "uniquePodCount": 0
+    },
+    "records": []
+  },
+  "audit": {
+    "auditLogs": [],
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    }
+  },
+  "billing_final": false,
+  "historical_unknown_preserved": "249c50635ec84ac38cef0eb66232efed",
+  "note": "All three exact capacity rejections; no Pod or model invocation. Runtime cap and reservation unchanged. Empty billing/audit are not final settlement or resolution of the older unknown."
+}

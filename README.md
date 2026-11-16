@@ -70,3 +70,9 @@ rejections. The new isolated scope allows RTX 4090 or L40S at <=$1.10/hour, keep
 the $5 / 1800-second / one-render envelope, and permits at most three allocation
 requests. [Fallback evidence](deployment/evidence/2026-11-16-fallback-validation/README.md)
 records checks and live status. Earlier consumed scopes remain immutable.
+
+PR #82 is installed as bef93c9. The approved L40S launch 43949478736 exhausted
+its three capacity-only requests: all returned explicit HTTP 400 no-capacity
+rejections. No Pod, render or take resulted; cleanup is confirmed and the billing
+reservation remains retained. The fallback scope is consumed. See the linked
+fallback evidence for request IDs and next-step constraints.

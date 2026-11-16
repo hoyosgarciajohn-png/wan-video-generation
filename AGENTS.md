@@ -81,3 +81,12 @@ and the exact old unknown exception. Its signed policy and durable attempt log
 prevent resets, duplicate allocations and retry after any uncertain response.
 Deployment and one-second execution are authorized. Success on L40S does not prove
 the repaired worker's 24GB RTX 4090 memory fit. Later five seconds uses measurements.
+
+The fallback scope is now consumed: batch 4e87af47cce0477b8750b2e4681b722d,
+project project-ebb553f81bbb476fa94edae11feb48c1. Installed runtime is bef93c9
+(PR #82). Launch 43949478736 submitted three requests at 20:24:48–20:25:19 UTC;
+all were explicit HTTP 400 no-capacity rejections. Final state failed, cleanup
+confirmed, no Pod, zero worker attempts/takes, reservation retained. Do not replay
+the launch, reset the grant or submit a fourth request. The original deadline and
+independent guard remain unchanged. All older liabilities and the exact unknown
+repair request remain preserved. One-second GPU validation is still unproved.
