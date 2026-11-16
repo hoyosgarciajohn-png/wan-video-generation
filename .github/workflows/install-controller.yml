@@ -6,11 +6,15 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, upgrade, verify]
+        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access]
         default: inspect
         required: true
       host_fingerprint:
         description: Exact ed25519 SHA256 fingerprint from the inspected host (required for install/verify)
+        type: string
+        required: false
+      access_public_key:
+        description: RSA 3072 public key for sealed existing owner-token delivery (owner-access only)
         type: string
         required: false
 permissions:
@@ -39,4 +43,5 @@ jobs:
           RUNPOD_CLEANUP_TOKEN: ${{ inputs.operation == 'install' && secrets.RUNPOD_CLEANUP_TOKEN || '' }}
           WAN_HOST_OPERATION: ${{ inputs.operation }}
           WAN_HOST_FINGERPRINT: ${{ inputs.host_fingerprint }}
+          WAN_ACCESS_PUBLIC_KEY: ${{ inputs.access_public_key }}
         run: bash deployment/hosting/cloud-install.sh
