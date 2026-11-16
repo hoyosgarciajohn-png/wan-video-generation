@@ -19,7 +19,11 @@ class ExportRunner:
         self.last_error = None
 
     @staticmethod
-    def verify(path, timeline):
+    def verify(path, timeline, profile):
+        # The immutable queued profile also covers legacy 320x180 exports.
+        fps = Fraction(profile['frame_rate']['numerator'], profile['frame_rate']['denominator'])
+        if (profile['container'], profile['video_codec'], profile['audio_codec']) != ('mp4','h264','aac') or fps <= 0:
+            raise ValueError('Unsupported frozen export profile')
         info = json.loads(subprocess.check_output(['ffprobe', '-v', 'error', '-protocol_whitelist', 'file,pipe',
                           '-f', 'mov', '-i', str(path), '-show_streams', '-show_format', '-of', 'json'],
                          stderr=subprocess.DEVNULL, timeout=20))
@@ -27,9 +31,10 @@ class ExportRunner:
         video = [s for s in streams if s['codec_type'] == 'video']
         audio = [s for s in streams if s['codec_type'] == 'audio']
         if (len(video) != 1 or len(audio) != bool(timeline['audio']) or len(streams) != len(video) + len(audio) or
-                video[0]['codec_name'] != 'h264' or (video[0]['width'], video[0]['height']) != (320,180) or
-                Fraction(video[0]['avg_frame_rate']) != 24 or
-                abs(float(video[0]['duration']) * 1000 - timeline['duration_ms']) > 1000 / 24 + 1 or
+                video[0]['codec_name'] != profile['video_codec'] or
+                (video[0]['width'], video[0]['height']) != (profile['width'],profile['height']) or
+                Fraction(video[0]['avg_frame_rate']) != fps or
+                abs(float(video[0]['duration']) * 1000 - timeline['duration_ms']) > 1000 / fps + 1 or
                 (audio and (audio[0]['codec_name'] != 'aac' or
                             abs(float(audio[0]['duration']) * 1000 - timeline['duration_ms']) > 25))):
             raise ValueError('Export output verification failed')
@@ -55,7 +60,7 @@ class ExportRunner:
             timeline = next(t for t in snapshot['timelines'] if t['id'] == frozen_job['timeline_id'] and t['revision'] == frozen_job['timeline_revision'])
             try:
                 rendered = Path(self.renderer(snapshot, export_id, project_id, self.control.asset_root, self.job_root))
-                self.verify(rendered, timeline)
+                self.verify(rendered, timeline, frozen_job['profile'])
                 checksum = digest(rendered)
                 key = f'projects/{project_id}/exports/{export_id}/output.mp4'
                 output = scoped(self.control.asset_root, key)
@@ -68,7 +73,7 @@ class ExportRunner:
                     if digest(output) != checksum:
                         raise ValueError('Immutable export output conflict')
                 sync_dir(output.parent)
-                self.verify(output, timeline)
+                self.verify(output, timeline, frozen_job['profile'])
                 if digest(output) != checksum:
                     raise ValueError('Export upload changed')
                 asset = dict(id='asset-' + export_id, project_id=project_id, owner_id=owner, kind='video',

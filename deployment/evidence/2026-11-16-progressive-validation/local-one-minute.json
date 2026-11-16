@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "mode": "fictional_cpu_only",
+  "gpu_requests": 0,
+  "wan_generated_clips": 0,
+  "shots": 12,
+  "duration_seconds": 60,
+  "source_resolution": [
+    320,
+    180
+  ],
+  "output_resolution": [
+    1280,
+    704
+  ],
+  "fps": 24,
+  "frames": 1440,
+  "audio_codec": "aac",
+  "video_codec": "h264",
+  "output_bytes": 615190,
+  "output_sha256": "5ad61224115ccf98e37095386831812f7d205a0e939238c879cc88ea8adc5d9f",
+  "output_path": "/workspace/scratch/e8fab6271911/wan-scale-one-minute/assets/projects/project-b55abf2ab5ec44fa8780c0dd7da45cca/exports/export-daf2aec2d7cd4a8dbd84591845a78b64/output.mp4",
+  "export_seconds": 37.629,
+  "total_seconds": 59.188,
+  "peak_child_rss_kib": 102404,
+  "restart_and_idempotency": "PASS",
+  "full_decode": "PASS",
+  "free_disk_bytes": 58796744704,
+  "limitations": [
+    "Synthetic blue clips enlarged for export; no real Wan generation or creative acceptance.",
+    "Resource measurements apply only to the machine running this rehearsal."
+  ]
+}

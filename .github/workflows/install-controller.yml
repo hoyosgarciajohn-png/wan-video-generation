@@ -6,13 +6,13 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, trial-prepare, trial-admit, trial-launch, trial-observe]
+        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, scale-rehearsal, trial-prepare, trial-admit, trial-launch, trial-observe]
         default: inspect
         required: true
       trial:
         description: Exact approved trial scope (only for trial operations)
         type: choice
-        options: [first, diagnostic]
+        options: [first, diagnostic, repair]
         default: first
         required: true
       host_fingerprint:

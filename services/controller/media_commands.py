@@ -198,7 +198,7 @@ class MediaCommands:
                 raise KeyError('Timeline revision unavailable')
             job = dict(id='export-' + uuid4().hex, project_id=project_id, timeline_id=payload['timeline_id'],
                        timeline_revision=payload['timeline_revision'], state='queued', output_asset_id=None,
-                       profile=dict(width=320, height=180, frame_rate=dict(numerator=24, denominator=1),
+                       profile=dict(width=1280, height=704, frame_rate=dict(numerator=24, denominator=1),
                                     container='mp4', video_codec='h264', audio_codec='aac'))
             bundle['exports'].append(job)
             self.control._save(db, bundle)

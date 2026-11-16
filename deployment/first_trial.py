@@ -57,6 +57,8 @@ def select_trial(name):
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
     if name == 'first':
         return
+    if name == 'repair':
+        return select_repair_trial()
     assert name == 'diagnostic', 'Unknown trial scope'
     proposal = read(ROOT / 'deployment/diagnostic-trial-proposal.json')
     assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION'
@@ -77,6 +79,30 @@ def select_trial(name):
     IDEMPOTENCY_KEY = 'john-diagnostic-approved-attempt'
     WORKER_ID = 'john-diagnostic-wan-worker'
     EXPECTED_PRIOR_BATCHES = {'7c811e6ab21a4392b0e3a80e331fc57a'}
+
+
+def select_repair_trial():
+    global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
+    global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
+    proposal = read(ROOT / 'deployment/repair-trial-proposal.json')
+    assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION'
+    assert proposal['execution_enabled'] is False
+    terms = proposal['proposed_additional_terms']
+    assert (terms['overall_cap_cents'],terms['pod_reservation_cents'],terms['storage_allowance_cents'],
+            terms['runtime_seconds_from_admission'],terms['pod_create_attempts'],terms['render_attempts'],
+            terms['target_duration_ms'],terms['frames']) == (500,400,100,1800,1,1,1000,25)
+    assert proposal['approval_reference']
+    TRIAL = STATE / 'repair-trial-20261116'
+    AUTH = Path('/etc/wan/repair-trial-authority-20261116.json')
+    IMAGE = 'ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50'
+    assert proposal['image'] == IMAGE
+    BUILD_EVIDENCE = '2026-11-16-memory-repair-build'
+    TITLE = 'Wan repaired worker validation · one one-second shot'
+    DURATION_MS = 1000
+    APPROVAL_ID = 'john-repair-validation-20261116'
+    IDEMPOTENCY_KEY = 'john-repair-validation-single-attempt'
+    WORKER_ID = 'john-repair-validation-worker'
+    EXPECTED_PRIOR_BATCHES = {'7c811e6ab21a4392b0e3a80e331fc57a','def5478dc85949139ca1c0ae404f9d1f'}
 
 
 def prior_history_closed(db):
@@ -347,7 +373,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
-    parser.add_argument('--trial', choices=['first','diagnostic'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()
