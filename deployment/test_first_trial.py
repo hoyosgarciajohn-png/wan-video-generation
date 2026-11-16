@@ -100,6 +100,10 @@ class FirstTrialGates(unittest.TestCase):
             value['dataCenters'][0]['availability']='NONE'
             with self.assertRaises(AssertionError): first_trial.checked_quote()
             value['dataCenters'][0]['availability']='LOW'
+            value['dataCenters'][0]['id']='EU-CZ-1'
+            self.assertEqual(first_trial.checked_quote()['region'],'EU-CZ-1')
+            # A prepared grant stays bound to its location; do not migrate it.
+            with self.assertRaises(AssertionError): first_trial.checked_quote('EUR-IS-2')
             value['price']['secure']=1.01
             with self.assertRaises(AssertionError): first_trial.checked_quote()
 
