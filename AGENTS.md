@@ -100,3 +100,17 @@ into signed approval and host evidence before admission. Only explicit capacity
 rejection permits another untried candidate. Preserve all five consumed scopes,
 the exact historical unknown exception, reservations and independent cleanup.
 This supersedes the $1.10 hourly ceiling only for the new scope, never old grants.
+
+The allocation scope is now consumed successfully: project
+project-13ccbd8f41ad4f4c94566f6e9e3aa2ca, batch 0a30c22ff1a8493bbe2714ad36cd0321.
+PR #84 is installed as 84fe9d2d9e2aad680c825069dd5dc5a84f5314f5. Launch
+43977423400 allocated H100 80GB HBM3 Pod ymhk7srf23nend in CA-MTL-1 at $4.39/hour
+on its first POST. At 23:32:28 UTC November 16 the controller recorded succeeded,
+cleanup confirmed, one take and one worker attempt; complete Pod inventory was
+empty. Preserve the successful take and consumed grant. Do not replay this launch.
+The final bill is pending; $1.36 is only an elapsed-time compute estimate.
+Exact peak VRAM/load/generation metrics were not retained before teardown.
+Guard 43976858968 stays active through the original deadline plus five minutes
+(23:44:46 UTC), including the exact old unresolved repair request. Preserve all
+older reservations and persistent cleanup. A later five-second test must use a
+new scoped authority, actual measurements and durable performance telemetry.

@@ -1,0 +1,86 @@
+{
+  "recorded_at": "2026-11-16T23:35:05.825Z",
+  "implementation_pr": 84,
+  "installed_commit": "84fe9d2d9e2aad680c825069dd5dc5a84f5314f5",
+  "project": "project-13ccbd8f41ad4f4c94566f6e9e3aa2ca",
+  "batch": "0a30c22ff1a8493bbe2714ad36cd0321",
+  "pod": "ymhk7srf23nend",
+  "launch_run": 43977423400,
+  "launch_job": 133684894142,
+  "launch_conclusion": "success",
+  "controller_final": {
+    "logged_at": "2026-11-16T23:32:28.5578499Z",
+    "checked_at": 1794871948.5339952,
+    "batch": "0a30c22ff1a8493bbe2714ad36cd0321",
+    "state": "succeeded",
+    "cleanup": "confirmed",
+    "pod": "ymhk7srf23nend",
+    "deadline": "2026-11-16T23:39:46Z",
+    "takes": 1,
+    "attempts": 1,
+    "failure_codes": [],
+    "billing": {
+      "status": "AWAITING_CONNECTED_BILLING_RECORD",
+      "reservation_retained": true
+    },
+    "reservation_state": "reserved",
+    "provider_create": null,
+    "allocation_requests": 1
+  },
+  "inventory": {
+    "observed_at": "2026-11-16T23:36:08.995Z",
+    "pods": []
+  },
+  "billing": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-17T00:00:00Z",
+        "podId": "ymhk7srf23nend",
+        "startTime": "2026-11-16T23:00:00Z"
+      },
+      "recordCount": 0,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0,
+        "gpuAmount": 0,
+        "totalAmount": 0
+      },
+      "uniquePodCount": 0
+    },
+    "records": []
+  },
+  "final_bill_pending": true,
+  "reservation_released": false,
+  "observed_timeline": {
+    "pod_created": "2026-11-16T23:13:54.118Z",
+    "container_started": "2026-11-16T23:19:56Z",
+    "weights_verified": "2026-11-16T23:29:20.970934896Z",
+    "worker_completed": "2026-11-16T23:32:20.224856048Z",
+    "cleanup_confirmed": "2026-11-16T23:32:28.5578499Z"
+  },
+  "sampling_observation": {
+    "steps": 50,
+    "completed_steps": 50,
+    "reported_elapsed_seconds": 25,
+    "source": "Read-only inference process progress; 50/50 [00:25<00:00, 1.94it/s]"
+  },
+  "worker_after_weight_verification_seconds": 179.254,
+  "allocation_to_cleanup_seconds": 1114.4159951210022,
+  "compute_elapsed_estimate_usd": 1.36,
+  "estimate_is_not_invoice": true,
+  "exact_model_load_generation_and_peak_vram_metrics": null,
+  "metrics_capture_note": "Read-only bounded observers were started, but no WAN_BENCHMARK_METRICS line was retrieved before automatic Pod deletion. Do not claim exact peak VRAM or load/generation timing.",
+  "guard": {
+    "run": 43976858968,
+    "job": 133682954759,
+    "status": "RUNNING_AT_CHECKPOINT",
+    "deadline": 1794872386,
+    "watch_until": 1794872686,
+    "preserves_old_unknown": true,
+    "checked_at": "2026-11-16T23:36:08.995Z"
+  },
+  "durable_controller_status": "/var/lib/wan/allocation-trial-20261116/status.json",
+  "next": "Preserve this consumed grant; retain billing reservations and old unresolved repair request. Five-second validation needs its own scope and durable performance telemetry.",
+  "billing_checked_at": "2026-11-16T23:36:08.995Z"
+}

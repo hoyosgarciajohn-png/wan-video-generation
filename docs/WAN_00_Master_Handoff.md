@@ -1,20 +1,57 @@
 # Wan Video Generation · Master handoff
-Version 1.43 | November 16, 2026 | Owner: John Hoyos
+Version 1.44 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
-John approved $4.50/hour, unchanged $5 total / 1800 seconds / one one-second
-render, and up to three capacity-only allocation requests switching approved
-GPU/location candidates. Implementation uses the fresh `allocation` scope,
-signed candidate list and host binding, fresh quote checks before each POST,
-durable candidate indices, and no replay after uncertain outcomes or restart.
-All five previous scopes and the exact old unknown exception are preserved.
-197 root tests and 50 deployment/guard/hosting tests passed; contract/shell checks
-passed. Worker compatibility review supports Ampere/Ada/Hopper candidates but
-actual repaired GPU execution is still unproved. Deployment and live result
-pending at this source checkpoint. See docs/B06_MULTI_GPU_ALLOCATION.md.
+**The approved multi-GPU allocation and repaired one-second GPU render passed.**
+PR #84 is merged and installed as 84fe9d2d9e2aad680c825069dd5dc5a84f5314f5.
+Upgrade 43976433823 passed with all three services active, HTTPS healthy and
+historical jobs preserved. Preparation 43976625623 and admission 43976761613
+passed. The signed plan froze H100 SXM across six locations with A100 SXM in
+Iceland as fallback, under $4.50/hour / $5 total / 1800 seconds / one render.
+All five previous scopes and the exact old unknown exception remain preserved.
+
+Project project-13ccbd8f41ad4f4c94566f6e9e3aa2ca, batch
+0a30c22ff1a8493bbe2714ad36cd0321, was admitted at 23:09:46 UTC November 16.
+Independent guard 43976858968 delivered READY and was verified running before
+launch 43977423400 / job 133684894142. The **first allocation request succeeded**:
+Pod ymhk7srf23nend, NVIDIA H100 80GB HBM3, CA-MTL-1, $4.39/hour.
+Hardware inspection confirmed 81,559 MiB and driver 595.91.07.
+
+The pinned image pulled and started at 23:19:56 UTC. All 34,201,537,147 model
+bytes passed checksum verification at 23:29:20.970 UTC. Worker completion was
+reported at 23:32:20.224 UTC. The final controller status at 23:32:28.557 UTC is
+**succeeded / cleanup confirmed / one take / one attempt / one allocation**.
+The provider then returned Pod-not-found and complete inventory was empty.
+The take was uploaded and committed through the existing durable-output validation
+path before automatic teardown. Owner creative acceptance remains pending in the
+live Studio; no human acceptance or five-second result is claimed.
+
+Measured observations: 50/50 sampling steps completed in about 25 seconds;
+weight-verification-to-worker-completion was 179.254 seconds; allocation-to-
+confirmed-cleanup was 1114.416 seconds (18m34s). Most time was cold startup and
+model transfer. $1.36 is an elapsed-time compute estimate, **not an invoice**.
+The connected billing query still had no records at checkpoint; final cost is
+pending and the reservation is retained. Exact model-load/generation subdivisions
+and peak VRAM were not retained before deletion: read-only metric observers did
+not yield a captured event. Preserve this limitation, and make metrics durable
+before the next paid stage. H100 success does not establish the 24GB 4090 fit.
+
+The fixed deadline remains 23:39:46 UTC (6:39:46 p.m. Eastern); guard 43976858968
+continues through 23:44:46 UTC to catch late allocations and watch the exact old
+unknown repair request. Persistent host cleanup remains active. Do not cancel the
+guard, replay this launch, reset the consumed grant, or silently release older
+reservations. The old repair request remains unresolved despite this success.
+
+Fictional verification: 197 root tests and 50 deployment/guard/hosting tests passed;
+contract, shell syntax and whitespace checks passed. Contract remains 0.1.0.
+Evidence: deployment/evidence/2026-11-16-multi-gpu-allocation/ and
+https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43977423400.
+Next recipient: B01/B06 GPU benchmark work. Retain output, obtain final billing,
+make performance telemetry durable and prepare the separately scoped five-second
+validation using these actual timings. No second render was submitted.
 
 ## Previous checkpoint — exhausted L40S fallback
 John approved the proposed RTX 4090/L40S fallback and controlled no-capacity retries.
