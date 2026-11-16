@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -25,7 +25,8 @@ printf 'Host ed25519 fingerprint: %s\n' "$fingerprint"
 # Subsequent operations pin that recorded key; they never disable host verification.
 ssh_options=(-F /dev/null -i "$temp_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes
     -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$temp_dir/known_hosts"
-    -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=3)
+    -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=3
+    -o ControlMaster=auto -o ControlPersist=60 -o ControlPath="$temp_dir/control")
 if [[ "$operation" == diagnose ]]; then
     ssh "${ssh_options[@]}" "root@$host" 'bash -s' <<'REMOTE'
 set -euo pipefail
@@ -46,9 +47,11 @@ printf '\n'
 REMOTE
     exit
 fi
-if [[ "$operation" == recovery ]]; then
-    scp "${ssh_options[@]}" deployment/host_acceptance.py "root@$host:/root/wan-host-acceptance.py"
-    ssh "${ssh_options[@]}" "root@$host" 'cd /opt/wan/current; PYTHONPATH=/opt/wan/current WAN_SOURCE_ROOT=/opt/wan/current /opt/wan/venv/bin/python /root/wan-host-acceptance.py host'
+if [[ "$operation" == recovery || "$operation" == recovery-copy ]]; then
+    if [[ "$operation" == recovery ]]; then
+        scp "${ssh_options[@]}" deployment/host_acceptance.py "root@$host:/root/wan-host-acceptance.py"
+        ssh "${ssh_options[@]}" "root@$host" 'cd /opt/wan/current; PYTHONPATH=/opt/wan/current WAN_SOURCE_ROOT=/opt/wan/current /opt/wan/venv/bin/python /root/wan-host-acceptance.py host'
+    fi
     mkdir "$temp_dir/acceptance"
     scp -r "${ssh_options[@]}" "root@$host:/var/lib/wan/acceptance-20261116/backup" "root@$host:/var/lib/wan/acceptance-20261116/workflow.json" "root@$host:/var/lib/wan/acceptance-20261116/result.json" "$temp_dir/acceptance/"
     python3 -m venv "$temp_dir/venv"
