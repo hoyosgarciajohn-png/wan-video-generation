@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.26 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.27 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -25,6 +25,10 @@ published image digest. Template creation does not verify an actual image pull.
 The manual read-only credential probe passed in GitHub Actions run 43784863537.
 This establishes authenticated Pod read access; deletion and shutdown remain unverified.
 No suitable existing controller host or approved recurring hosting budget is established.
+The fresh-host installer is prepared, including disarmed cleanup-schema initialization.
+DigitalOcean is at owner sign-in. Proposed host: Basic Regular 2 vCPU / 4 GiB /
+80 GiB plus weekly backups, $28.80/month before tax; requested ceiling $32/month
+including tax. Neither hosting purchase nor this new monthly ceiling is approved.
 The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries below
 are chronological; this checkpoint supersedes earlier publication status.
 
@@ -731,3 +735,49 @@ authority and primary plus independent cleanup, model/storage bootstrap, actual
 private image download and CUDA/Wan inference, and authoritative billing retrieval.
 Runpod funding ($10 credit) and credential setup are complete. No additional payment,
 GPU/storage allocation, recurring host or paid builder was purchased in this step.
+
+## Controller installation prepared; hosting decision pending — November 15, 2026
+
+User requested controller hosting and automatic shutdown installation. Remote main
+baseline c4b6251076797ab7d38f452721b1f8b496b82199 was verified. No compatible
+connected host exists in the known setup. DigitalOcean/Hetzner plugin discovery
+returned no matching management integration. DigitalOcean's console was opened
+and is at sign-in; its existing servers, account state and actual regional stock
+remain unknown. That page is retained for the owner to sign in.
+
+The recommended concrete configuration is documented in
+[HOSTING_DECISION.md](https://github.com/hoyosgarciajohn-png/wan-video-generation/blob/main/deployment/hosting/HOSTING_DECISION.md):
+one Ubuntu 24.04 amd64 DigitalOcean Basic Regular bundled 2 vCPU / 4 GiB / 80 GiB
+server ($24/month) plus weekly backups ($4.80/month), four weekly copies, subtotal
+$28.80 before tax. Request approval for a **$32/month ceiling including tax**.
+No hosting approval is inferred from the earlier $5 GPU trial or credential approval.
+Check existing suitable resources first after login; confirm exact price/capacity
+before purchase. No domain, upgrade, extra volume or other paid add-on is included.
+
+Hetzner CX23 remains publicly marked unavailable; CPX22's current European USD
+rate is $22.99 before extras. Connected Runpod CPU3c is available at two vCPUs x
+$0.03/hour, $43.20 per 720 hours before storage; not chosen for continuous hosting.
+Sources and limits are retained in the decision document.
+
+Implementation: guarded fresh-host service installer validates exact commit,
+architecture, dependencies and protected secret files; refuses existing state or
+settings; installs separate controller/cleanup/HTTPS services. The dedicated Caddy
+unit avoids overwriting another site's proxy configuration. The new disarmed
+initializer creates cleanup/admission/execution tables without authority keys or
+provider transport. This fixes the fresh-install failure where cleanup tables
+were absent. No live create route is enabled. Installer source and new runtime
+files are included in source-bound preflight; PLAN_ONLY remains non-executable.
+
+Validation actually run: 2 fictional initialization checks (repeat initialization,
+retained data, empty cleanup without network, and restored-path refusal), 8 affected
+preflight checks, bash syntax check, source-bound plan verification and whitespace
+check. All pass. Installer/systemd/TLS were not executed on a real server; no
+shutdown operation or Runpod private image download is claimed. Existing build,
+credential and publication checks were retained without repetition. Contract 0.1.0.
+
+Next recipient: Command Center after owner hosting decision and DigitalOcean
+sign-in. Confirm region/price and hostname, provision/reuse the approved host,
+securely install credentials and the prepared release, verify TLS/persistence/
+recovery/monitor operation, then install live authority and use the one-attempt
+GPU trial. The approved $5 / 1,800-second / one-attempt trial remains unused.
+No additional payment, recurring host, GPU or storage resource was created.

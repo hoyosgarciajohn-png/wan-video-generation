@@ -31,7 +31,8 @@
     "private_pull_credential_saved": "PASS",
     "private_runpod_template_saved": "PASS",
     "cleanup_credential_saved": "PASS",
-    "cleanup_credential_read_access": "PASS"
+    "cleanup_credential_read_access": "PASS",
+    "host_installation_source": "PREPARED_TARGETED_CHECKS_PASS_NOT_INSTALLED"
   },
   "image_ids": {
     "cpu": "sha256:b3d35b89b04d8e093ca9de9d96757ae70f69df13d27c1ffa3e54a78343d11fc3",

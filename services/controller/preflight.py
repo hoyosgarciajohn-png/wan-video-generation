@@ -24,7 +24,9 @@ CRITICAL = ('services/controller/live_execution.py','services/controller/live_bi
             'deployment/hosted_app.py','deployment/cleanup_monitor.py','deployment/deadline_guard.py',
             'deployment/publish_image.py','deployment/hosting/requirements.lock',
             'deployment/hosting/wan-controller.service','deployment/hosting/wan-cleanup.service',
-            'deployment/hosting/Caddyfile.example','.github/workflows/deadline-guard.yml')
+            'deployment/hosting/Caddyfile.example','deployment/hosting/wan-proxy.service',
+            'deployment/hosting/install-services.sh','deployment/initialize_host.py',
+            '.github/workflows/deadline-guard.yml')
 
 
 def _hash(value):
