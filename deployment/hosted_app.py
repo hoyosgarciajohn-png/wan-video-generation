@@ -7,6 +7,7 @@ spending authority or expose a provider-create route.
 from email.message import Message
 from http import HTTPStatus
 import json
+import logging
 import mimetypes
 import os
 from pathlib import Path
@@ -82,6 +83,17 @@ class Application:
             reply = self.reply(env)
         except Exception:
             reply = Reply(503, {'error': 503})
+        if reply.status == 403 and env.get('PATH_INFO') == '/v1/studio/session':
+            # Only fixed categories/booleans: no cookie, token, IP, URL or header text.
+            fetch_site = env.get('HTTP_SEC_FETCH_SITE')
+            logging.warning('WAN_SESSION_REJECT %s', json.dumps({
+                'host_matches': env.get('HTTP_HOST') in self.api.allowed_hosts,
+                'origin_matches': env.get('HTTP_ORIGIN') == self.api.origin,
+                'origin_present': bool(env.get('HTTP_ORIGIN')),
+                'fetch_site': fetch_site if fetch_site in ('same-origin', 'same-site', 'cross-site', 'none') else 'absent-or-other',
+                'studio_header_matches': env.get('HTTP_X_WAN_REQUEST') == 'studio',
+                'method': env.get('REQUEST_METHOD') if env.get('REQUEST_METHOD') in ('GET','POST','DELETE') else 'other',
+            }, sort_keys=True))
         body = b'' if reply.status == 204 else json.dumps(reply.data, separators=(',', ':'), allow_nan=False).encode()
         headers = {'Content-Type': 'application/json', 'Cache-Control': 'no-store',
                    'Content-Security-Policy': CSP, 'Referrer-Policy': 'no-referrer',

@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -26,6 +26,26 @@ printf 'Host ed25519 fingerprint: %s\n' "$fingerprint"
 ssh_options=(-F /dev/null -i "$temp_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes
     -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$temp_dir/known_hosts"
     -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=3)
+if [[ "$operation" == diagnose ]]; then
+    ssh "${ssh_options[@]}" "root@$host" 'bash -s' <<'REMOTE'
+set -euo pipefail
+journalctl -u wan-controller --since "30 minutes ago" -o cat --no-pager | python3 -c 'import sys; print("".join(line for line in sys.stdin if line.startswith("WARNING:root:WAN_SESSION_REJECT ")))'
+REMOTE
+    exit
+fi
+if [[ "$operation" == owner-access ]]; then
+    [[ -n ${WAN_ACCESS_PUBLIC_KEY:-} ]] || fail 'Encryption recipient required'
+    printf '%s\n' "$WAN_ACCESS_PUBLIC_KEY" > "$temp_dir/recipient.pem"
+    openssl pkey -pubin -in "$temp_dir/recipient.pem" -text -noout | head -1 | grep -Fx 'Public-Key: (3072 bit)' >/dev/null || fail 'RSA 3072 recipient required'
+    scp "${ssh_options[@]}" "$temp_dir/recipient.pem" "root@$host:/root/wan-access-recipient.pem"
+    ssh "${ssh_options[@]}" "root@$host" 'bash -s' <<'REMOTE'
+set -euo pipefail
+trap 'rm -f /root/wan-access-recipient.pem' EXIT
+python3 -c 'import json; p=json.load(open("/etc/wan/studio-tokens.json")); assert len(p)==1 and list(p.values())==["john-hoyos"]; print(next(iter(p)),end="")' | openssl pkeyutl -encrypt -pubin -inkey /root/wan-access-recipient.pem -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 | base64 -w0
+printf '\n'
+REMOTE
+    exit
+fi
 if [[ "$operation" == inspect ]]; then
     ssh "${ssh_options[@]}" "root@$host" 'set -eu; hostname; uname -m; . /etc/os-release; printf "%s\n" "$PRETTY_NAME"; free -m; df -h /; cloud-init status --long; ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256; test ! -e /opt/wan/current; test ! -e /var/lib/wan; printf "FRESH_HOST_ACCESS_PASS\n"'
     exit

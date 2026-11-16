@@ -61,6 +61,18 @@ class HostedApplicationTests(unittest.TestCase):
         self.app.healthy = lambda: False
         self.assertEqual(self.call('/healthz')['status'], 503)
 
+    def test_session_rejection_diagnostics_never_log_credentials_or_header_text(self):
+        with self.assertLogs(level='WARNING') as logs:
+            result = self.call('/v1/studio/session', HTTP_SEC_FETCH_SITE='cross-site',
+                               HTTP_COOKIE='fictional-sensitive-cookie',
+                               HTTP_ORIGIN='https://private-origin.example')
+        self.assertEqual(result['status'], 403)
+        message = '\n'.join(logs.output)
+        self.assertIn('"fetch_site": "cross-site"', message)
+        self.assertNotIn('fictional-sensitive-cookie', message)
+        self.assertNotIn('private-origin', message)
+        self.assertNotIn(self.token, message)
+
     def test_restore_never_silently_opens_an_empty_database(self):
         (self.root / 'RESTORED.json').write_text('{}')
         with self.assertRaises(ValueError): open_control({'WAN_STATE': str(self.root)})
