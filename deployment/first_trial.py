@@ -163,7 +163,10 @@ def checked_quote(region=None):
     assert value['id'] == GPU and value['secure'] and 0 < price <= Decimal('1.00')
     available = [x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH', 'MEDIUM', 'LOW')]
     if region is None:
-        region = next((x for x in ('EU-RO-1', 'US-IL-1', 'EUR-IS-1', 'EUR-IS-2') if x in available), None)
+        # The approval bounds GPU, cloud, price and runtime, not geography.
+        # Prefer previous locations, then bind any currently quoted location.
+        region = next((x for x in ('EU-RO-1', 'US-IL-1', 'EUR-IS-1', 'EUR-IS-2') if x in available),
+                      next(iter(available), None))
     assert region in available, 'Approved GPU region has no current capacity'
     return {'checked_at': time.time(), 'gpu': GPU, 'region': region, 'usd_per_hour': str(price), 'min_cuda': '12.8'}
 
