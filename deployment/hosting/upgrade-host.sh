@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One reviewed upgrade from the observed initial deployment; preserve private state.
+# Reviewed upgrade from the observed controller deployment; preserve private state.
 set -euo pipefail
 umask 0077
 release_sha=${1:?}
@@ -7,7 +7,11 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-[[ $old_sha == 45559974d44797e26fb543c6e5ff9e4f75344dcb ]]
+expected_old_sha=8e07ba3e8dfb9a250424bb4c8607cd1cac36cfe6
+if [[ $old_sha != "$expected_old_sha" ]]; then
+    printf 'Upgrade baseline mismatch: expected %s; observed %s\n' "$expected_old_sha" "$old_sha" >&2
+    exit 1
+fi
 git diff --quiet && git diff --cached --quiet
 [[ ! -L /opt/wan/current ]]
 bootstrap_dir=/root/wan-bootstrap-$release_sha
