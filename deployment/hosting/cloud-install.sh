@@ -62,6 +62,12 @@ if [[ "$operation" == recovery || "$operation" == recovery-copy ]]; then
     exit
 fi
 if [[ "$operation" == trial-* ]]; then
+    trial=${WAN_TRIAL:-first}
+    case "$trial" in
+        first) trial_dir=/var/lib/wan/live-trial-20261116 ;;
+        diagnostic) trial_dir=/var/lib/wan/diagnostic-trial-20261116 ;;
+        *) fail 'Unknown trial scope' ;;
+    esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then
         [[ -n ${WAN_GPU_QUOTE:-} ]] || fail 'Fresh connected GPU quote required'
         printf '%s' "$WAN_GPU_QUOTE" > "$temp_dir/quote.json"
@@ -69,12 +75,12 @@ if [[ "$operation" == trial-* ]]; then
     fi
     if [[ "$operation" == trial-observe && -n ${WAN_BILLING_RECORD:-} ]]; then
         printf '%s' "$WAN_BILLING_RECORD" > "$temp_dir/billing.json"
-        scp "${ssh_options[@]}" "$temp_dir/billing.json" "root@$host:/var/lib/wan/live-trial-20261116/connected-billing.json"
+        scp "${ssh_options[@]}" "$temp_dir/billing.json" "root@$host:$trial_dir/connected-billing.json"
     fi
     [[ "$operation" == trial-observe ]] || ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
     guard_run=''
     if [[ "$operation" == trial-launch ]]; then
-        ssh "${ssh_options[@]}" "root@$host" 'cat /var/lib/wan/live-trial-20261116/guard-ready.json' > "$temp_dir/guard.json"
+        ssh "${ssh_options[@]}" "root@$host" "cat '$trial_dir/guard-ready.json'" > "$temp_dir/guard.json"
         guard_run=$(python3 -c 'import json,sys; v=json.load(open(sys.argv[1]))["run_id"]; assert isinstance(v,str) and v.isdigit(); print(v)' "$temp_dir/guard.json")
         GUARD_RUN="$guard_run" python3 - <<'PY'
 import json, os
@@ -88,7 +94,7 @@ assert value['path']=='.github/workflows/deadline-guard.yml' and value['head_sha
 print('INDEPENDENT_GUARD_RUNNING_VERIFIED')
 PY
     fi
-    ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}'"
+    ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}' --trial '$trial'"
     exit
 fi
 if [[ "$operation" == inspect ]]; then

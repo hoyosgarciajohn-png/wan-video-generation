@@ -3,6 +3,11 @@
 set -euo pipefail
 umask 0077
 [[ ${GITHUB_REF:-} == refs/heads/main ]]
+case "${WAN_TRIAL:-first}" in
+    first) trial_dir=/var/lib/wan/live-trial-20261116 ;;
+    diagnostic) trial_dir=/var/lib/wan/diagnostic-trial-20261116 ;;
+    *) exit 1 ;;
+esac
 task_dir=$(mktemp -d)
 guard_pid=''
 trap '[[ -z "$guard_pid" ]] || kill "$guard_pid" 2>/dev/null || true; rm -rf "$task_dir"' EXIT
@@ -21,7 +26,7 @@ done
 [[ -f "$WAN_GUARD_READY_FILE" ]]
 scp -F /dev/null -i "$task_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes \
   -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$task_dir/known_hosts" -o ConnectTimeout=15 \
-  "$WAN_GUARD_READY_FILE" root@64.225.114.46:/var/lib/wan/live-trial-20261116/guard-ready.json
+  "$WAN_GUARD_READY_FILE" "root@64.225.114.46:$trial_dir/guard-ready.json"
 printf 'INDEPENDENT_GUARD_READY_DELIVERED\n'
 # Keep launch readiness current while this independent guard is alive. A
 # delivery failure after startup must never stop deadline enforcement.
@@ -30,7 +35,7 @@ while kill -0 "$guard_pid" 2>/dev/null; do
     kill -0 "$guard_pid" 2>/dev/null || break
     if ! scp -F /dev/null -i "$task_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes \
       -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$task_dir/known_hosts" -o ConnectTimeout=15 \
-      "$WAN_GUARD_READY_FILE" root@64.225.114.46:/var/lib/wan/live-trial-20261116/guard-ready.json; then
+      "$WAN_GUARD_READY_FILE" "root@64.225.114.46:$trial_dir/guard-ready.json"; then
         printf 'GUARD_RECEIPT_DELIVERY_UNAVAILABLE; deadline watch continues\n'
     fi
 done

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "as_of": "2026-11-16",
-  "status": "PENDING_FRESH_OWNER_APPROVAL",
+  "status": "OWNER_APPROVED_RUNTIME_PREPARATION",
   "execution_enabled": false,
   "purpose": "One new bounded diagnostic render after the consumed first trial; this file is not runtime authority",
   "previous_trial": {
@@ -60,5 +60,6 @@
     "This is not five-second acceptance or a quality/throughput benchmark",
     "The spending ceiling is enforced by admission, pricing, single-attempt and shutdown controls, not a provider-side hard account cap",
     "Automatic application-side provider billing collection remains pending"
-  ]
+  ],
+  "approval_reference": "Command Center chat, November 16 2026: John replied yes i approve to one new one-second diagnostic attempt, maximum 30 minutes and an additional $5 ceiling."
 }

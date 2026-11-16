@@ -2,6 +2,12 @@ name: Guard one Runpod deadline
 on:
   workflow_dispatch:
     inputs:
+      trial:
+        description: Exact approved trial scope for readiness receipt
+        type: choice
+        options: [first, diagnostic]
+        default: first
+        required: true
       scope:
         description: Exact JSON array of owner ID and project ID
         required: true
@@ -35,4 +41,5 @@ jobs:
           WAN_GUARD_SCOPE: ${{ inputs.scope }}
           WAN_GUARD_BATCH: ${{ inputs.batch }}
           WAN_GUARD_DEADLINE: ${{ inputs.deadline }}
+          WAN_TRIAL: ${{ inputs.trial }}
         run: bash deployment/hosting/run-guard.sh
