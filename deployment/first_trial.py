@@ -342,8 +342,19 @@ def observe():
     summary = dict(checked_at=time.time(), batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
         provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'])
     atomic_json(TRIAL / 'status.json', summary)
-    print(json.dumps(summary), flush=True)
+    # Keep complete evidence on disk, but put lifecycle fields first in a short
+    # live log line so the Actions viewer does not truncate the useful status.
+    print(json.dumps(operator_summary(summary)), flush=True)
     return summary
+
+
+def operator_summary(summary):
+    batch = summary['batch']
+    return dict(checked_at=summary['checked_at'], batch=batch['id'], state=batch['state'],
+        cleanup=batch['cleanup_state'], pod=batch['provider_resource_id'], deadline=batch['deadline_at'],
+        takes=len(summary['takes']), attempts=len(summary['attempts']),
+        failure_codes=[a['failure_reason'] for a in summary['attempts'] if a.get('failure_reason')],
+        billing=summary['billing'], reservation_state=summary['reservation_state'])
 
 
 def launch():

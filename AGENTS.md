@@ -26,3 +26,13 @@ previously proposed additional $5 / 1800-second / one-attempt envelope, without
 resetting either consumed scope. This scope authorizes only one new one-second
 validation; later paid stages need measured budgets and separate scoped authority.
 The exporter and isolated fictional one-minute rehearsal are authorized implementation.
+
+Progressive operational release 42b3e993 is installed and verified. The hosted
+one-minute synthetic rehearsal passed in run 43890910756. Repair preparation
+43891758558 completed for project-10088bb273fb41d78399957f2dc8cd83 in EU-RO-1.
+Admission 43892215902 created batch 249c50635ec84ac38cef0eb66232efed, fixed
+deadline 2026-11-16T15:33:20Z. Guard 43892343231 protects launch 43892451814.
+One create was attempted; no allocation has yet been observed. Preserve the
+reservation and unresolved cleanup; do not repeat prepare/admit/launch or deploy
+over the admitted source. Observe through the deadline plus five-minute guard
+window, then reconcile. No fourth create or five-second grant is authorized.

@@ -1,0 +1,36 @@
+{
+  "source_commit": "5ff04c6ffd9649c0cdda9a0cb4bbf304be4740c2",
+  "workflow_run": 43890910756,
+  "job_id": 133381534109,
+  "status": "PASS",
+  "mode": "fictional_cpu_only",
+  "gpu_requests": 0,
+  "wan_generated_clips": 0,
+  "shots": 12,
+  "duration_seconds": 60,
+  "source_resolution": [
+    320,
+    180
+  ],
+  "output_resolution": [
+    1280,
+    704
+  ],
+  "fps": 24,
+  "frames": 1440,
+  "audio_codec": "aac",
+  "video_codec": "h264",
+  "output_bytes": 615191,
+  "output_sha256": "f8c51ad0f4c63a0f45779660ead07e77cc00e7f4ea04f1a10e6e73d6fb0b374a",
+  "output_path": "/var/lib/wan/scale-rehearsal-20261116-one-minute/assets/projects/project-554f2e834d544eff923a319854125082/exports/export-88f1c6fe82e44768860433b2391734ad/output.mp4",
+  "export_seconds": 17.517,
+  "total_seconds": 27.158,
+  "peak_child_rss_kib": 110680,
+  "restart_and_idempotency": "PASS",
+  "full_decode": "PASS",
+  "free_disk_bytes": 47838625792,
+  "limitations": [
+    "Synthetic blue clips enlarged for export; no real Wan generation or creative acceptance.",
+    "Resource measurements apply only to the machine running this rehearsal."
+  ]
+}

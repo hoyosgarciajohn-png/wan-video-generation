@@ -128,6 +128,17 @@ class FirstTrialGates(unittest.TestCase):
                 path.write_text(json.dumps(dict(ready,**{key:value})))
                 with self.assertRaises(AssertionError): first_trial.guard_ready(job)
 
+    def test_operator_line_keeps_status_visible_without_large_prompt(self):
+        summary = dict(checked_at=1, batch=dict(id='fictional',state='provisioning',
+            cleanup_state='pending',provider_resource_id=None,deadline_at='2026-11-16T15:33:20Z',
+            shot_snapshots=[{'prompt':'private-prompt' * 10000}]), takes=[], attempts=[],
+            billing={'status':'NO_POD_ID'},reservation_state='reserved')
+        message=json.dumps(first_trial.operator_summary(summary))
+        self.assertLess(len(message),1000)
+        self.assertIn('provisioning',message)
+        self.assertNotIn('private-prompt',message)
+        self.assertIn('shot_snapshots',summary['batch'])
+
 
 class BootstrapExecutionTests(LiveExecutionTests):
     def setUp(self):

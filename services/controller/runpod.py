@@ -5,6 +5,7 @@ This transport is not spending authorization. Production admission remains disar
 import copy
 import hashlib
 import json
+import logging
 import re
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -14,6 +15,7 @@ from src.wan_platform.fake_provider import Pod
 
 _ABSENT = object()
 MAX_RESPONSE = 8 * 1024 * 1024
+LOGGER = logging.getLogger(__name__)
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -105,8 +107,10 @@ class RunpodProvider:
                           data=None if data is None else json.dumps(data).encode(),
                           headers={'Authorization': 'Bearer ' + self._token, 'Content-Type': 'application/json',
                                    'User-Agent': 'wan-command-center/0.1'}, method=method)
+        status = None
         try:
             with self._transport(request, timeout=15) as response:
+                status = response.status
                 expected = {'GET': 200, 'POST': 201, 'DELETE': 204}[method]
                 if response.status != expected:
                     raise ValueError('Unexpected status')
@@ -120,8 +124,15 @@ class RunpodProvider:
             error.close()
             if error.code == 404 and path.startswith('/pods/') and method in ('GET', 'DELETE'):
                 return _ABSENT
+            if method == 'POST':
+                LOGGER.warning('WAN_PROVIDER_CREATE_UNCONFIRMED %s', json.dumps(
+                    {'kind': 'http_error', 'http_status': error.code}))
             raise ConnectionError(f'Runpod request failed with HTTP {error.code}') from None
         except (URLError, OSError, ValueError, RecursionError):
+            if method == 'POST':
+                # No body, URL, exception text, headers or worker credentials.
+                LOGGER.warning('WAN_PROVIDER_CREATE_UNCONFIRMED %s', json.dumps(
+                    {'kind': 'transport_or_response', 'http_status': status}))
             raise ConnectionError('Runpod transport or response failure') from None
 
     def _name(self, batch_id, request_key):

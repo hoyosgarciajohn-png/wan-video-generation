@@ -76,6 +76,21 @@ class RunpodTests(unittest.TestCase):
                 call()
             self.assertNotIn('fictional-secret', str(caught.exception))
 
+    def test_create_error_retains_safe_status_without_retry_or_secret(self):
+        for status in (400, 403, 429, 500):
+            with self.subTest(status=status):
+                self.replies = iter([(status, None)])
+                before = len(self.calls)
+                with self.assertLogs('services.controller.runpod', level='WARNING') as logs:
+                    with self.assertRaises(ConnectionError):
+                        self.provider.create('batch', 'key')
+                self.assertEqual(len(self.calls), before + 1)
+                event = json.loads(logs.output[0].split('WAN_PROVIDER_CREATE_UNCONFIRMED ', 1)[1])
+                self.assertEqual(event, {'kind': 'http_error', 'http_status': status})
+                self.assertNotIn('fictional-key', logs.output[0])
+                self.assertNotIn('fictional-secret-diagnostic', logs.output[0])
+                self.assertEqual(self.provider._known, {})
+
     def test_bad_or_repeated_pagination_never_returns_partial_matches(self):
         name = self.provider._name('batch', 'key')
         self.replies = iter([(200, page([{'id': 'pod', 'name': name}], 'repeat')),

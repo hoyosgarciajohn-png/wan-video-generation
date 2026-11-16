@@ -25,3 +25,9 @@ both prior jobs, approvals, image references and billing reservations. New host 
 GPU execution evidence will be appended after actual operations. The public render
 path stays synthetic. This evidence does not close real five-second or minute-long
 Wan acceptance, creative acceptance, final billing or larger scale validation.
+
+Hosted continuation: see hosted-operations.md, hosted-one-minute.json and
+repair-checkpoint.json. The HD exporter is installed and the hosted one-minute
+fictional pipeline passed. The one-second repair scope made its sole create
+request but allocation is unconfirmed; the launch and independent guard remain
+active at the checkpoint. This does not establish any repaired Wan output.
