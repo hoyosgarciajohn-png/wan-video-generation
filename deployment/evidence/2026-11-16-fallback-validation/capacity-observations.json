@@ -1,0 +1,196 @@
+{
+  "note": "Partial sample retained from active launch monitoring; transient LOW is not reserved capacity.",
+  "samples": [
+    {
+      "observed_at": 1794860511.069,
+      "data": {
+        "availability": "NONE",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": false,
+            "version": "13.2"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    },
+    {
+      "observed_at": 1794860561.956,
+      "data": {
+        "availability": "NONE",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": false,
+            "version": "13.2"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    },
+    {
+      "observed_at": 1794860582.6,
+      "data": {
+        "availability": "NONE",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": false,
+            "version": "13.2"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    },
+    {
+      "observed_at": 1794860603.919,
+      "data": {
+        "availability": "NONE",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": false,
+            "version": "13.2"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    },
+    {
+      "observed_at": 1794860625.335,
+      "data": {
+        "availability": "LOW",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": true,
+            "version": "13.2"
+          }
+        ],
+        "dataCenters": [
+          {
+            "availability": "LOW",
+            "id": "US-NC-1",
+            "name": "US-NC-1"
+          },
+          {
+            "availability": "LOW",
+            "id": "US-TX-3",
+            "name": "US-TX-3"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "minRam": 62,
+        "minVcpuCount": 16,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    },
+    {
+      "observed_at": 1794860665.295,
+      "data": {
+        "availability": "LOW",
+        "community": true,
+        "cudaVersions": [
+          {
+            "available": true,
+            "version": "13.2"
+          }
+        ],
+        "dataCenters": [
+          {
+            "availability": "LOW",
+            "id": "EUR-IS-2",
+            "name": "EUR-IS-2"
+          }
+        ],
+        "id": "NVIDIA L40S",
+        "manufacturer": "NVIDIA",
+        "maxCount": {
+          "community": 8,
+          "secure": 8
+        },
+        "memory": 48,
+        "minRam": 125,
+        "minVcpuCount": 16,
+        "name": "L40S",
+        "pool": "ADA_48_PRO",
+        "price": {
+          "community": 0.79,
+          "secure": 1.09,
+          "serverless": 1.89
+        },
+        "secure": true
+      }
+    }
+  ]
+}

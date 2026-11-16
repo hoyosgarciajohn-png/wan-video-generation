@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.41 | November 16, 2026 | Owner: John Hoyos
+Version 1.42 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -16,11 +16,52 @@ revocation or expiry stops retries; restart never replays a POST. Preserve all
 four earlier scopes and the exact unresolved historical repair request.
 
 Fictional verification passed: 182 root tests and 48 deployment/guard/hosting
-tests (230 total), plus contract, shell syntax and whitespace checks. Installed
-runtime is still d30fa01; no new GPU request has been submitted at this checkpoint.
+tests (230 total), plus contract, shell syntax and whitespace checks. PR #82 is
+merged and installed as bef93c9e27ae6382695701e2e640852c78d79ab0, upgrade
+43946771144 / job 133578443705, passed at 20:09:48 UTC. All three services and
+HTTPS checks passed. Preparation 43946945751 / job 133579026280 passed.
+
+The new trial was admitted by 43947092891 / job 133579527960 at 20:11:12 UTC:
+project project-ebb553f81bbb476fa94edae11feb48c1, batch
+4e87af47cce0477b8750b2e4681b722d, frozen NVIDIA L40S / EUR-IS-2 / $1.09 per hour.
+The original fixed deadline is 20:41:11 UTC (3:41:11 p.m. Eastern). Independent
+guard 43947253491 / job 133580091315 is running and delivered READY at 20:12:05 UTC.
+It also watches the old exact unknown request. Capacity disappeared during guard
+startup, then briefly returned in Iceland at 20:24:25 UTC. Launch 43949478736 /
+job 133587835939 submitted the approved bounded allocation sequence on the fresh
+quote and verified the independent guard before creating.
+
+**All three allocation requests were explicitly rejected with HTTP 400 no-capacity**
+at 20:24:48, 20:25:03 and 20:25:19 UTC (3:24–3:25 p.m. Eastern). The final
+controller result is failed, cleanup confirmed, no Pod ID, zero worker attempts,
+zero takes and three allocation requests. This validates the rejection/retry path,
+not GPU execution. The green launch workflow means the operator completed its
+bounded handling; it is not a successful video test. Do not rerun this launch,
+reset its grant or start a fourth allocation request. The fallback scope is consumed.
+
+Complete Pod inventory and the account audit query since 20:09 UTC are empty.
+The current 20:00–21:00 UTC Pod billing bucket has zero records/totals. No GPU
+runtime occurred in this trial; billing is not final and its $4 reservation remains
+retained alongside all historical liabilities. The independent guard remains
+running at the evidence checkpoint, with the original 20:41:11 UTC deadline and
+five-minute late-allocation window; persistent host cleanup remains enabled.
+Redacted responses, exact request IDs, launch quote and sampled capacity changes
+are saved in deployment/evidence/2026-11-16-fallback-validation/.
+
+The current trial froze only EUR-IS-2 because it was the sole quoted location at
+admission. Later samples briefly exposed US-MO-1, US-NC-1 and US-TX-3, but could
+not expand an admitted grant. Next preparation should gather multiple suitable
+locations before admission and minimize the gap between quote and launch.
+The hourly capacity automation remains read-only; it cannot launch or reset trials.
+
+The old support thread was re-read: only the sent inquiry is present; no reply in
+that thread as of this checkpoint. Preserve the unknown request and its reservation.
 L40S success would validate the workflow on 48GB VRAM, not the repaired 24GB RTX
 4090 memory fit. Five seconds follows a measured successful one-second result.
-Contract remains 0.1.0. Live evidence will be appended after execution.
+Contract remains 0.1.0. One second, five seconds and one minute of real WAN clips
+remain unproved. The 1280x704/24fps exporter and fictional one-minute rehearsal
+remain verified. Installed runtime source is bef93c9; this evidence update does
+not redeploy the host.
 
 ## Previous checkpoint — isolated capacity rejection
 **The new one-second allocation attempt was explicitly rejected by Runpod at
@@ -47,7 +88,7 @@ image remains `sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3b
 it has not yet been validated on a GPU.
 
 PR #80 merged as `d30fa01aec7dc6bf50be8e5e2a950efb3c04fffc`, installed by
-upgrade run 43931628684 at 18:42:48 UTC. This remains the installed runtime source;
+upgrade run 43931628684 at 18:42:48 UTC. This was the installed runtime source then;
 a later evidence-only documentation merge is not another host deployment.
 Controller, persistent cleanup and proxy services are active/enabled; SQLite
 integrity and HTTPS checks passed. The fix refreshes only unregistered preparation,

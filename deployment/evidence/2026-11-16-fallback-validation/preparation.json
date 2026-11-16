@@ -1,0 +1,24 @@
+{
+  "recorded_at": "2026-11-16T20:11:28.528Z",
+  "installed_commit": "bef93c9e27ae6382695701e2e640852c78d79ab0",
+  "pr": 82,
+  "upgrade_run": 43946771144,
+  "upgrade_job": 133578443705,
+  "prepare_run": 43946945751,
+  "prepare_job": 133579026280,
+  "prepared": {
+    "status": "PREPARED_NO_ADMISSION_NO_GPU",
+    "project": "project-ebb553f81bbb476fa94edae11feb48c1",
+    "quote": {
+      "checked_at": 1794859824.1439633,
+      "gpu": "NVIDIA L40S",
+      "region": "EUR-IS-2",
+      "data_center_ids": [
+        "EUR-IS-2"
+      ],
+      "usd_per_hour": "1.09",
+      "min_cuda": "12.8"
+    },
+    "build": "b980738d91f5d5870be6061ff8306137b931109a43c8cb52247e1d2b71d5cb18"
+  }
+}
