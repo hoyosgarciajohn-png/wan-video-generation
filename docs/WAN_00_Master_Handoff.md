@@ -1,76 +1,89 @@
 # Wan Video Generation · Master handoff
-Version 1.39 | November 16, 2026 | Owner: John Hoyos
+Version 1.40 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
-John explicitly instructed making a new test without waiting for support. This
-supersedes the prior reconciliation-before-submission prerequisite for one isolated
-`validation` trial, including its necessary deployment. The unchanged envelope is
-$5 additional total, $4 Pod reservation, $1 storage allowance, 1800 seconds from
-admission, one create, one render, one-second 1280x704/24fps output. Keep the same
-Secure RTX 4090, CUDA 12.8+, RAM 64GB+, ephemeral 80GB and $1/hour quote ceiling.
+**The new one-second allocation attempt was explicitly rejected by Runpod at
+13:52:45 Eastern / 18:52:45 UTC on November 16. No Pod was created, no GPU render
+started and no take was saved. Five seconds and one minute of real Wan footage
+remain unproved.** This is an allocation failure, not another observed model failure.
 
-The new exception names only expired repair batch
-`249c50635ec84ac38cef0eb66232efed`. It requires failed state, no observed Pod,
-retained $4 reservation, expired/revoked old worker access, fresh cleanup heartbeat
-and a successful provider absence check. Any other unresolved historical request
-blocks the test. It never marks the old request closed or releases its reservation.
-The persistent cleanup continues, and the new independent guard also watches and
-terminates any late old allocation while enforcing the new trial's own deadline.
+Runpod returned HTTP 400, request ID
+`req_c5b30a44-e3c4-4dd2-becf-5ad5c57063c9`, with the explanation:
+“There are no longer any instances available with the requested specifications.
+Please refresh and try again.” PR #76's deployed diagnostics preserved that
+response and classified it as an explicit rejection, rather than a timeout or
+unknown outcome. The controller reports `failed`, cleanup `confirmed`, no Pod ID,
+zero worker attempts and zero takes. The launch workflow is green because the
+operator successfully handled rejection and cleanup; it is not GPU-test success.
 
-PR #76 was merged as dc01def and PR #77 recorded support delivery. The request was
-sent from the owner's Gmail to help@runpod.io, message/thread 1a1e55a2f38c51af.
-No provider conclusion has yet been recorded in the project. The original lost
-response remains unknown; empty inventory is not definitive rejection.
+John authorized this isolated validation without waiting for the old support
+inquiry, then instructed one second when matching capacity appeared, followed by
+five seconds. The unchanged envelope was $5 additional total, $4 Pod reservation,
+$1 storage allowance, 1800 seconds from admission, one create and one render.
+Secure RTX 4090 24GB, CUDA >=12.8, host RAM >=64GB, 80GB ephemeral disk and a
+$1/hour ceiling were enforced. The observed quote was $0.89/hour. The repaired
+image remains `sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50`;
+it has not yet been validated on a GPU.
 
-This implementation adds a private maintenance database/assets checkpoint while
-leaving cleanup running across the source swap. It is explicitly not an automatic
-restore bundle; normal backup/restore closure requirements remain unchanged.
-PR #76's redacted launch diagnostics and multiple eligible data centers are now
-**deployed**, together with the owner-authorized exception in PR #78. Installed
-source is `3a2f0cafd420a50fc2b744dc0490541f52cbbf87`. Upgrade run
-43926416349 succeeded at 18:13:08 UTC. All three services are active/enabled,
-SQLite integrity and internal/external HTTPS checks pass. The cleanup heartbeat
-still reports only the old repair request unresolved; three historical live jobs
-and all reservations remain. Provider authentication and absence reads passed.
+PR #80 merged as `d30fa01aec7dc6bf50be8e5e2a950efb3c04fffc`, installed by
+upgrade run 43931628684 at 18:42:48 UTC. This remains the installed runtime source;
+a later evidence-only documentation merge is not another host deployment.
+Controller, persistent cleanup and proxy services are active/enabled; SQLite
+integrity and HTTPS checks passed. The fix refreshes only unregistered preparation,
+archives earlier signed preparation, combines fresh and previously quoted locations,
+and preserves registered/admitted authority immutably. Its verification passed
+172 root checks and 47 deployment/guard/hosting checks (219 total), plus shell
+syntax and whitespace checks. Contract version remains 0.1.0.
 
-**Progression resumed on the owner's instruction to run one second, followed
-by five seconds.** Preparation run 43930617081 succeeded at 18:36:46 UTC on
-installed 3a2f0ca. It created project `project-bad45576e6c840cfbf3f4c633c8e3f87`
-and unregistered signed preparation for US-TX-3 at $0.89/hour. No admission,
-deadline, create or render has occurred yet. Texas capacity then disappeared
-while EU-RO-1 and EUR-IS-1 appeared.
+The consumed validation is project `project-bad45576e6c840cfbf3f4c633c8e3f87`,
+batch `bee9e55b1d4a4f458771ad4ac69c3318`. Admission run 43931801108 froze
+`EU-RO-1` and `US-TX-3` at 18:43:32 UTC, with deadline 19:13:32 UTC
+(2:13:32 p.m. Eastern). Replacement independent guard 43932987270 delivered
+readiness at 18:50:21 UTC and remained active at the evidence checkpoint. The
+first guard 43931920247 had no started job; GitHub rejected its cancellation.
+Both have the same fixed deadline and cannot create Pods. The sole create was
+submitted by launch run 43933406724 / job 133531537501 at 18:52:45 UTC.
+**Do not rerun that launch, reset its grant, or admit another job in this scope.**
 
-The operator is being corrected to refresh only unregistered preparation at
-admission, combining newly available quoted data centers with its previously
-quoted locations (up to eight). Archive the earlier preparation, preserve the
-same project, $400-cent Pod reservation, runtime, hardware and image constraints,
-and refresh source attestation for the reviewed deployment. Once an approval is
-registered or a job exists, it stays immutable. Add the historical-exception
-module to the signed source inventory. This does not retry a consumed grant.
+Complete provider inventory was empty, audit search since 18:40 UTC returned no
+records, and the 18:00–19:00 UTC billing query returned zero records/totals.
+No new GPU runtime occurred. These account observations are not final settlement;
+the new $4 reservation remains retained. The controller's confirmed cleanup for
+this new request follows its explicit rejection, not an inference from absence.
+Evidence and redacted provider result are in
+`deployment/evidence/2026-11-16-isolated-validation/`.
 
-The next deployment starts from observed source 3a2f0ca and retains the old unknown
-request and monitoring. Main must match the installed source for admission and
-launch. After a valid fresh quote, admit once, start the independent guard, then
-launch once. The owner requested five seconds after one-second success; measure
-actual result/time/cost and prepare a separate bounded stage within retained
-spending limits. Contract remains 0.1.0. Live result remains pending.
+The older repair batch `249c50635ec84ac38cef0eb66232efed` remains failed with
+unresolved cleanup and its own retained $4 reservation. Its original response
+was lost, so the new explicit rejection does not resolve the old request. The
+persistent cleanup process stays active, old worker access is expired, and the
+independent guard also watches that exact old request. PR #77 records the support
+inquiry sent to help@runpod.io, message/thread `1a1e55a2f38c51af`. No provider
+conclusion has been recorded in the project; the inbox was not rechecked here.
+
+An hourly read-only matching-capacity watch is enabled, first scheduled for
+2:49 p.m. Eastern on November 16. It reports meaningful changes without creating
+Pods, resetting grants or spending again. A LOW catalog quote is not a reservation
+and does not prove the host-RAM filter can be satisfied at allocation time. A
+future paid attempt needs a fresh isolated bounded authority; the consumed scope
+cannot be reused. Once one second succeeds, measure runtime/cost and establish
+the separate five-second stage inside the retained budget limits. No larger
+budget or unlimited automatic retries are inferred.
 
 **The 1280x704/24fps exporter is already deployed.** Frozen legacy 320x180 jobs
 retain their original profile. Hosted fictional one-minute rehearsal 43890910756
 passed: twelve five-second blue clips, 1440 frames, H.264/AAC, full decode and
 restart/idempotency; export 17.517 seconds, whole rehearsal 27.158 seconds, peak
 child RSS 110680 KiB. It does not prove one minute of generated Wan footage.
-Actual repaired one-second/five-second output and the real one-minute project
-remain unproved. Public Studio dispatch remains synthetic; live creative acceptance
-is pending. Historical GPU failures and billing records below are preserved.
+Public Studio dispatch remains synthetic; live creative acceptance is pending.
 
-Next: obtain provider confirmation, reconcile the old exact request, deploy and
-verify PR #76, then prepare/admit/guard/launch the newly approved one-second scope.
-Subsequent stages need measured feasibility inside the unchanged cost/runtime
-limits and their own isolated grants; no larger budget is inferred.
+Next: monitor matching capacity and retain the old support/cleanup work; prepare
+a fresh bounded attempt when suitable capacity is available. One-second success
+must precede five seconds, then one minute with real Wan clips. The consumed
+attempt is fully recorded; no further create was submitted in this session.
 
 ## Previous checkpoint — before progressive implementation
 The controller is live at https://wan-64-225-114-46.sslip.io. Owner sign-in after the

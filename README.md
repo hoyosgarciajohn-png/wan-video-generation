@@ -55,3 +55,12 @@ reservation and cleanup monitoring, checks its expired worker access, and adds i
 to the new independent cleanup guard. All other unresolved historical work blocks
 admission. Hardware, $5 additional total and 1800-second limits stay unchanged.
 See [the current handoff](docs/WAN_00_Master_Handoff.md) for deployment and results.
+
+The latest isolated one-second allocation was rejected by Runpod with HTTP 400
+at 18:52:45 UTC on November 16: no instance matched the requested specifications.
+No Pod, GPU render or take resulted. The repaired diagnostics retained the reason
+and request ID, and cleanup is confirmed for this request. PR #80 is installed
+as d30fa01. The one-create scope is consumed, its billing reservation is retained,
+and the older ambiguous request remains unresolved. Hourly capacity checks are
+read-only. Five-second generation awaits successful one-second output. See
+[the allocation result](deployment/evidence/2026-11-16-isolated-validation/allocation-result.json).

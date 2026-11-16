@@ -61,3 +61,14 @@ exists but was not admitted. Refreshing only an unregistered preparation to
 include fresh eligible locations is authorized; preserve its previous signed
 preparation as evidence and never mutate registered/admitted grants. Verify the
 one-second result, measured runtime and cost before the separate five-second stage.
+
+The isolated validation is now consumed: project
+project-bad45576e6c840cfbf3f4c633c8e3f87, batch bee9e55b1d4a4f458771ad4ac69c3318.
+Its sole POST at 18:52:45 UTC was explicitly rejected (HTTP 400, no matching
+capacity), request req_c5b30a44-e3c4-4dd2-becf-5ad5c57063c9. No Pod, worker
+attempt or take; state failed and cleanup confirmed. Preserve its $4 reservation
+and all older liabilities. Installed source is d30fa01 (PR #80). Launch workflow
+43933406724 success means rejection was handled, not that video generation passed.
+Never rerun this launch or reset its grant. Hourly matching-capacity automation is
+read-only; a future paid attempt requires fresh isolated bounded authority.
+Five seconds remains pending successful one-second output and measured feasibility.
