@@ -37,6 +37,24 @@ def terminate_matches(provider, batch, observed):
     return bool(observed)
 
 
+def readiness(provider, scope, batch, deadline, observed):
+    # Remember allocations before the deadline, including ones primary cleanup
+    # removes early. A refreshed receipt requires a successful provider read.
+    for pod in provider.find(batch, batch):
+        observed.add(pod.id)
+    return {'status': 'READY', 'batch': batch, 'deadline': deadline,
+            'scope': scope, 'provider_name': provider._name(batch, batch),
+            'checked_at': time.time(), 'run_id': os.environ.get('GITHUB_RUN_ID')}
+
+
+def save_ready(ready):
+    if os.environ.get('WAN_GUARD_READY_FILE'):
+        path = Path(os.environ['WAN_GUARD_READY_FILE'])
+        temporary = path.with_suffix('.tmp')
+        temporary.write_text(json.dumps(ready))
+        temporary.replace(path)
+
+
 def main():
     start = time.time()
     batch = os.environ['WAN_GUARD_BATCH']
@@ -45,15 +63,8 @@ def main():
     provider = CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=scope, transport=https_transport())
     observed = set()
     # Verify credentials/inventory before announcing readiness. No POST occurs.
-    for pod in provider.find(batch, batch): observed.add(pod.id)
-    ready = {'status': 'READY', 'batch': batch, 'deadline': deadline,
-             'scope': scope, 'provider_name': provider._name(batch, batch),
-             'checked_at': time.time(), 'run_id': os.environ.get('GITHUB_RUN_ID')}
-    if os.environ.get('WAN_GUARD_READY_FILE'):
-        path = Path(os.environ['WAN_GUARD_READY_FILE'])
-        temporary = path.with_suffix('.tmp')
-        temporary.write_text(json.dumps(ready))
-        temporary.replace(path)
+    ready = readiness(provider, scope, batch, deadline, observed)
+    save_ready(ready)
     print(json.dumps(ready), flush=True)
     confirmed = False
     # Keep reconciling for five minutes after the deadline to catch late creates.
@@ -65,6 +76,13 @@ def main():
             except Exception:
                 confirmed, status = False, 'CLEANUP_UNRESOLVED'
             print(json.dumps({'checked_at': time.time(), 'status': status, 'batch': batch}), flush=True)
+        else:
+            try:
+                save_ready(readiness(provider, scope, batch, deadline, observed))
+            except Exception:
+                # Keep the deadline fallback alive, but do not refresh a receipt
+                # when provider access is unavailable.
+                print(json.dumps({'status': 'READINESS_UNAVAILABLE', 'batch': batch}), flush=True)
         time.sleep(10)
     if not confirmed:
         raise SystemExit('Cleanup was not proved; reconcile this exact request before any new launch')

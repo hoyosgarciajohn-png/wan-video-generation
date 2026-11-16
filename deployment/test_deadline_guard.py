@@ -1,6 +1,6 @@
 import json
 import unittest
-from deployment.deadline_guard import validate, terminate_matches
+from deployment.deadline_guard import validate, terminate_matches, readiness
 from deployment.cleanup_monitor import CleanupOnlyProvider
 from tests.test_live_execution import HTTP
 
@@ -22,6 +22,21 @@ class DeadlineGuardTests(unittest.TestCase):
         self.assertTrue(terminate_matches(provider, 'batch', observed))
         self.assertEqual(set(http.pods), {'other'})
         self.assertTrue(terminate_matches(provider, 'batch', observed))
+        self.assertEqual(http.posts, 0)
+
+    def test_early_primary_deletion_is_remembered_without_guard_deleting_early(self):
+        http = HTTP()
+        provider = CleanupOnlyProvider('fictional-token', scope='["owner","project"]', transport=http)
+        observed = set()
+        http.pods['mine'] = {'id': 'mine', 'name': provider._name('batch', 'batch')}
+        http.pods['other'] = {'id': 'other', 'name': 'unrelated-pod'}
+        ready = readiness(provider, '["owner","project"]', 'batch', 2800, observed)
+        self.assertEqual(ready['status'], 'READY')
+        self.assertEqual(observed, {'mine'})
+        self.assertEqual(set(http.pods), {'mine', 'other'})
+        del http.pods['mine']  # Independent primary cleanup completed early.
+        self.assertTrue(terminate_matches(provider, 'batch', observed))
+        self.assertEqual(set(http.pods), {'other'})
         self.assertEqual(http.posts, 0)
 
 

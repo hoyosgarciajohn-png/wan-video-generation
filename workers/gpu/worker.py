@@ -11,11 +11,28 @@ import threading
 import time
 
 from .common import (ROOT, atomic_json, digest, frame_count, probe, record, require,
-                     scoped, sync_dir, timestamp, utcnow, validate_claim)
+                     scoped, stamp, sync_dir, timestamp, utcnow, validate_claim)
 
 
 class LeaseLost(RuntimeError):
     pass
+
+
+class RenderProcessFailed(RuntimeError):
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def process_failure(log):
+    log.seek(0, os.SEEK_END)
+    log.seek(max(0, log.tell() - 65536))
+    tail = log.read().decode('utf-8', errors='replace')
+    if 'CUDA out of memory' in tail or 'torch.OutOfMemoryError' in tail:
+        return 'gpu_out_of_memory'
+    stages = [line.split(':', 1)[1] for line in tail.splitlines() if line.startswith('WAN_STAGE:')]
+    return {'model_load': 'model_load_failed', 'generation': 'generation_failed',
+            'video_encode': 'video_encode_failed'}.get(stages[-1] if stages else '', 'render_failed')
 
 
 class Lease:
@@ -69,7 +86,8 @@ def execute(command, lease):
             while process.poll() is None:
                 lease.check()
                 time.sleep(0.1)
-            require(process.returncode == 0, 'Render process failed')
+            if process.returncode != 0:
+                raise RenderProcessFailed(process_failure(log))
             lease.check()
         finally:
             if process.poll() is None:
@@ -157,8 +175,10 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
     destination = scoped(output_root, key)
     destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     journal = destination.with_name('completion.json')
+    failure = destination.with_name('failure.json')
     with destination.with_name('attempt.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
+        require(not failure.exists(), 'Attempt already failed; a fresh authorized attempt is required')
         if journal.exists():
             saved = json.loads(journal.read_text())
             require(saved['identity'] == identity(claim), 'Attempt replay conflict')
@@ -170,6 +190,7 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
                         'metrics': saved['metrics']}
         with Lease(client, claim, interval) as lease:
             start = time.monotonic()
+            stage = 'render'
             try:
                 if claim['input_assets'] and hasattr(client, 'download_inputs'):
                     require(input_root is not None, 'Local input directory required')
@@ -179,6 +200,7 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
                     local = Path(work) / 'output.mp4'
                     lease.progress = 0.1
                     metrics = render(claim, local, lease, input_root, weights)
+                    stage = 'output_validation'
                     lease.progress = 0.8
                     media = probe(local, a['settings'], frame_count(claim['shot_snapshot'],
                                                                   claim['batch']['execution_mode']))
@@ -202,9 +224,13 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
                     sync_dir(destination.parent)
                     verify_manifest(claim, manifest, destination)
                     lease.check()
-            except Exception:
+            except Exception as error:
+                code = error.code if isinstance(error, RenderProcessFailed) else (
+                    'output_validation_failed' if stage == 'output_validation' else 'render_failed')
+                atomic_json(failure, {'identity': identity(claim), 'code': code, 'failed_at': stamp()})
+                print(json.dumps({'event': 'wan_attempt_failed', 'code': code}), file=sys.stderr, flush=True)
                 try:
-                    client.fail(a, 'render_failed')
+                    client.fail(a, code)
                 except Exception:
                     pass
                 raise

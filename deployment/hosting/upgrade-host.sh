@@ -7,7 +7,7 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-[[ $old_sha == 113d9c8e8a4c52bf0b752c9f5abec48a01698e0d ]]
+[[ $old_sha == 387555fd40a57f1fcda2d0abff1fff20d93e4075 ]]
 git diff --quiet && git diff --cached --quiet
 [[ ! -L /opt/wan/current ]]
 bootstrap_dir=/root/wan-bootstrap-$release_sha
@@ -31,7 +31,9 @@ done
 /opt/wan/venv/bin/python - <<'PY'
 import sqlite3
 with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
-    assert db.execute('SELECT count(*) FROM live_job_links').fetchone()[0] == 0
+    # Historical jobs and unsettled bills must survive upgrades. Only an active
+    # job or unresolved cleanup blocks replacing the controller source.
+    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
 PY
 mkdir -m 0700 "$bootstrap_dir/pre-upgrade"
 /opt/wan/venv/bin/python -m services.controller.backup create --database /var/lib/wan/studio.sqlite --assets /var/lib/wan/assets --output "$bootstrap_dir/pre-upgrade"

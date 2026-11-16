@@ -1,0 +1,81 @@
+{
+  "checked_at": 1794803526.601838,
+  "batches": [
+    {
+      "approved_at": "2026-11-16T03:58:34.129121Z",
+      "budget": {
+        "approved_cents": 400,
+        "currency": "USD",
+        "reserved_cents": 400,
+        "spent_cents": 0
+      },
+      "cleanup_state": "confirmed",
+      "deadline_at": "2026-11-16T04:28:34Z",
+      "execution_mode": "runpod",
+      "id": "7c811e6ab21a4392b0e3a80e331fc57a",
+      "idempotency_key": "john-first-approved-attempt",
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "project_id": "project-d5ec9ddbe55c4e12901fc2273bc4ea3d",
+      "provider_resource_id": "xhd7cd3nqsrcca",
+      "shot_snapshots": [
+        {
+          "prompt": "A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.",
+          "reference_asset_ids": [],
+          "revision": 1,
+          "settings": {
+            "frame_rate": {
+              "denominator": 1,
+              "numerator": 24
+            },
+            "height": 704,
+            "seed": 42,
+            "steps": 50,
+            "width": 1280
+          },
+          "shot_id": "shot-1",
+          "target_duration_ms": 5000
+        }
+      ],
+      "state": "failed"
+    }
+  ],
+  "attempts": [
+    {
+      "batch_id": "7c811e6ab21a4392b0e3a80e331fc57a",
+      "completed_at": "2026-11-16T04:25:42.605881Z",
+      "failure_reason": "render_failed",
+      "id": "fc4c7cef68ba4c2ab2e217e5ae67f573",
+      "lease_expires_at": "2026-11-16T04:26:08.321877Z",
+      "lease_id": "b632d75433a946dc82fcdfa29f1f0c0c",
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "project_id": "project-d5ec9ddbe55c4e12901fc2273bc4ea3d",
+      "settings": {
+        "frame_rate": {
+          "denominator": 1,
+          "numerator": 24
+        },
+        "height": 704,
+        "seed": 42,
+        "steps": 50,
+        "width": 1280
+      },
+      "shot_id": "shot-1",
+      "shot_revision": 1,
+      "started_at": "2026-11-16T04:07:51.255587Z",
+      "state": "failed",
+      "worker_id": "john-first-wan-worker"
+    }
+  ],
+  "takes": [],
+  "reviews": []
+}

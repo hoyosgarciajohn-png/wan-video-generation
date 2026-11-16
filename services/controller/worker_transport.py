@@ -135,7 +135,8 @@ class WorkerTransport:
         if action == 'heartbeat':
             require(type(payload[field]) in (float,int) and 0 <= payload[field] <= 1, 'Invalid progress')
         elif action == 'fail':
-            require(payload[field] in ('render_failed','worker_failed'), 'Unknown failure code')
+            require(payload[field] in ('render_failed','worker_failed','gpu_out_of_memory','model_load_failed',
+                    'generation_failed','video_encode_failed','output_validation_failed'), 'Unknown failure code')
         else:
             require(isinstance(payload[field], dict) and set(payload[field]) == {'asset','media'}, 'Invalid output manifest')
         self._attempt(authorization, attempt_id, payload['lease_id'], active=action != 'complete')

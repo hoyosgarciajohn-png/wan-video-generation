@@ -23,5 +23,16 @@ scp -F /dev/null -i "$task_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes \
   -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$task_dir/known_hosts" -o ConnectTimeout=15 \
   "$WAN_GUARD_READY_FILE" root@64.225.114.46:/var/lib/wan/live-trial-20261116/guard-ready.json
 printf 'INDEPENDENT_GUARD_READY_DELIVERED\n'
+# Keep launch readiness current while this independent guard is alive. A
+# delivery failure after startup must never stop deadline enforcement.
+while kill -0 "$guard_pid" 2>/dev/null; do
+    sleep 30
+    kill -0 "$guard_pid" 2>/dev/null || break
+    if ! scp -F /dev/null -i "$task_dir/key" -o IdentitiesOnly=yes -o BatchMode=yes \
+      -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$task_dir/known_hosts" -o ConnectTimeout=15 \
+      "$WAN_GUARD_READY_FILE" root@64.225.114.46:/var/lib/wan/live-trial-20261116/guard-ready.json; then
+        printf 'GUARD_RECEIPT_DELIVERY_UNAVAILABLE; deadline watch continues\n'
+    fi
+done
 wait "$guard_pid"
 guard_pid=''

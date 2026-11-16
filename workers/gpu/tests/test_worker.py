@@ -113,6 +113,19 @@ class WorkerTests(unittest.TestCase):
                 self.run_job()
         self.assertEqual(self.client.failures, ['render_failed'])
 
+    def test_failed_attempt_cannot_render_again_after_container_restart(self):
+        with patch('workers.gpu.worker.render', side_effect=RuntimeError('private diagnostic')):
+            with self.assertRaises(RuntimeError): self.run_job()
+        with patch('workers.gpu.worker.render', side_effect=AssertionError('Second render forbidden')):
+            with self.assertRaisesRegex(ValueError, 'already failed'): self.run_job()
+        self.assertEqual(self.client.failures, ['render_failed'])
+
+    def test_child_failure_classification_never_returns_private_log_text(self):
+        from workers.gpu.worker import process_failure
+        import io
+        self.assertEqual(process_failure(io.BytesIO(b'WAN_STAGE:generation\nCUDA out of memory\nprivate prompt')), 'gpu_out_of_memory')
+        self.assertEqual(process_failure(io.BytesIO(b'WAN_STAGE:video_encode\nprivate diagnostic')), 'video_encode_failed')
+
     def test_invalid_claims_rejected(self):
         mutations = [
             lambda c: c.update(contract_version='9.0.0'),
