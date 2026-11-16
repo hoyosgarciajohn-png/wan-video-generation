@@ -6,7 +6,7 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy]
+        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, trial-prepare, trial-admit, trial-launch, trial-observe]
         default: inspect
         required: true
       host_fingerprint:
@@ -19,6 +19,7 @@ on:
         required: false
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: wan-controller-install
   cancel-in-progress: false
@@ -26,7 +27,7 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -44,6 +45,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Inspect, install or verify exact approved host
         env:
+          GH_TOKEN: ${{ github.token }}
           WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
           RUNPOD_CLEANUP_TOKEN: ${{ inputs.operation == 'install' && secrets.RUNPOD_CLEANUP_TOKEN || '' }}
           WAN_HOST_OPERATION: ${{ inputs.operation }}

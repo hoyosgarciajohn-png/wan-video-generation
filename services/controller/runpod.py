@@ -38,8 +38,12 @@ def validate_launch_profile(profile):
     if not isinstance(profile['image'], str) or not re.fullmatch(r'[A-Za-z0-9._:/-]+@sha256:[a-f0-9]{64}', profile['image']):
         raise ValueError('A digest-pinned image is required')
     gpu = profile['gpu']
-    if not isinstance(gpu, dict) or set(gpu) != {'id', 'count'} or not _text(gpu['id']) or type(gpu['count']) is not int or gpu['count'] != 1:
+    if not isinstance(gpu, dict) or not {'id', 'count'} <= set(gpu) or set(gpu) - {'id', 'count', 'minCudaVersion', 'minRamPerGpu'} or not _text(gpu['id']) or type(gpu['count']) is not int or gpu['count'] != 1:
         raise ValueError('Exactly one explicit GPU is required')
+    if 'minCudaVersion' in gpu and (not isinstance(gpu['minCudaVersion'], str) or not re.fullmatch(r'[0-9]+\.[0-9]+', gpu['minCudaVersion'])):
+        raise ValueError('Invalid CUDA host floor')
+    if 'minRamPerGpu' in gpu and (type(gpu['minRamPerGpu']) is not int or not 1 <= gpu['minRamPerGpu'] <= 65536):
+        raise ValueError('Invalid system RAM floor')
     if profile['cloud'] != 'SECURE' or type(profile['disk']) is not int or not 1 <= profile['disk'] <= 1000:
         raise ValueError('Secure cloud and bounded disk are required')
     dc = profile['dataCenterIds']

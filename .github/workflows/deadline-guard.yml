@@ -31,7 +31,8 @@ jobs:
       - name: Watch the exact request and terminate at its deadline
         env:
           RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
           WAN_GUARD_SCOPE: ${{ inputs.scope }}
           WAN_GUARD_BATCH: ${{ inputs.batch }}
           WAN_GUARD_DEADLINE: ${{ inputs.deadline }}
-        run: python3 -m deployment.deadline_guard
+        run: bash deployment/hosting/run-guard.sh

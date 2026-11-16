@@ -13,6 +13,8 @@ from workers.gpu.common import LOCK, timestamp
 
 WORKER_CMD = ['worker','--output-root','/worker','--weights','/models',
               '--result','/worker/result.json','--claim-wait-seconds','60']
+BOOTSTRAP_ENTRYPOINT = ['bash', '-c']
+BOOTSTRAP_CMD = ['python -m workers.gpu.weights download /models && exec python -m workers.gpu.cli ' + ' '.join(WORKER_CMD)]
 
 
 class LiveExecution:
@@ -71,7 +73,9 @@ class LiveExecution:
         require(balance['spent_cents']<grant['approved_cents'] and balance['spent_cents']+balance['reserved_cents']<=grant['approved_cents'], 'Live budget exhausted or overcommitted')
         require(timestamp(grant['valid_until']).timestamp()>=row[3] and row[3]>self.control.clock().timestamp(), 'Live runtime expired')
         launch=grant['launch_profile']
-        require(launch.get('cmd')==WORKER_CMD and launch.get('entrypoint',['python','-m','workers.gpu.cli'])==['python','-m','workers.gpu.cli'], 'Exact one-shot worker command required')
+        direct = launch.get('cmd') == WORKER_CMD and launch.get('entrypoint', ['python','-m','workers.gpu.cli']) == ['python','-m','workers.gpu.cli']
+        bootstrap = launch.get('cmd') == BOOTSTRAP_CMD and launch.get('entrypoint') == BOOTSTRAP_ENTRYPOINT and launch['mounts'] == {}
+        require(direct or bootstrap, 'Exact one-shot worker command required')
         require(row[3]-timestamp(batch['approved_at']).timestamp()>60, 'Runtime must include bounded startup wait')
         require(isinstance(worker_token,str), 'Trusted worker bootstrap credential required')
         credential=db.execute('SELECT id,expires,revoked FROM worker_credentials WHERE token_hash=? AND owner=? AND project=? AND batch=?',

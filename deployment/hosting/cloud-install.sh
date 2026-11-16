@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy|trial-prepare|trial-admit|trial-launch|trial-observe) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -58,6 +58,28 @@ if [[ "$operation" == recovery || "$operation" == recovery-copy ]]; then
     "$temp_dir/venv/bin/pip" install --require-hashes --only-binary=:all: -r deployment/hosting/requirements.lock
     "$temp_dir/venv/bin/python" -m deployment.host_acceptance off-host --directory "$temp_dir/acceptance"
     cp "$temp_dir/acceptance/result.json" "$temp_dir/acceptance/off-host-result.json" "$RUNNER_TEMP/"
+    scp "${ssh_options[@]}" "$temp_dir/acceptance/off-host-result.json" "root@$host:/var/lib/wan/acceptance-20261116/off-host-result.json"
+    exit
+fi
+if [[ "$operation" == trial-* ]]; then
+    [[ "$operation" == trial-observe ]] || ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
+    guard_run=''
+    if [[ "$operation" == trial-launch ]]; then
+        ssh "${ssh_options[@]}" "root@$host" 'cat /var/lib/wan/live-trial-20261116/guard-ready.json' > "$temp_dir/guard.json"
+        guard_run=$(python3 -c 'import json,sys; v=json.load(open(sys.argv[1]))["run_id"]; assert isinstance(v,str) and v.isdigit(); print(v)' "$temp_dir/guard.json")
+        GUARD_RUN="$guard_run" python3 - <<'PY'
+import json, os
+from urllib.request import Request, urlopen
+run=os.environ['GUARD_RUN']
+url='https://api.github.com/repos/hoyosgarciajohn-png/wan-video-generation/actions/runs/'+run
+req=Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+with urlopen(req,timeout=20) as response: value=json.load(response)
+assert value['status']=='in_progress' and value['event']=='workflow_dispatch'
+assert value['path']=='.github/workflows/deadline-guard.yml' and value['head_sha']==os.environ['GITHUB_SHA']
+print('INDEPENDENT_GUARD_RUNNING_VERIFIED')
+PY
+    fi
+    ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}'"
     exit
 fi
 if [[ "$operation" == inspect ]]; then
