@@ -95,6 +95,11 @@ class FirstTrialGates(unittest.TestCase):
         with patch.object(first_trial,'catalog_snapshot', return_value=value):
             self.assertEqual(first_trial.checked_quote()['region'],'US-IL-1')
             with self.assertRaises(AssertionError): first_trial.checked_quote('unavailable')
+            value['dataCenters']=[{'id':'EUR-IS-2','availability':'LOW'}]
+            self.assertEqual(first_trial.checked_quote()['region'],'EUR-IS-2')
+            value['dataCenters'][0]['availability']='NONE'
+            with self.assertRaises(AssertionError): first_trial.checked_quote()
+            value['dataCenters'][0]['availability']='LOW'
             value['price']['secure']=1.01
             with self.assertRaises(AssertionError): first_trial.checked_quote()
 
