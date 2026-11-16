@@ -1,6 +1,14 @@
-# One approved live trial
+# Bounded live trial operations
 
-John authorized $5 total, 1,800 seconds from admission, one five-second shot, one Pod-create attempt and one render attempt. The dedicated controller's monthly cost is separate. This operator does not authorize another trial.
+The original five-second trial is consumed. John separately approved one additional
+one-second diagnostic on November 16, 2026. Each scope has its own $5 ceiling,
+1,800 seconds from admission, one Pod-create attempt and one render attempt.
+The dedicated controller's monthly cost is separate. Neither scope authorizes a retry.
+
+The workflow `trial` input defaults to `first`; select `diagnostic` explicitly for
+the approved additional trial. The CLI equivalent is `--trial diagnostic`.
+The new project, grant, operator directory, signing keys and idempotency key remain
+separate. Historical first-trial billing and evidence must never be reset or reused.
 
 1. Finish hosted and independent recovery verification. The copy-only operation preserves the successful original rehearsal and copies its independent restore receipt back to the host.
 2. Upgrade the existing controller to the reviewed release. `trial-prepare` checks the immutable published build, fresh RTX 4090 quote from the connected Runpod account (at most $1/hour, at most 180 seconds old), cleanup heartbeat and recovery receipts, then creates one project and private owner/host/billing keys. It enables worker reception without exposing admission, provisioning or provider credentials through the web API.
@@ -13,4 +21,16 @@ John authorized $5 total, 1,800 seconds from admission, one five-second shot, on
 
 `trial-observe` can safely inspect/reconcile the same attempt after an operator interruption. It never issues a fresh create. If cleanup is unresolved, use the exact bound Pod identity and preserve the reservation; never start another attempt.
 
-The first trial is now consumed. Actual private image pull, pinned model download, worker claim and deadline deletion are verified; inference failed before committing a take. See ../evidence/2026-11-16-first-live-trial/README.md. Recovery uses separate synthetic media. Prepared failure/guard corrections require deployment and a rebuilt private image before a new concretely scoped trial can be approved. Do not rerun prepare/admit/launch for this consumed trial.
+The first trial's private image pull, pinned model download, worker claim and
+deadline deletion are verified; inference failed before committing a take.
+See ../evidence/2026-11-16-first-live-trial/README.md. Recovery uses separate synthetic
+media. Failure closure, safe stage diagnostics and stronger guard readiness are now
+installed in controller `8e07ba3`; the rebuilt private image ends `f993b`.
+
+The additional diagnostic was admitted at 05:42:07 UTC on November 16 with fixed
+deadline 06:12:07 UTC. Its sole Pod is `hzprkb5xllm8p0`. Follow the exact terminal
+result in ../evidence/2026-11-16-diagnostic-trial/README.md; do not rerun its
+prepare/admit/launch operations. `trial-observe --trial diagnostic` remains the
+inspection and connected billing import path. The source proposal is a validated
+description, not an executable grant; its approved status does not reset the
+durable single-attempt runtime ledger.

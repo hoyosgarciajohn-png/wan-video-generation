@@ -1,0 +1,29 @@
+{
+  "hardware": {
+    "durationMs": 138,
+    "exitCode": 0,
+    "stderr": "",
+    "stdout": "{\"gpu\": \"NVIDIA GeForce RTX 4090, 24564 MiB, 3196 MiB, 0 %, 595.91.07\", \"memory\": [[\"/sys/fs/cgroup/memory/memory.limit_in_bytes\", \"82999996416\"]]}\n",
+    "timedOut": false,
+    "truncated": false
+  },
+  "checkpoint_logs": {
+    "items": [
+      {
+        "source": "container",
+        "line": "PASS: pinned checkpoint files verified",
+        "ts": "2026-11-16T05:51:38.396832302Z"
+      }
+    ],
+    "count": 1,
+    "truncated": false
+  },
+  "initial_phase": {
+    "durationMs": 161,
+    "exitCode": 0,
+    "stderr": "",
+    "stdout": "{\"checked_at\": 1794808486.0225623, \"gpu\": \"3196 MiB, 0 %\", \"processes\": [{\"pid\": \"68\", \"stages\": [\"model_load\", \"generation\"], \"steps\": [\"0%|          | 0/3 [00:00<?, ?it/s]\", \"100%|\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588| 3/3 [00:00<00:00, 50.70it/s]\"], \"cuda_oom\": false, \"traceback\": false}]}\n",
+    "timedOut": false,
+    "truncated": false
+  }
+}
