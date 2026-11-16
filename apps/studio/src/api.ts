@@ -63,7 +63,7 @@ export type StudioCommand =
       idempotency_key: string;
     };
 export class StudioClient {
-  constructor(private readonly request: typeof fetch = fetch) {}
+  constructor(private readonly request: typeof fetch = fetch.bind(globalThis)) {}
   private async call<T>(
     path: string,
     method = "GET",

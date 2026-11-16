@@ -3,6 +3,26 @@ import assert from "node:assert/strict";
 import { StudioClient } from "../src/api";
 import { initialWorkspace, StudioError } from "../src/model";
 
+test("default browser transport preserves the native fetch receiver", async () => {
+  const original = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async function (this: unknown, url, init) {
+    assert.equal(this, globalThis);
+    assert.equal(url, "/v1/studio/session");
+    assert.equal(init?.credentials, "same-origin");
+    calls++;
+    return Response.json({ owner_id: "fictional-owner" });
+  };
+  try {
+    assert.deepEqual(await new StudioClient().session(), {
+      owner_id: "fictional-owner",
+    });
+    assert.equal(calls, 1);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test("session and workspace client use same-origin cookies and revision envelopes", async () => {
   const calls: { url: string; init?: RequestInit }[] = [];
   const workspace = initialWorkspace();
