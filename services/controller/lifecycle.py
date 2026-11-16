@@ -122,7 +122,8 @@ class Lifecycle:
                     return
                 pod = pods[0]
         except ProviderCreateError as error:
-            # Only this process's single POST can establish explicit rejection.
+            # Only this dispatch's definitive response can establish rejection.
+            # Opt-in retries must prove every preceding request was rejected.
             # A GET error or an old missing diagnostic cannot close an allocation.
             if dispatch:
                 with self.transaction() as db:

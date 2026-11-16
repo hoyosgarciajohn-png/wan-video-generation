@@ -1,7 +1,7 @@
 """Private operator for separately approved, isolated one-attempt Wan trials.
 
 The web service receives worker traffic but never receives provider credentials or
-signing keys. No scheduler and no create retry exist here. Preparation is free;
+signing keys. Only the approved fallback scope permits bounded capacity retries. Preparation is free;
 admission starts the deadline; launch requires the separate guard's fresh receipt.
 """
 import argparse
@@ -23,6 +23,7 @@ from urllib.request import Request
 
 from deployment.hosted_app import open_control
 from deployment import validation_policy
+from services.controller.allocation_retry import POLICY as CAPACITY_POLICY
 from services.controller.live_admission import LiveAdmission, APPROVAL_DOMAIN, HOST_DOMAIN, configuration_hash
 from services.controller.live_billing import BILLING_DOMAIN
 from services.controller.live_execution import LiveExecution, BOOTSTRAP_CMD, BOOTSTRAP_ENTRYPOINT
@@ -51,20 +52,44 @@ IDEMPOTENCY_KEY = 'john-first-approved-attempt'
 WORKER_ID = 'john-first-wan-worker'
 EXPECTED_PRIOR_BATCHES = set()
 ALLOW_KNOWN_UNKNOWN = False
+CAPACITY_RETRY = False
+HOURLY_CEILING = Decimal('1.00')
 
 
 def select_trial(name):
     """Allowlisted operator scope, never an arbitrary path or mutable retry."""
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
-    global ALLOW_KNOWN_UNKNOWN
-    ALLOW_KNOWN_UNKNOWN = name == 'validation'
+    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU
+    CAPACITY_RETRY = name == 'fallback'
+    HOURLY_CEILING = Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
+    GPU = 'NVIDIA GeForce RTX 4090'
+    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback')
     if name == 'first':
         return
     if name == 'repair':
         return select_repair_trial()
-    if name == 'validation':
+    if name in ('validation','fallback'):
         select_repair_trial('validation')
+        if name == 'fallback':
+            proposal = read(ROOT / 'deployment/fallback-trial-proposal.json')
+            assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION' and proposal['execution_enabled'] is False
+            terms = proposal['proposed_additional_terms']
+            assert (terms['overall_cap_cents'],terms['pod_reservation_cents'],terms['storage_allowance_cents'],
+                    terms['runtime_seconds_from_admission'],terms['pod_create_attempts'],terms['render_attempts'],
+                    terms['gpu_quote_ceiling_cents_per_hour']) == (500,400,100,1800,3,1,110)
+            assert terms['gpus'] == ['NVIDIA GeForce RTX 4090','NVIDIA L40S']
+            assert proposal['capacity_retry'] == CAPACITY_POLICY and proposal['image'] == IMAGE
+            TRIAL = STATE / 'fallback-trial-20261116'
+            AUTH = Path('/etc/wan/fallback-trial-authority-20261116.json')
+            TITLE = 'Wan approved GPU fallback validation · one second'
+            APPROVAL_ID = 'john-capacity-fallback-20261116'
+            IDEMPOTENCY_KEY = 'john-capacity-fallback-bounded-attempt'
+            WORKER_ID = 'john-capacity-fallback-worker'
+            EXPECTED_PRIOR_BATCHES.add('bee9e55b1d4a4f458771ad4ac69c3318')
+            if (TRIAL / 'prepared.json').exists():
+                GPU = read(TRIAL / 'prepared.json')['pricing']['gpu']
+                assert GPU in terms['gpus']
         return
     assert name == 'diagnostic', 'Unknown trial scope'
     proposal = read(ROOT / 'deployment/diagnostic-trial-proposal.json')
@@ -174,9 +199,13 @@ def catalog_snapshot():
 def checked_quote(region=None):
     # Supplied by the authorized connected Runpod read, via pinned operator SSH.
     # The existing cleanup credential deliberately has no catalog/billing access.
+    global GPU
     value = catalog_snapshot()
+    if CAPACITY_RETRY and region is None:
+        assert value['id'] in ('NVIDIA GeForce RTX 4090','NVIDIA L40S')
+        GPU = value['id']
     price = Decimal(str(value['price']['secure']))
-    assert value['id'] == GPU and value['secure'] and 0 < price <= Decimal('1.00')
+    assert value['id'] == GPU and value['secure'] and 0 < price <= HOURLY_CEILING
     available = [x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH', 'MEDIUM', 'LOW')]
     if region is None:
         # The approval bounds GPU, cloud, price and runtime, not geography.
@@ -264,13 +293,15 @@ def prepare():
     expires = stamp(utcnow() + timedelta(hours=6))
     grant = dict(id=APPROVAL_ID, owner=OWNER, project=project, currency='USD', approved_cents=400,
         max_runtime_seconds=1800, valid_until=expires, profile=profile, launch_profile=launch, source_sha256=_sources())
+    if CAPACITY_RETRY:
+        grant['capacity_retry'] = dict(CAPACITY_POLICY)
     host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch), source_sha256=grant['source_sha256'],
         build_manifest_sha256=build['manifest_sha256'], valid_until=expires, worker_endpoint=ORIGIN, storage_id=profile['storage_id'])
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
     atomic_json(TRIAL / 'host.json', sign(host, 'host', HOST_DOMAIN))
     atomic_json(TRIAL / 'prepared.json', dict(owner=OWNER, project=project, shot=shot['id'], pricing=pricing,
         source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(), build=build,
-        overall_cap_cents=500, pod_cap_cents=400, storage_allowance_cents=100, runtime_seconds=1800, max_attempts=1))
+        overall_cap_cents=500, pod_cap_cents=400, storage_allowance_cents=100, runtime_seconds=1800, max_attempts=1, max_create_requests=3 if CAPACITY_RETRY else 1))
     # Only install a receiver in the web process; provider access stays private.
     env = Path('/etc/wan/controller.env')
     current = env.read_text()
@@ -308,6 +339,9 @@ def refresh_unregistered_validation(c, saved):
     if not archive.exists():
         atomic_json(archive, dict(approval=approval, host=host, prepared=saved))
     grant['profile']['region'] = regions[0]
+    if CAPACITY_RETRY:
+        grant['profile']['gpu_type'] = current['gpu']
+        grant['launch_profile']['gpu']['id'] = current['gpu']
     grant['launch_profile']['dataCenterIds'] = regions
     grant['source_sha256'] = _sources()
     grant['valid_until'] = stamp(utcnow() + timedelta(hours=6))
@@ -399,7 +433,7 @@ def observe():
             assert detail['name'] == 'wan-' + hashlib.sha256(json.dumps([job['scope'],job['batch'],job['batch']]).encode()).hexdigest()
             hourly = Decimal(str(detail['cost']))
             provider = {k:detail.get(k) for k in ('id','status','cost','cudaVersion','dataCenterId','startedAt')}
-            if not hourly.is_finite() or hourly > Decimal('1.00'):
+            if not hourly.is_finite() or hourly > HOURLY_CEILING:
                 e.cancel(OWNER, job['project'], job['batch'])
                 provider['canceled_above_price_ceiling'] = True
         except Exception:
@@ -410,9 +444,11 @@ def observe():
     bundle = c.bundle(OWNER, job['project'])
     with c.transaction() as db:
         raw_diagnostic = db.execute('SELECT create_diagnostic FROM pod_batches WHERE id=?', (job['batch'],)).fetchone()[0]
+        allocation_row = db.execute('SELECT allocation_attempts FROM live_execution_bindings WHERE batch=?',(job['batch'],)).fetchone()
+        allocation_history = json.loads(allocation_row[0]) if allocation_row else []
     summary = dict(checked_at=time.time(), batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
         provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'],
-        provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None)
+        provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None, allocation_attempts=allocation_history)
     atomic_json(TRIAL / 'status.json', summary)
     # Keep complete evidence on disk, but put lifecycle fields first in a short
     # live log line so the Actions viewer does not truncate the useful status.
@@ -427,7 +463,7 @@ def operator_summary(summary):
         takes=len(summary['takes']), attempts=len(summary['attempts']),
         failure_codes=[a['failure_reason'] for a in summary['attempts'] if a.get('failure_reason')],
         billing=summary['billing'], reservation_state=summary['reservation_state'],
-        provider_create=summary.get('provider_create'))
+        provider_create=summary.get('provider_create'), allocation_requests=len(summary.get('allocation_attempts',[])))
 
 
 def launch():
@@ -440,7 +476,7 @@ def launch():
     c, a, e = services()
     with c.transaction() as db:
         assert db.execute("SELECT dispatch_state FROM live_job_links WHERE batch=?",(job['batch'],)).fetchone()[0] == 'disabled'
-    print(json.dumps({'status':'ONE_CREATE_ATTEMPT_STARTING','batch':job['batch'],'deadline':job['deadline']}), flush=True)
+    print(json.dumps({'status':'BOUNDED_CAPACITY_LAUNCH_STARTING' if CAPACITY_RETRY else 'ONE_CREATE_ATTEMPT_STARTING','batch':job['batch'],'deadline':job['deadline']}), flush=True)
     e.provision(OWNER, job['project'], job['batch'], read(TRIAL / 'host.json'), worker_token=read(TRIAL / 'worker.json')['token'])
     while time.time() < job['deadline'] + 60:
         status = observe()
@@ -460,7 +496,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
-    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()

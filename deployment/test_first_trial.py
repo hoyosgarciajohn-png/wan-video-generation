@@ -89,6 +89,26 @@ class FirstTrialGates(unittest.TestCase):
             db.execute("INSERT INTO live_job_links VALUES ('already-validation','fictional','fictional','disabled')")
             with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
 
+    def test_fallback_scope_and_quote_bind_only_approved_gpus(self):
+        first_trial.select_trial('fallback')
+        self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),4)
+        self.assertTrue(first_trial.CAPACITY_RETRY)
+        self.assertTrue(first_trial.ALLOW_KNOWN_UNKNOWN)
+        self.assertEqual(str(first_trial.HOURLY_CEILING),'1.10')
+        value={'id':'NVIDIA L40S','secure':True,'price':{'secure':1.09},
+               'dataCenters':[{'id':'EUR-IS-2','availability':'LOW'}]}
+        with patch.object(first_trial,'catalog_snapshot',return_value=value):
+            self.assertEqual(first_trial.checked_quote()['gpu'],'NVIDIA L40S')
+            self.assertEqual(first_trial.checked_quote(['EUR-IS-2'])['gpu'],'NVIDIA L40S')
+            value['id']='NVIDIA H100'
+            with self.assertRaises(AssertionError):first_trial.checked_quote()
+            value['id']='NVIDIA L40S';value['price']['secure']=1.11
+            with self.assertRaises(AssertionError):first_trial.checked_quote()
+        first_trial.select_trial('validation')
+        self.assertFalse(first_trial.CAPACITY_RETRY)
+        self.assertEqual(first_trial.GPU,'NVIDIA GeForce RTX 4090')
+        self.assertEqual(str(first_trial.HOURLY_CEILING),'1.00')
+
     def test_diagnostic_requires_exact_closed_prior_trial(self):
         first_trial.select_trial('diagnostic')
         with sqlite3.connect(':memory:') as db:

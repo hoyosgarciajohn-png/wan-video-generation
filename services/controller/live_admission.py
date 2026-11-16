@@ -13,6 +13,7 @@ import re
 from uuid import uuid4
 
 from services.controller.budget import cents
+from services.controller.allocation_retry import validate_policy
 from services.controller.live_billing import initialize as initialize_billing, totals as billing_totals
 from services.controller.lifecycle import Lifecycle
 from services.controller.real_jobs import RealJobBridge
@@ -110,7 +111,9 @@ class LiveAdmission:
 
     def _grant(self, owner, project, envelope, *, current=True):
         grant = _verify(envelope, self._approval_keys, APPROVAL_DOMAIN, owner)
-        require(set(grant) == GRANT_FIELDS, 'Exact approval fields required')
+        require(set(grant) in (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'}), 'Exact approval fields required')
+        if 'capacity_retry' in grant:
+            validate_policy(grant['capacity_retry'])
         if grant['owner'] != owner or grant['project'] != project:
             raise AuthorityError('Approval owner or project mismatch')
         require(isinstance(grant['id'], str) and re.fullmatch(r'[A-Za-z0-9_-]{1,200}', grant['id']), 'Route-compatible approval ID required')

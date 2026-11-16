@@ -73,6 +73,7 @@ if [[ "$operation" == trial-* ]]; then
         diagnostic) trial_dir=/var/lib/wan/diagnostic-trial-20261116 ;;
         repair) trial_dir=/var/lib/wan/repair-trial-20261116 ;;
         validation) trial_dir=/var/lib/wan/validation-trial-20261116 ;;
+        fallback) trial_dir=/var/lib/wan/fallback-trial-20261116 ;;
         *) fail 'Unknown trial scope' ;;
     esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then

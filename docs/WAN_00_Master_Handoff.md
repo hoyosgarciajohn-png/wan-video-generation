@@ -1,10 +1,28 @@
 # Wan Video Generation · Master handoff
-Version 1.40 | November 16, 2026 | Owner: John Hoyos
+Version 1.41 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
+John approved the proposed RTX 4090/L40S fallback and controlled no-capacity retries.
+The fresh `fallback` scope keeps $5 total ($4 Pod / $1 storage), one one-second
+render, 1800 seconds from admission, CUDA >=12.8, host RAM >=64GB, Secure Cloud,
+80GB ephemeral disk and no persistent volumes. Hourly ceiling is now $1.10.
+Use at most three allocation requests with 15-second backoff, the same immutable
+name/profile/deadline/reservation, and retry only the exact explicit HTTP 400
+no-capacity response. Any uncertain response, allocated Pod, cancellation,
+revocation or expiry stops retries; restart never replays a POST. Preserve all
+four earlier scopes and the exact unresolved historical repair request.
+
+Fictional verification passed: 182 root tests and 48 deployment/guard/hosting
+tests (230 total), plus contract, shell syntax and whitespace checks. Installed
+runtime is still d30fa01; no new GPU request has been submitted at this checkpoint.
+L40S success would validate the workflow on 48GB VRAM, not the repaired 24GB RTX
+4090 memory fit. Five seconds follows a measured successful one-second result.
+Contract remains 0.1.0. Live evidence will be appended after execution.
+
+## Previous checkpoint — isolated capacity rejection
 **The new one-second allocation attempt was explicitly rejected by Runpod at
 13:52:45 Eastern / 18:52:45 UTC on November 16. No Pod was created, no GPU render
 started and no take was saved. Five seconds and one minute of real Wan footage

@@ -72,3 +72,12 @@ and all older liabilities. Installed source is d30fa01 (PR #80). Launch workflow
 Never rerun this launch or reset its grant. Hourly matching-capacity automation is
 read-only; a future paid attempt requires fresh isolated bounded authority.
 Five seconds remains pending successful one-second output and measured feasibility.
+
+John approved the concrete fallback/retry proposal: RTX 4090 or L40S, <=$1.10/hour,
+unchanged $5 total / 1800 seconds, one render and at most three allocation requests
+with 15-second backoff only after the exact explicit HTTP 400 no-capacity response.
+Use the new fallback scope; preserve all four consumed scopes, billing reservations
+and the exact old unknown exception. Its signed policy and durable attempt log
+prevent resets, duplicate allocations and retry after any uncertain response.
+Deployment and one-second execution are authorized. Success on L40S does not prove
+the repaired worker's 24GB RTX 4090 memory fit. Later five seconds uses measurements.

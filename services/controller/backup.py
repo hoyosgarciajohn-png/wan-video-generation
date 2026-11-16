@@ -208,11 +208,14 @@ def _inspect_live_admission(db, names, projects):
                 isinstance(envelope['key_id'], str) and bool(envelope['key_id']) and hex_hash(envelope['signature']),
                 'Malformed signed approval history')
         grant = envelope['payload']
-        require(isinstance(grant, dict) and set(grant) == GRANT_FIELDS and
+        require(isinstance(grant, dict) and set(grant) in (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'}) and
                 (grant['id'],grant['owner'],grant['project']) == (identity,owner,project) and grant['currency'] == 'USD' and
                 type(grant['approved_cents']) is int and 0 < grant['approved_cents'] <= 2**53-1 and
                 type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= 3600,
                 'Invalid live approval terms')
+        if 'capacity_retry' in grant:
+            from services.controller.allocation_retry import validate_policy
+            validate_policy(grant['capacity_retry'])
         timestamp(grant['valid_until'])
         require(isinstance(grant['source_sha256'], dict) and bool(grant['source_sha256']) and
                 all(isinstance(k,str) and hex_hash(v) for k,v in grant['source_sha256'].items()), 'Invalid signed source inventory')
@@ -292,6 +295,22 @@ def _inspect_live_admission(db, names, projects):
                     host['payload'].get('project') == project and host['payload'].get('config_hash') == approvals[approval][3],
                     'Execution host binding mismatch')
             timestamp(host['payload']['valid_until'])
+        if binding and 'allocation_attempts' in {r[1] for r in db.execute('PRAGMA table_info(live_execution_bindings)')}:
+            from services.controller.allocation_retry import capacity_rejected
+            history = json.loads(db.execute('SELECT allocation_attempts FROM live_execution_bindings WHERE batch=?',(batch_id,)).fetchone()[0])
+            policy = approvals[approval][2].get('capacity_retry')
+            require(isinstance(history,list) and len(history) <= (policy['max_attempts'] if policy else 0),
+                    'Allocation history exceeds signed policy')
+            for index,event in enumerate(history):
+                require(isinstance(event,dict) and type(event.get('attempt')) is int and event['attempt'] == index+1 and
+                        set(event) in ({'attempt','started_at'}, {'attempt','started_at','result','finished_at'}),
+                        'Invalid allocation audit event')
+                timestamp(event['started_at'])
+                if 'result' in event:
+                    require(isinstance(event['result'],dict), 'Invalid allocation result')
+                    timestamp(event['finished_at'])
+                require(index == len(history)-1 or capacity_rejected(event.get('result',{})),
+                        'Allocation retry followed an uncertain or allocated outcome')
         frozen = json.loads(pod[4])
         require(frozen.get('mode') == 'live_pending' and frozen.get('config_hash') == approvals[approval][3] and
                 all(frozen['canonical_batch'][k] == batch[k] for k in

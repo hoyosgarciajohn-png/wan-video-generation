@@ -4,6 +4,7 @@ import hashlib
 import json
 
 from services.controller.lifecycle import Lifecycle
+from services.controller.allocation_retry import CapacityRetryProvider, capacity_rejected
 from services.controller.live_admission import LiveAdmission, _keys, configuration_hash
 from services.controller.live_billing import ingest, totals
 from services.controller.runpod import RunpodProvider
@@ -30,6 +31,8 @@ class LiveExecution:
             db.execute('''CREATE TABLE IF NOT EXISTS live_execution_bindings (
                 batch TEXT PRIMARY KEY, credential TEXT NOT NULL,
                 host_envelope TEXT NOT NULL, created TEXT NOT NULL)''')
+            if 'allocation_attempts' not in {r[1] for r in db.execute('PRAGMA table_info(live_execution_bindings)')}:
+                db.execute("ALTER TABLE live_execution_bindings ADD COLUMN allocation_attempts TEXT NOT NULL DEFAULT '[]'")
 
     def _context(self, db, owner, project, batch_id):
         bundle = self.control._load(db, owner, project)
@@ -61,6 +64,36 @@ class LiveExecution:
                      WHERE p.id=? AND p.pod_id=? AND l.owner=? AND l.project=?''',(batch_id,pod_id,owner,project)).fetchone()
                 return provider._name(batch_id,batch_id) if found else None
         provider._expected_names=expected
+        if 'capacity_retry' in grant and worker_token is not None:
+            policy = grant['capacity_retry']
+            def before():
+                with self.control.transaction() as db:
+                    _,_,link,current,row = self._context(db,owner,project,batch_id)
+                    self.admission._approval(db,owner,project,link[0])
+                    require(current == grant and link[2] == 'attempted' and row[0] == 'provisioning' and
+                            row[2] is None and row[3] - self.control.clock().timestamp() > policy['min_remaining_seconds'],
+                            'Capacity retry is no longer authorized')
+                    history = json.loads(db.execute('SELECT allocation_attempts FROM live_execution_bindings WHERE batch=?',
+                                                   (batch_id,)).fetchone()[0])
+                    require(len(history) < policy['max_attempts'] and
+                            all(capacity_rejected(x.get('result', {})) for x in history),
+                            'Allocation history cannot be retried')
+                    history.append({'attempt': len(history)+1, 'started_at': stamp(self.control.clock())})
+                    db.execute('UPDATE live_execution_bindings SET allocation_attempts=? WHERE batch=?',
+                               (canonical(history),batch_id))
+                    return len(history)
+            def record(attempt, result):
+                try:
+                    with self.control.transaction() as db:
+                        history = json.loads(db.execute('SELECT allocation_attempts FROM live_execution_bindings WHERE batch=?',
+                                                       (batch_id,)).fetchone()[0])
+                        require(len(history) == attempt and 'result' not in history[-1], 'Allocation receipt conflict')
+                        history[-1].update(result=result, finished_at=stamp(self.control.clock()))
+                        db.execute('UPDATE live_execution_bindings SET allocation_attempts=? WHERE batch=?',
+                                   (canonical(history),batch_id))
+                except Exception:
+                    raise ConnectionError('Allocation result could not be retained; no retry') from None
+            return CapacityRetryProvider(provider,policy,before,record)
         return provider
 
     def _authorize_dispatch(self, db, owner, project, batch_id, host_envelope, worker_token):
@@ -81,7 +114,7 @@ class LiveExecution:
         credential=db.execute('SELECT id,expires,revoked FROM worker_credentials WHERE token_hash=? AND owner=? AND project=? AND batch=?',
                               (hashlib.sha256(worker_token.encode()).hexdigest(),owner,project,batch_id)).fetchone()
         require(credential is not None and not credential[2] and timestamp(credential[1]).timestamp()>row[3], 'Bootstrap credential does not cover runtime')
-        db.execute('INSERT INTO live_execution_bindings VALUES (?,?,?,?)',(batch_id,credential[0],canonical(host_envelope),stamp(self.control.clock())))
+        db.execute('INSERT INTO live_execution_bindings (batch,credential,host_envelope,created) VALUES (?,?,?,?)',(batch_id,credential[0],canonical(host_envelope),stamp(self.control.clock())))
         db.execute("UPDATE live_job_links SET dispatch_state='attempted' WHERE batch=?",(batch_id,))
 
     def provision(self, owner, project, batch_id, host_envelope=None, *, worker_token=None):
