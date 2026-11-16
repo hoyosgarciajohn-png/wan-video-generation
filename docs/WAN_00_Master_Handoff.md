@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.23 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.25 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -16,10 +16,14 @@ implemented and tested with fictional data, but are not installed on a host.
 Runpod funding is complete: after John confirmed with Bank of America and
 explicitly authorized retry, the same $10 credit payment succeeded. The billing
 page now displays $10.00 balance, $0.000/hour current spend, and Auto-Pay Disabled.
-No additional payment or GPU attempt was made. GitHub requires email
-verification before preparing a classic private-image pull token; its code-entry
-page is open. The cleanup-key form is prepared but not submitted. No suitable
-existing controller host or approved recurring hosting budget is established.
+No additional payment or GPU attempt was made. After John's explicit approval,
+both credentials were created and saved: wan-runpod-image-pull (read:packages
+only, expires December 15, 2026) is stored in Runpod as wan-ghcr-pull; wan-cleanup
+(REST Pods Read/Write only) is stored in GitHub Actions as RUNPOD_CLEANUP_TOKEN.
+The private Runpod template lehfc5qf3s binds that registry credential to the exact
+published image digest. Template creation does not verify an actual image pull.
+A manual read-only credential probe is prepared; live access verification is pending.
+No suitable existing controller host or approved recurring hosting budget is established.
 The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries below
 are chronological; this checkpoint supersedes earlier publication status.
 
@@ -54,22 +58,23 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Command Center: finish GitHub verification and scoped private-image/cleanup
-credentials; select and deploy the approved controller host; verify both cleanup
-layers and live authority; then verify the exact private image on Runpod within
-the already-approved trial. John approved $5 total, 30 minutes from admission,
-one five-second clip and one attempt on November 15, 2026. Do not request the same
-numeric approval again. Runpod now has $10 of prepaid credit; that does not expand
-the $5 consumption cap. No new recurring hosting expense is approved or incurred.
+Command Center: run the manual read-only cleanup-credential access check; select
+an available controller host and obtain approval for its concrete recurring cost;
+install HTTPS, persistent storage/restore evidence, live authority and both cleanup
+layers; then verify the exact private image on Runpod within the approved trial.
+John approved $5 total, 30 minutes from admission, one five-second clip and one
+attempt on November 15, 2026. Do not request the same numeric approval again.
+The $10 prepaid balance does not expand the $5 consumption cap. No new recurring
+hosting expense is approved or incurred.
 
-Remaining inputs: scoped GHCR pull credential saved directly in Runpod; an
-application/cleanup Runpod credential in trusted service secret storage; an
-available Linux amd64 controller host and owned HTTPS hostname. Install actual
-live authority, persistent storage/restore evidence and primary plus second-host
-cleanup before GPU creation. Recheck compatible RTX 4090 capacity and price only
-when these prerequisites are ready. Model checksums, Wan CUDA import, inference
+Remaining inputs: available Linux amd64 controller host and owned HTTPS hostname;
+controller credential storage and installed authority; model/journal mounts and
+worker bootstrap credential; verified primary plus independent cleanup. The cleanup
+key is stored only in GitHub Actions, not yet on a controller. Recheck compatible
+RTX 4090 capacity and price when ready. Model checksums, Wan CUDA import, inference
 and authoritative application billing collection remain open. The private image
-contains no model weights; no template or GPU resource has been created.
+contains no model weights. Template lehfc5qf3s is saved but not launch-ready;
+no GPU, volume, endpoint or model-download job has been created.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -651,3 +656,52 @@ $5 maximum total, 1,800 seconds from admission and one attempt; it has not start
 No GPU, volume or recurring hosting resource was created. GitHub email verification,
 private pull credentials, hosting and installed shutdown remain pending. The
 billing result is left open, and the credential/verification tabs remain available.
+
+
+## GitHub verification complete; credentials prepared — November 15, 2026
+
+John reported Done, and the browser showed the new classic-token form rather
+than the previous Confirm access screen. GitHub verification is observed complete.
+The form has note wan-runpod-image-pull, 30-day expiration (December 15, 2026),
+and exactly one selected scope: read:packages. Generate token was not clicked.
+Runpod's registry credential form has name wan-ghcr-pull and the GitHub username;
+its password remains empty and Save was not clicked.
+
+The wan-cleanup Runpod API-key form remains prepared with only REST Pods Read and
+Write selected. No key has been created. Those provider permissions include Pod
+creation and deletion across the account; the cleanup program limits itself to
+its exact WAN resource bindings and GET/DELETE but does not narrow the key itself.
+The WAN repository's Actions secret entry is prepared for RUNPOD_CLEANUP_TOKEN;
+its secret value remains empty and Add secret was not submitted. The requested
+owner confirmation covers creating both credentials and directly saving the GHCR
+token to Runpod registry credentials and the Runpod key to this private repository's
+encrypted Actions secrets. Tokens must never appear in chat, logs or source files.
+
+Funding remains complete and the GPU trial unused. No further payment, provider
+resource, hosting service, live credential or rendering job was created. Hosting
+and actual Runpod download/installed shutdown remain open. No code or tests changed.
+
+## Approved credentials saved and private template created — November 15, 2026
+
+John explicitly approved creation and secure storage of both credentials. The
+GitHub classic token wan-runpod-image-pull has read:packages only and 30-day
+expiration (December 15, 2026). It was transferred directly to Runpod registry
+wan-ghcr-pull, ID cmwik8xrr008eoog7l16ldqug, for hoyosgarciajohn-png. The Runpod
+key wan-cleanup has only REST Pods Read and Write, with GraphQL/Serverless and
+all other REST sections disabled. It was transferred directly into this private
+repository's encrypted RUNPOD_CLEANUP_TOKEN Actions secret. Both destination
+listings were verified. Values are absent from chat, source, evidence and documents.
+
+Private template lehfc5qf3s was created and read back through Runpod. It uses the
+published sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2
+image, registry ID above, 80 GB ephemeral disk, CUDA 12.8, no ports, no SSH or
+Jupyter, empty environment and no mounts. This configuration incurs no GPU or
+storage allocation. Controller/bootstrap and model mounts remain required.
+
+The new manual check-cleanup-credential workflow makes exactly one authenticated
+GET using the saved secret. It cannot create/delete resources and logs only a
+sanitized result. Two fictional tests pass: GET-only request/data redaction and
+failure-message redaction. Live workflow execution is pending at this checkpoint.
+Read authentication does not prove deletion permission or installed shutdown.
+No GPU attempt, recurring host or additional payment was made. Contract remains
+0.1.0. The next recipient is Command Center for hosted deployment prerequisites.

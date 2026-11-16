@@ -1,11 +1,9 @@
 {
-  "status": "DRAFT_NOT_CREATED_NOT_LAUNCHABLE",
+  "status": "CREATED_NOT_LAUNCHABLE",
   "missing": [
-    "registry credential",
     "controller HTTPS and live authority",
     "model/journal mounts",
     "scoped worker bootstrap credential",
-    "funded account",
     "verified primary and independent deadline monitors"
   ],
   "template_body": {
@@ -37,6 +35,10 @@
       "/worker/result.json",
       "--claim-wait-seconds",
       "60"
-    ]
-  }
+    ],
+    "registry": "cmwik8xrr008eoog7l16ldqug"
+  },
+  "template_id": "lehfc5qf3s",
+  "registry_credential_id": "cmwik8xrr008eoog7l16ldqug",
+  "runpod_image_pull_verified": false
 }

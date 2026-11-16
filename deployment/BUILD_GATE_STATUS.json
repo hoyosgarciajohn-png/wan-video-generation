@@ -27,7 +27,11 @@
     "anonymous_registry_access": "DENIED",
     "runpod_image_pull": "UNVERIFIED",
     "hosting_source_checks": "PASS",
-    "installed_shutdown_services": "UNVERIFIED"
+    "installed_shutdown_services": "UNVERIFIED",
+    "private_pull_credential_saved": "PASS",
+    "private_runpod_template_saved": "PASS",
+    "cleanup_credential_saved": "PASS",
+    "cleanup_credential_read_access": "PENDING"
   },
   "image_ids": {
     "cpu": "sha256:b3d35b89b04d8e093ca9de9d96757ae70f69df13d27c1ffa3e54a78343d11fc3",
@@ -35,7 +39,7 @@
   },
   "remote_ci_triggered": true,
   "provider_spend": 0,
-  "note": "Private worker image published to GHCR. Manifest/config match tested image; anonymous access denied. Actual Runpod pull, model/CUDA inference, controller hosting and installed shutdown remain unverified. No Runpod resources, top-up or paid builder purchased; approved $5 / 1800s / one-attempt trial unused.",
+  "note": "Private image published; credentials saved; private template lehfc5qf3s created without allocation. Runpod funded with $10 prepaid credit; Auto-Pay disabled. Actual Runpod pull, model/CUDA inference, hosting and installed shutdown remain unverified. Approved $5 / 1800s / one-attempt trial unused.",
   "evidence": {
     "cpu": "deployment/evidence/2026-11-15-cpu-final",
     "gpu": "deployment/evidence/2026-11-15-gpu-final",
