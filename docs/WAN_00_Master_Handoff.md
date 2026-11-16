@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.21 | November 16, 2026 UTC (November 15 owner local) | Owner: John Hoyos
+Version 1.22 | November 16, 2026 UTC (November 15 owner local) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -13,10 +13,14 @@ Actual Runpod download remains unverified. No Docker Desktop is required.
 
 Controller hosting, persistent state and two automatic-cleanup layers are
 implemented and tested with fictional data, but are not installed on a host.
-The Runpod account displays $0, no payment method and no registry credential.
-The console requires a minimum $10 credit top-up; none was submitted. No suitable
-existing controller host or recurring hosting budget is established. The approved
-$5 / 1,800-second / one-attempt trial remains unused. Historical entries below
+The Runpod account still displays $0 and has no registry credential. After John's
+instruction to proceed, one $10 credit purchase was attempted through the existing
+checkout payment method; it was declined. No other card was tried. The funding
+checkout remains open for John to select a working method. GitHub requires email
+verification before preparing a classic private-image pull token; its code-entry
+page is open. The cleanup-key form is prepared but not submitted. No suitable
+existing controller host or approved recurring hosting budget is established.
+The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries below
 are chronological; this checkpoint supersedes earlier publication status.
 
 ## Ownership and source of truth
@@ -573,3 +577,53 @@ The $5 allocation remains $4 Pod plus $1 separately tracked storage, maximum
 shot, with temporary storage retention no longer than 24 hours. Reservations and
 cleanup checks cannot guarantee a provider-side dollar hard stop during outages
 or delayed billing. Contract remains 0.1.0. Next recipient: Command Center.
+
+Published evidence: [PR #44](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/44), merged main `0bc52ba44e084767cbbfd373f7ca9c9e2625c56d`; exact reviewed tree `c954754e098d9043f5366e7cd580ea363ffb5d4a`. Private image publication is verified; actual Runpod pull, hosting and installed cleanup remain open.
+
+
+## Account setup continuation — November 16 UTC
+
+John instructed the Command Center to proceed with the remaining setup after
+being shown the $10 minimum funding amount. One $10 Runpod credit payment was
+submitted through the existing selected checkout method and returned a card-declined
+message. The balance remained $0 and no successful top-up is claimed. The agent
+stopped after that single funding attempt; no alternate card was selected or
+retried. The checkout is left open for John. This is separate from the unused
+one-attempt GPU trial; no Pod or inference attempt was made. Auto-pay remains off.
+Do not repeat the funding attempt without John's choice of a working payment method.
+
+GitHub classic token creation is blocked by Confirm access. The Verify via email
+step sent the owner an authentication code; John must complete it on GitHub.
+Never paste the code or new credentials in chat. The Runpod registry form is
+named wan-ghcr-pull, with username/password not populated and Save not submitted.
+The proposed GitHub token remains read:packages only; no token was generated.
+
+The Runpod API-key form is prepared as wan-cleanup with only REST Pods Read and
+Write selected. Create was NOT submitted; no credential was generated or saved.
+Runpod's Pod Write permission is broader than delete-only and can also authorize
+Pod creation. The cleanup software restricts itself to GET/DELETE, but that does
+not reduce the credential's provider permissions. Final credential creation and
+secure installation need the owner's action/confirmation; do not reuse or expose
+the existing connected-app key. GraphQL, Serverless, Secrets, Authentication,
+Billing and unrelated scopes were not enabled on this prepared cleanup form.
+
+Hosting research: the official Hetzner cost-optimized page still lists CX23 as
+unavailable. OVHcloud's US configurator lists VPS-1 unavailable, and the VPS-2
+configuration showed no available location in the North America and Europe tabs.
+No host was ordered. Its default 12-month commitment was changed to No commitment
+for investigation only. The incomplete zero-dollar cart was not treated as a quote.
+DigitalOcean's public Basic Regular rate for 2 vCPU/4 GiB/80 GiB is $24/month before
+optional backup and taxes; it is an unapproved higher-cost fallback, not a selected
+host or verified capacity. Do not silently substitute it for the cheaper plan.
+
+References checked November 16 UTC:
+- https://www.hetzner.com/cloud/cost-optimized/
+- https://us.ovhcloud.com/vps/configurator/?planCode=vps-2027-model1
+- https://www.digitalocean.com/pricing/droplets
+
+Immediate handoff: John completes GitHub email verification and chooses a working
+payment method in the Runpod $10 checkout. Continue the scoped private-registry
+credential, trusted cleanup secret and concrete hosting selection afterward.
+The existing private image and 36-test evidence are unchanged; no code was changed
+and no tests were repeated. Hosting, actual Runpod image download and installed
+automatic shutdown remain unverified. No new recurring service was purchased.
