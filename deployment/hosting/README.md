@@ -1,6 +1,6 @@
 # Hosting and automatic cleanup
 
-Updated November 15, 2026 (owner local date). **Not deployed.** Runpod has $10
+Updated November 15, 2026 (owner local date). **Host created; installation pending.** Runpod has $10
 prepaid credit, zero observed Pods, saved private registry credential wan-ghcr-pull,
 and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions;
 its Pod read access passed run 43784863537. No credential is installed on a
@@ -8,9 +8,10 @@ controller. John approved one DigitalOcean Basic Regular bundled server: 1 vCPU,
 2 GiB RAM, 50 GiB SSD, $12/month plus $2.40/month weekly backups, before tax.
 This replaces the earlier free-only direction. Account access, empty Droplet
 inventory and the exact checkout price are verified. The configured region is
-SFO2; Basic Regular was unavailable in NYC3. The dedicated SSH key is prepared
-but awaits confirmation before registration and encrypted private-repository
-secret storage. No server was created or installed.
+SFO2; Basic Regular was unavailable in NYC3. John confirmed the dedicated SSH
+access. The public key is registered and WAN_HOST_SSH_KEY is saved in the private
+repository. Droplet 619703894 (64.225.114.46) is active with weekly backups enabled.
+The controller and cleanup services are not installed yet.
 See [the approved hosting decision](HOSTING_DECISION.md) and
 [non-executable configuration](digitalocean-controller-proposal.json).
 
@@ -133,16 +134,34 @@ web app remains fixture-only, and no provider creation route is enabled.
 
 ## Inputs still required
 
-- Confirmation to register the dedicated WAN administrator SSH key and retain
-  its private part as encrypted WAN_HOST_SSH_KEY in the private WAN repository.
-  The $14.40/month pre-tax configuration is approved and checkout verified;
-  actual tax was not itemized. Do not repeat the initial hosting approval.
-- Approved hostname and DNS control; no domain purchase is included.
+- Installation and acceptance on the created host. The $14.40/month pre-tax
+  configuration and dedicated SSH access are approved; do not repeat either.
+- Temporary hostname wan-64-225-114-46.sslip.io resolves through the public
+  IP-based DNS service without a domain purchase; DNS/TLS acceptance is pending.
 - Host-side operator and cleanup credentials and installed live authority.
 - Off-host recovery arrangement, monitor acceptance, exact image pull and model setup.
 
 Funding, private-pull credential, and GitHub cleanup-secret creation are complete.
 Do not repeat those requests or rotate credentials implicitly.
+
+## Manual cloud installation
+
+The install-controller workflow uses GitHub's runner because outbound SSH is not
+available in the editing workspace. It targets only 64.225.114.46, the address
+shown by DigitalOcean for the approved host. Its initial inspect operation uses
+trust on first use and records the ed25519 host fingerprint. Install and verify
+require that exact fingerprint, with strict host verification enabled. This is
+not an independent out-of-band host-key verification.
+
+Installation builds Studio with Node 22 off-host, transfers the exact clean
+checkout and built files, and installs vendor packages and hash-locked Python
+dependencies. Secrets travel through SSH stdin and private files, never logs or
+artifacts. The owner sign-in token is generated on the host. Bootstrap refuses an
+existing application installation and does not silently retry or overwrite state.
+The firewall permits key-only SSH, HTTP and HTTPS; the app remains loopback-only.
+The workflow performs one authenticated Runpod inventory read after installation,
+but cannot create a GPU or grant live execution authority. A failed partial
+installation must be inspected before another install attempt.
 
 ## Acceptance record
 

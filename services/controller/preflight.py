@@ -26,6 +26,8 @@ CRITICAL = ('services/controller/live_execution.py','services/controller/live_bi
             'deployment/hosting/wan-controller.service','deployment/hosting/wan-cleanup.service',
             'deployment/hosting/Caddyfile.example','deployment/hosting/wan-proxy.service',
             'deployment/hosting/install-services.sh','deployment/initialize_host.py',
+            'deployment/hosting/cloud-install.sh','deployment/hosting/bootstrap-host.sh',
+            'deployment/hosting/verify-host.sh','.github/workflows/install-controller.yml',
             '.github/workflows/deadline-guard.yml')
 
 
