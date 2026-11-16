@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.34 | November 16, 2026 | Owner: John Hoyos
+Version 1.35 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -63,16 +63,34 @@ the earlier allocation identity and confirmed absence repeatedly from 06:12:17.7
 through 06:17:00.647 UTC, completing the original deadline plus five-minute watch.
 This corroborates the primary cleanup that removed the Pod at 06:03:20 UTC.
 
-A memory-repair candidate is prepared in draft PR #69:
+The memory repair in PR #69 is merged:
 https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/69
-Head `1722e8cd9929a2b5c5784408dbf5644aa1264bbc`. It initializes DiT on CPU, encodes
-text on GPU with sequential offload, uses BF16 VAE parameters/autocast, and preserves
-fixed text/decode failure phases without private diagnostic text. Ten targeted
-fictional CPU checks passed. The pinned upstream source supports the proposed
-execution order. High decoder memory is a hypothesis, not the proved failing stage.
-This candidate is NOT built, published, installed or GPU-validated. Output quality,
-actual memory fit and CUDA compatibility remain pending. Do not reuse the old image's
-source-bound attestation for changed worker code.
+Merge/source `2e1676f2d1d2c77f06e5814b8af923f6151b8342`. It initializes DiT on CPU,
+encodes text on GPU with sequential offload, uses BF16 VAE parameters/autocast, and
+preserves safe text/decode failure phases. The ten previously passing fictional
+checks apply to unchanged candidate bytes; no unchanged tests were repeated.
+
+**The repaired image is built, privately published and verified offline.** Build
+43864992211 succeeded in 6m 6s at about 07:22 Eastern on November 16. Immutable image:
+`ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50`.
+Docker image/config ID: `sha256:423869b663a14557115ada15e6f8ed5a7fc7935a76a38379c1eb929d1db330c3`.
+Manifest SHA256: `b980738d91f5d5870be6061ff8306137b931109a43c8cb52247e1d2b71d5cb18`.
+Artifact 14225002489; downloaded ZIP SHA256:
+`8cd4f536078b3fed012de9f53616b089d3688556c63f25123e526c78ca318c4c`.
+
+At 07:24 Eastern independent artifact review verified all 32 source files, all four
+execution-log hashes, image/config/registry binding, synthetic media checksum and
+full FFmpeg decode. Strict offline preflight passed. Registry remained private,
+anonymous access was denied, and authenticated manifest access passed. Evidence is
+preserved in `deployment/evidence/2026-11-16-memory-repair-build/` before the one-day
+Actions artifact expires. No model weights or GPU were used by these offline checks.
+
+This is NOT a proved OOM fix: Runpod download and actual CUDA execution for this new
+digest remain unverified. GPU memory fit, decoder numerical quality and real video
+output remain pending. The exact earlier failure stage remains unproved. Existing
+host/source, image references on consumed trials and runtime grants were not changed.
+No paid GPU trial, new host or volume was launched. Runpod inventory remained empty.
+The build used the existing GitHub-hosted setup; a GitHub invoice was not retrieved.
 
 Evidence is under `deployment/evidence/2026-11-16-diagnostic-trial/`. Human creative
 acceptance, a successful real Wan clip, five-second acceptance, warm-batch benchmarks
@@ -111,20 +129,23 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Continue free review and build preparation for draft PR #69. Build a new immutable
-private worker image and verify its source/runtime evidence before proposing another
-paid trial. Do not deploy the candidate or claim the OOM is fixed based on CPU mocks.
+The repaired image build and offline/private registry verification are complete.
+Prepare the next isolated validation scope using the immutable image ending `ed50`.
+Before actual admission, install and verify reviewed matching controller source and
+fresh host/build authority, confirm current GPU price/availability and cleanup health,
+and obtain a separately approved spending/runtime/attempt envelope. Then bind an
+independent guard to the new original deadline before any single Pod creation.
 
-Any subsequent GPU validation requires a fresh, concrete owner-approved scope and
-new isolated job/grant. Both existing attempts are consumed; preserve their terminal
-states, fixed deadlines and unsettled billing. A proposed one-second validation may
-use the same $5 / 1,800-second / one-attempt limits, but no such third attempt is
-approved. Do not reset or rerun either historical prepare/admit/launch flow.
+Both existing attempts are consumed. No third Pod or render is authorized. Preserve
+all prior outcomes, fixed deadlines, image references and unsettled liabilities.
+The proposed later validation remains one one-second shot, one create/render,
+at most $5 additional and 1,800 seconds from its own admission; this handoff does
+not approve it. Do not reset or rerun either historical prepare/admit/launch flow.
 
 Other pending operations: final provider bill reconciliation, automatic billing
 collection, the first completed weekly backup, recurring offsite application backup
 and restore of the new post-trial snapshot. Existing synthetic recovery evidence
-remains valid. General paid Studio rendering and creative acceptance are not complete.
+remains valid. General paid Studio rendering and human creative acceptance are pending.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -1043,3 +1064,14 @@ is authorized.
 Independent guard closure: run 43811980342 completed successfully after repeated
 ABSENCE_CONFIRMED observations through 06:17:00.647 UTC. No GPU remains and the
 late-allocation observation window is complete.
+
+## Repaired worker build — November 16, 2026 (07:22–07:24 Eastern)
+
+John requested building and verifying the repaired image before a separately approved
+paid trial. PR #69 merged as 2e1676f2d1d2c77f06e5814b8af923f6151b8342. Publication run
+43864992211 passed; image digest ends f3f3bebed50. Downloaded evidence, source/log
+checksums, immutable identity, private registry access and full synthetic-video
+decode passed. The actual image reference and manifest hashes are in the current
+checkpoint and deployment/evidence/2026-11-16-memory-repair-build/. This continuation
+created no Runpod Pod, no new runtime grant and no controller deployment. Both paid
+attempts remain consumed; actual GPU validation of the repair is still pending.
