@@ -4,7 +4,7 @@ import hashlib
 import json
 
 from services.controller.lifecycle import Lifecycle
-from services.controller.allocation_retry import CapacityRetryProvider, capacity_rejected
+from services.controller.allocation_retry import CapacityRetryProvider, capacity_rejected, candidate_profile
 from services.controller.live_admission import LiveAdmission, _keys, configuration_hash
 from services.controller.live_billing import ingest, totals
 from services.controller.runpod import RunpodProvider
@@ -19,10 +19,11 @@ BOOTSTRAP_CMD = ['python -m workers.gpu.weights download /models && exec python 
 
 
 class LiveExecution:
-    def __init__(self, admission, *, runpod_token=None, transport=None, billing_keys=None):
+    def __init__(self, admission, *, runpod_token=None, transport=None, billing_keys=None, candidate_check=None):
         require(type(admission) is LiveAdmission, 'Trusted live admission required')
         self.admission, self.control = admission, admission.control
         self._token, self._transport = runpod_token, transport
+        self._candidate_check = candidate_check
         self._billing_keys = _keys(billing_keys or {})
         # Billing authority must not reuse an owner approval secret.
         require(not any(a[1] == b[1] for a in self._billing_keys.values() for b in admission._approval_keys.values()),
@@ -78,7 +79,18 @@ class LiveExecution:
                     require(len(history) < policy['max_attempts'] and
                             all(capacity_rejected(x.get('result', {})) for x in history),
                             'Allocation history cannot be retried')
-                    history.append({'attempt': len(history)+1, 'started_at': stamp(self.control.clock())})
+                    event = {'attempt': len(history)+1, 'started_at': stamp(self.control.clock())}
+                    if 'allocation_plan' in grant:
+                        require(callable(self._candidate_check), 'Fresh candidate check required')
+                        candidates = grant['allocation_plan']['candidates']
+                        used = {x['candidate'] for x in history}
+                        eligible = [i for i, candidate in enumerate(candidates) if i not in used and
+                                    self._candidate_check(candidate, grant['allocation_plan']['max_hourly_cents'])]
+                        require(bool(eligible), 'No untried eligible allocation candidate')
+                        selected = eligible[0]
+                        provider._profile = candidate_profile(profile, candidates[selected])
+                        event['candidate'] = selected
+                    history.append(event)
                     db.execute('UPDATE live_execution_bindings SET allocation_attempts=? WHERE batch=?',
                                (canonical(history),batch_id))
                     return len(history)

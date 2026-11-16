@@ -90,3 +90,13 @@ confirmed, no Pod, zero worker attempts/takes, reservation retained. Do not repl
 the launch, reset the grant or submit a fourth request. The original deadline and
 independent guard remain unchanged. All older liabilities and the exact unknown
 repair request remain preserved. One-second GPU validation is still unproved.
+
+John approved the reviewed multi-GPU allocation proposal: $4.50/hour maximum,
+$5 total ($4 Pod reservation / $1 storage), 1800 seconds from admission, one
+one-second render and at most three create requests. Implement, deploy and execute
+one fresh `allocation` scope. Eligible GPUs are the reviewed RTX 4090, L40S,
+A100 SXM 80GB, H100 NVL and H100 SXM 80GB. Bind the GPU/location candidate list
+into signed approval and host evidence before admission. Only explicit capacity
+rejection permits another untried candidate. Preserve all five consumed scopes,
+the exact historical unknown exception, reservations and independent cleanup.
+This supersedes the $1.10 hourly ceiling only for the new scope, never old grants.

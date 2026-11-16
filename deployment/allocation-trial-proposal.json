@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-16",
+  "status": "OWNER_APPROVED_RUNTIME_PREPARATION",
+  "execution_enabled": false,
+  "purpose": "One one-second validation with signed GPU/location switching and the approved $4.50 hourly ceiling",
+  "controller_origin": "https://wan-64-225-114-46.sslip.io",
+  "controller_installed_source": "bef93c9e27ae6382695701e2e640852c78d79ab0",
+  "controller_verification_run": 43946771144,
+  "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50",
+  "image_build_run": 43864992211,
+  "image_runpod_pull": "UNVERIFIED",
+  "proposed_additional_terms": {
+    "currency": "USD",
+    "overall_cap_cents": 500,
+    "pod_reservation_cents": 400,
+    "storage_allowance_cents": 100,
+    "runtime_seconds_from_admission": 1800,
+    "pod_create_attempts": 3,
+    "render_attempts": 1,
+    "target_duration_ms": 1000,
+    "frames": 25,
+    "width": 1280,
+    "height": 704,
+    "fps": 24,
+    "steps": 50,
+    "seed": 42,
+    "prompt": "A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.",
+    "model_profile": "wan22-ti2v-5b",
+    "gpu_count": 1,
+    "cloud": "SECURE",
+    "gpu_quote_ceiling_cents_per_hour": 450,
+    "minimum_cuda_version": "12.8",
+    "minimum_host_ram_gb": 64,
+    "ephemeral_disk_gb": 80,
+    "persistent_volumes": 0,
+    "new_paid_services": false,
+    "gpus": [
+      "NVIDIA GeForce RTX 4090",
+      "NVIDIA L40S",
+      "NVIDIA A100-SXM4-80GB",
+      "NVIDIA H100 NVL",
+      "NVIDIA H100 80GB HBM3"
+    ]
+  },
+  "launch_requirements": [
+    "John explicitly authorized a new test without waiting: only the exact expired unknown repair request may remain unresolved, with its $4 reservation and cleanup monitoring retained",
+    "Fresh allocation identity; source-bound signed candidate list; preserve all five consumed scopes and unsettled liabilities",
+    "Fresh Secure Cloud quotes <=$4.50/hour; freeze all eligible approved GPU candidates and up to eight locations per GPU before admission; prefer availability then geographic breadth then price",
+    "Verify private digest and exact worker source evidence",
+    "Healthy persistent cleanup and independent guard with the same fixed deadline before create",
+    "At most three POSTs total, one name/deadline/reservation; choose an untried signed GPU/location candidate after exact HTTP 400 no-capacity only; fresh quotes before each request; no retry after uncertain outcome or restart",
+    "Upload, checksum and decode output before confirming success; retrieve it after verified deletion",
+    "Import provider billing and retain any unsettled reservation"
+  ],
+  "limitations": [
+    "The repaired image is offline-verified, not GPU-validated.",
+    "The failing allocation in the prior OOM diagnostic is unknown.",
+    "A successful one-second clip is not five-second or sustained batch acceptance.",
+    "Budget limits are enforced by admission, one-attempt, price and shutdown controls, not a provider hard account cap.",
+    "Prior billing remains provisional and automatic collection remains pending.",
+    "Success on a larger GPU does not validate the 24GB RTX 4090 memory repair."
+  ],
+  "approval_reference": "John: \"Ok. I approved. GO ahead\" after the concrete proposal to raise the hourly ceiling to $4.50, keep $5 total and 1800 seconds, one allocated Pod and one render, and up to three capacity-only requests switching eligible GPU/location candidates. Includes implementation, deployment and this fresh isolated one-second trial.",
+  "previous_trials": [
+    {
+      "batch_id": "7c811e6ab21a4392b0e3a80e331fc57a",
+      "attempt_consumed": true,
+      "cleanup": "CONFIRMED",
+      "billing_final": false
+    },
+    {
+      "batch_id": "def5478dc85949139ca1c0ae404f9d1f",
+      "attempt_consumed": true,
+      "cleanup": "CONFIRMED",
+      "billing_final": false
+    },
+    {
+      "batch_id": "249c50635ec84ac38cef0eb66232efed",
+      "attempt_consumed": true,
+      "cleanup": "UNRESOLVED_NEVER_OBSERVED",
+      "billing_final": false
+    },
+    {
+      "batch_id": "bee9e55b1d4a4f458771ad4ac69c3318",
+      "attempt_consumed": true,
+      "cleanup": "CONFIRMED_EXPLICIT_REJECTION",
+      "billing_final": false
+    },
+    {
+      "batch_id": "4e87af47cce0477b8750b2e4681b722d",
+      "attempt_consumed": true,
+      "cleanup": "CONFIRMED_EXPLICIT_REJECTION",
+      "billing_final": false
+    }
+  ],
+  "later_stages": "Authorized direction: five seconds, then one minute of real WAN clips. No later paid grant is installed; first measure the successful one-second result and establish feasibility within unchanged spending limits.",
+  "capacity_retry": {
+    "max_attempts": 3,
+    "delay_seconds": 15,
+    "min_remaining_seconds": 120
+  }
+}

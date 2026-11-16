@@ -23,7 +23,7 @@ from urllib.request import Request
 
 from deployment.hosted_app import open_control
 from deployment import validation_policy
-from services.controller.allocation_retry import POLICY as CAPACITY_POLICY
+from services.controller.allocation_retry import POLICY as CAPACITY_POLICY, ALLOCATION_GPUS
 from services.controller.live_admission import LiveAdmission, APPROVAL_DOMAIN, HOST_DOMAIN, configuration_hash
 from services.controller.live_billing import BILLING_DOMAIN
 from services.controller.live_execution import LiveExecution, BOOTSTRAP_CMD, BOOTSTRAP_ENTRYPOINT
@@ -53,6 +53,7 @@ WORKER_ID = 'john-first-wan-worker'
 EXPECTED_PRIOR_BATCHES = set()
 ALLOW_KNOWN_UNKNOWN = False
 CAPACITY_RETRY = False
+MULTI_GPU = False
 HOURLY_CEILING = Decimal('1.00')
 
 
@@ -60,25 +61,26 @@ def select_trial(name):
     """Allowlisted operator scope, never an arbitrary path or mutable retry."""
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
-    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU
-    CAPACITY_RETRY = name == 'fallback'
-    HOURLY_CEILING = Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
+    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU, MULTI_GPU
+    MULTI_GPU = name == 'allocation'
+    CAPACITY_RETRY = name in ('fallback', 'allocation')
+    HOURLY_CEILING = Decimal('4.50') if MULTI_GPU else Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
     GPU = 'NVIDIA GeForce RTX 4090'
-    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback')
+    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback','allocation')
     if name == 'first':
         return
     if name == 'repair':
         return select_repair_trial()
-    if name in ('validation','fallback'):
+    if name in ('validation','fallback','allocation'):
         select_repair_trial('validation')
-        if name == 'fallback':
-            proposal = read(ROOT / 'deployment/fallback-trial-proposal.json')
+        if CAPACITY_RETRY:
+            proposal = read(ROOT / f'deployment/{name}-trial-proposal.json')
             assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION' and proposal['execution_enabled'] is False
             terms = proposal['proposed_additional_terms']
             assert (terms['overall_cap_cents'],terms['pod_reservation_cents'],terms['storage_allowance_cents'],
                     terms['runtime_seconds_from_admission'],terms['pod_create_attempts'],terms['render_attempts'],
-                    terms['gpu_quote_ceiling_cents_per_hour']) == (500,400,100,1800,3,1,110)
-            assert terms['gpus'] == ['NVIDIA GeForce RTX 4090','NVIDIA L40S']
+                    terms['gpu_quote_ceiling_cents_per_hour']) == (500,400,100,1800,3,1,450 if MULTI_GPU else 110)
+            assert terms['gpus'] == (list(ALLOCATION_GPUS) if MULTI_GPU else ['NVIDIA GeForce RTX 4090','NVIDIA L40S'])
             assert proposal['capacity_retry'] == CAPACITY_POLICY and proposal['image'] == IMAGE
             TRIAL = STATE / 'fallback-trial-20261116'
             AUTH = Path('/etc/wan/fallback-trial-authority-20261116.json')
@@ -87,6 +89,14 @@ def select_trial(name):
             IDEMPOTENCY_KEY = 'john-capacity-fallback-bounded-attempt'
             WORKER_ID = 'john-capacity-fallback-worker'
             EXPECTED_PRIOR_BATCHES.add('bee9e55b1d4a4f458771ad4ac69c3318')
+            if MULTI_GPU:
+                TRIAL = STATE / 'allocation-trial-20261116'
+                AUTH = Path('/etc/wan/allocation-trial-authority-20261116.json')
+                TITLE = 'Wan multi-GPU allocation validation · one second'
+                APPROVAL_ID = 'john-multi-gpu-allocation-20261116'
+                IDEMPOTENCY_KEY = 'john-multi-gpu-allocation-bounded-attempt'
+                WORKER_ID = 'john-multi-gpu-allocation-worker'
+                EXPECTED_PRIOR_BATCHES.add('4e87af47cce0477b8750b2e4681b722d')
             if (TRIAL / 'prepared.json').exists():
                 GPU = read(TRIAL / 'prepared.json')['pricing']['gpu']
                 assert GPU in terms['gpus']
@@ -173,7 +183,8 @@ def services():
     a = LiveAdmission(StudioWorkspace(c), approval_keys={'owner': (OWNER, bytes.fromhex(keys['owner']))},
         host_keys={'host': (OWNER, bytes.fromhex(keys['host']))}, build_evidence=TRIAL / 'build')
     e = LiveExecution(a, runpod_token=Path('/etc/wan/runpod-token').read_text().strip(),
-        transport=https_transport(), billing_keys={'billing': (OWNER, bytes.fromhex(keys['billing']))})
+        transport=https_transport(), billing_keys={'billing': (OWNER, bytes.fromhex(keys['billing']))},
+        candidate_check=candidate_available if MULTI_GPU else None)
     return c, a, e
 
 
@@ -196,10 +207,53 @@ def catalog_snapshot():
     return envelope['data']
 
 
+def candidate_available(candidate, ceiling):
+    snapshot = catalog_snapshot()
+    assert isinstance(snapshot, dict) and isinstance(snapshot.get('gpus'), list)
+    value = next((x for x in snapshot['gpus'] if x['id'] == candidate['gpu_type']), None)
+    if value is None or not value.get('secure') or value.get('availability') not in ('HIGH', 'MEDIUM', 'LOW'):
+        return False
+    price = Decimal(str(value['price']['secure']))
+    if not price.is_finite() or not 0 < price * 100 <= ceiling:
+        return False
+    available = {x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH','MEDIUM','LOW')}
+    return bool(available.intersection(candidate['data_center_ids']))
+
+
+def allocation_quote(plan=None):
+    global GPU
+    snapshot = catalog_snapshot()
+    assert isinstance(snapshot, dict) and isinstance(snapshot.get('gpus'), list)
+    ranked = []
+    for value in snapshot['gpus']:
+        if value['id'] not in ALLOCATION_GPUS:
+            continue
+        locations = [x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH','MEDIUM','LOW')][:8]
+        candidate = dict(gpu_type=value['id'], data_center_ids=locations)
+        if not locations or not candidate_available(candidate, 450):
+            continue
+        price = Decimal(str(value['price']['secure']))
+        ranked.append(({'HIGH':0,'MEDIUM':1,'LOW':2}[value['availability']], -len(locations), price, candidate))
+    ranked.sort(key=lambda x: x[:3])
+    if plan is None:
+        candidates = [x[3] for x in ranked]
+        assert candidates, 'No eligible approved GPU candidate'
+        plan = dict(max_hourly_cents=450, candidates=candidates)
+    else:
+        assert any(candidate_available(x, plan['max_hourly_cents']) for x in plan['candidates']), 'No admitted candidate currently available'
+    first = plan['candidates'][0]
+    GPU = first['gpu_type']
+    return dict(checked_at=time.time(), gpu=GPU, region=first['data_center_ids'][0],
+                data_center_ids=first['data_center_ids'], max_hourly_cents=450,
+                allocation_plan=deepcopy(plan), min_cuda='12.8')
+
+
 def checked_quote(region=None):
     # Supplied by the authorized connected Runpod read, via pinned operator SSH.
     # The existing cleanup credential deliberately has no catalog/billing access.
     global GPU
+    if MULTI_GPU:
+        return allocation_quote(region)
     value = catalog_snapshot()
     if CAPACITY_RETRY and region is None:
         assert value['id'] in ('NVIDIA GeForce RTX 4090','NVIDIA L40S')
@@ -295,7 +349,9 @@ def prepare():
         max_runtime_seconds=1800, valid_until=expires, profile=profile, launch_profile=launch, source_sha256=_sources())
     if CAPACITY_RETRY:
         grant['capacity_retry'] = dict(CAPACITY_POLICY)
-    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch), source_sha256=grant['source_sha256'],
+    if MULTI_GPU:
+        grant['allocation_plan'] = pricing['allocation_plan']
+    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch, grant.get('allocation_plan')), source_sha256=grant['source_sha256'],
         build_manifest_sha256=build['manifest_sha256'], valid_until=expires, worker_endpoint=ORIGIN, storage_id=profile['storage_id'])
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
     atomic_json(TRIAL / 'host.json', sign(host, 'host', HOST_DOMAIN))
@@ -324,7 +380,7 @@ def refresh_unregistered_validation(c, saved):
             return saved
         assert db.execute('SELECT count(*) FROM live_job_links WHERE project=?', (saved['project'],)).fetchone()[0] == 0
     current = checked_quote()
-    regions = list(dict.fromkeys(current['data_center_ids'] + saved['pricing']['data_center_ids']))[:8]
+    regions = current['data_center_ids'] if MULTI_GPU else list(dict.fromkeys(current['data_center_ids'] + saved['pricing']['data_center_ids']))[:8]
     current.update(region=regions[0], data_center_ids=regions)
     approval = read(TRIAL / 'approval.json')
     host = read(TRIAL / 'host.json')
@@ -343,10 +399,12 @@ def refresh_unregistered_validation(c, saved):
         grant['profile']['gpu_type'] = current['gpu']
         grant['launch_profile']['gpu']['id'] = current['gpu']
     grant['launch_profile']['dataCenterIds'] = regions
+    if MULTI_GPU:
+        grant['allocation_plan'] = current['allocation_plan']
     grant['source_sha256'] = _sources()
     grant['valid_until'] = stamp(utcnow() + timedelta(hours=6))
     attestation = deepcopy(host['payload'])
-    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile']),
+    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan')),
                        source_sha256=grant['source_sha256'], valid_until=grant['valid_until'])
     saved = dict(saved, pricing=current, source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip())
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
@@ -365,7 +423,7 @@ def admit():
         prior_history_closed(db)
     if ALLOW_KNOWN_UNKNOWN:
         saved = refresh_unregistered_validation(c, saved)
-    pricing = checked_quote(saved['pricing'].get('data_center_ids', [saved['pricing']['region']]))
+    pricing = checked_quote(saved['pricing']['allocation_plan'] if MULTI_GPU else saved['pricing'].get('data_center_ids', [saved['pricing']['region']]))
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
@@ -472,7 +530,7 @@ def launch():
     ready = guard_ready(job)
     # The CI caller supplies a live GitHub API observation before this SSH call.
     assert os.environ.get('WAN_VERIFIED_GUARD_RUN') == ready['run_id']
-    checked_quote(job['pricing'].get('data_center_ids', [job['pricing']['region']]))
+    checked_quote(job['pricing']['allocation_plan'] if MULTI_GPU else job['pricing'].get('data_center_ids', [job['pricing']['region']]))
     c, a, e = services()
     with c.transaction() as db:
         assert db.execute("SELECT dispatch_state FROM live_job_links WHERE batch=?",(job['batch'],)).fetchone()[0] == 'disabled'
@@ -496,7 +554,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
-    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()

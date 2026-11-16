@@ -1,10 +1,22 @@
 # Wan Video Generation · Master handoff
-Version 1.42 | November 16, 2026 | Owner: John Hoyos
+Version 1.43 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
+John approved $4.50/hour, unchanged $5 total / 1800 seconds / one one-second
+render, and up to three capacity-only allocation requests switching approved
+GPU/location candidates. Implementation uses the fresh `allocation` scope,
+signed candidate list and host binding, fresh quote checks before each POST,
+durable candidate indices, and no replay after uncertain outcomes or restart.
+All five previous scopes and the exact old unknown exception are preserved.
+197 root tests and 50 deployment/guard/hosting tests passed; contract/shell checks
+passed. Worker compatibility review supports Ampere/Ada/Hopper candidates but
+actual repaired GPU execution is still unproved. Deployment and live result
+pending at this source checkpoint. See docs/B06_MULTI_GPU_ALLOCATION.md.
+
+## Previous checkpoint — exhausted L40S fallback
 John approved the proposed RTX 4090/L40S fallback and controlled no-capacity retries.
 The fresh `fallback` scope keeps $5 total ($4 Pod / $1 storage), one one-second
 render, 1800 seconds from admission, CUDA >=12.8, host RAM >=64GB, Secure Cloud,

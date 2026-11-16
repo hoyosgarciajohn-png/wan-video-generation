@@ -12,7 +12,7 @@ on:
       trial:
         description: Exact approved trial scope (only for trial operations)
         type: choice
-        options: [first, diagnostic, repair, validation, fallback]
+        options: [first, diagnostic, repair, validation, fallback, allocation]
         default: first
         required: true
       host_fingerprint:

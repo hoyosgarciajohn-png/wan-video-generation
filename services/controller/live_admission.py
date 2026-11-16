@@ -13,7 +13,7 @@ import re
 from uuid import uuid4
 
 from services.controller.budget import cents
-from services.controller.allocation_retry import validate_policy
+from services.controller.allocation_retry import validate_policy, validate_plan
 from services.controller.live_billing import initialize as initialize_billing, totals as billing_totals
 from services.controller.lifecycle import Lifecycle
 from services.controller.real_jobs import RealJobBridge
@@ -26,6 +26,8 @@ APPROVAL_DOMAIN = 'wan-live-owner-approval-v1'
 HOST_DOMAIN = 'wan-live-host-acceptance-v1'
 GRANT_FIELDS = {'id','owner','project','currency','approved_cents','max_runtime_seconds',
                 'valid_until','profile','launch_profile','source_sha256'}
+GRANT_SHAPES = (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'},
+                GRANT_FIELDS | {'capacity_retry', 'allocation_plan'})
 
 
 def _sources():
@@ -39,10 +41,13 @@ def _build(directory, image_ref):
     return verify_build(directory, image_ref)
 
 
-def configuration_hash(profile, launch_profile):
+def configuration_hash(profile, launch_profile, allocation_plan=None):
     RealJobBridge.configuration_hash(profile)
     launch = validate_launch_profile(launch_profile)
-    return hashlib.sha256(canonical(dict(profile=profile, launch_profile=launch, model_lock=LOCK)).encode()).hexdigest()
+    value = dict(profile=profile, launch_profile=launch, model_lock=LOCK)
+    if allocation_plan is not None:
+        value['allocation_plan'] = validate_plan(allocation_plan, launch)
+    return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
 class AuthorityError(PermissionError):
@@ -111,7 +116,7 @@ class LiveAdmission:
 
     def _grant(self, owner, project, envelope, *, current=True):
         grant = _verify(envelope, self._approval_keys, APPROVAL_DOMAIN, owner)
-        require(set(grant) in (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'}), 'Exact approval fields required')
+        require(set(grant) in GRANT_SHAPES, 'Exact approval fields required')
         if 'capacity_retry' in grant:
             validate_policy(grant['capacity_retry'])
         if grant['owner'] != owner or grant['project'] != project:
@@ -132,7 +137,7 @@ class LiveAdmission:
         if current:
             require(expiry > self.control.clock(), 'Approval expired')
             require(grant['source_sha256'] == _sources(), 'Approved source inventory changed')
-        return grant, configuration_hash(profile, launch)
+        return grant, configuration_hash(profile, launch, grant.get('allocation_plan'))
 
     def _approval(self, db, owner, project, approval_id, *, current=True):
         row = db.execute('SELECT envelope,revoked FROM live_approvals WHERE id=? AND owner=? AND project=?',
