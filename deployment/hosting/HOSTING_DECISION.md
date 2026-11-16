@@ -1,6 +1,6 @@
 # Approved small DigitalOcean controller — November 15, 2026
 
-Status: **APPROVED_AWAITING_ACCOUNT_SIGN_IN**. John selected the lower-cost
+Status: **APPROVED_AWAITING_SSH_ACCESS_CONFIRMATION**. John selected the lower-cost
 DigitalOcean option and intends to consider capacity upgrades only if needed.
 The approval replaces the earlier free-only controller direction. It does not
 revive the former $24 server or $32 monthly ceiling.
@@ -9,7 +9,8 @@ revive the former $24 server or $32 monthly ceiling.
 
 One dedicated `wan-controller-01` CPU Droplet: **Basic Regular bundled**, Linux
 amd64, Ubuntu 24.04 LTS preference, 1 vCPU, 2 GiB RAM, 50 GiB SSD, 2,000 GiB
-monthly outbound allowance. Use an available US region after checking the account.
+monthly outbound allowance. SFO2 is selected and available in the inspected form;
+the same Basic Regular plan was unavailable in NYC3.
 
 | Item | Monthly published amount |
 |---|---:|
@@ -32,16 +33,28 @@ resources, contain credentials or enable Runpod dispatch.
 ## Observed account state
 
 No DigitalOcean management integration was returned by current plugin discovery.
-The connected Chrome session opened https://cloud.digitalocean.com/ and reached
-https://cloud.digitalocean.com/login. The email/password fields are blank. The
-page is retained for the owner to sign in. Account resources, region, capacity,
-payment state and checkout are unverified. No server or subscription was created.
+John completed sign-in. The connected Chrome session verified the My Team account,
+the first-project project and an empty global Droplet inventory. A primary payment
+method exists. No payment was attempted. The prepared form selects Ubuntu 24.04
+LTS x64, SFO2, Basic Regular s-1vcpu-2gb, quantity one, and weekly percentage
+backups. Its displayed total is $14.40/month; tax is not itemized. Extra storage
+and the managed database remain unchecked. Free monitoring is selected.
 
-## Installation sequence after sign-in
+A dedicated ed25519 key named wan-controller-deploy was generated locally with
+private-file mode 0600. Its fingerprint is
+SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA. The public-key form is prepared
+but unsubmitted. Confirmation is pending before registering this new administrator
+access and storing the private part as encrypted WAN_HOST_SSH_KEY in the private
+hoyosgarciajohn-png/wan-video-generation repository. Use the key only for the WAN
+controller; do not select the unrelated existing SUMAN staging key. No private
+key is in source, documents or screenshots. No host or subscription was created.
 
-1. Inspect account/project inventory. Select one dedicated host and exact plan;
-   enable weekly percentage-based backups and confirm the final price.
-2. Establish scoped host administration and HTTPS access. Do not put keys into
+## Remaining installation sequence
+
+1. Obtain the concrete administrator-access confirmation, register the prepared
+   public key, and retain the private part in the approved encrypted secret store.
+   Recheck the existing prepared checkout before creating exactly one host.
+2. Establish scoped host administration and HTTPS access. Do not put private keys into
    user-data, repository content or screenshots. No domain purchase is included.
 3. Build Studio outside this 2 GiB host. Install the reviewed source, hash-locked
    Python dependencies, FFmpeg/ffprobe and Caddy on the server. Keep model weights
@@ -83,8 +96,9 @@ Always Free remains an alternate requiring ARM acceptance and available capacity
 Windows requires reliable power/network access. These routes are not the selected
 installation after John's latest approval.
 
-This checkpoint records approval and deployment settings only. No runtime source,
-credentials, other project, host, volume or GPU was changed. Documentation and JSON
+This checkpoint records account inspection and prepared deployment settings. A new
+local key pair exists but no external access was granted. No runtime source,
+other project, host, volume or GPU was changed. Documentation and JSON
 consistency were checked; existing tests were not repeated. Actual installation,
 TLS, shutdown, image pull and bill collection remain pending. Contract 0.1.0.
 

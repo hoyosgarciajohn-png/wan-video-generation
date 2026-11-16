@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "APPROVED_AWAITING_ACCOUNT_SIGN_IN",
+  "status": "APPROVED_AWAITING_SSH_ACCESS_CONFIRMATION",
   "executable": false,
   "owner": "John Hoyos",
   "approval_date_local": "2026-11-15",
@@ -28,7 +28,22 @@
   "expected_tax_additional": true,
   "provider_hard_account_spending_cap": false,
   "automatic_capacity_upgrade": false,
-  "region": null,
+  "region": "sfo2",
+  "account_access_verified": true,
+  "project_name": "first-project",
+  "project_id": "9bf0133f-d248-4eef-a8c8-229efe4170f6",
+  "observed_existing_droplets": 0,
+  "payment_method_present": true,
+  "checkout_monthly_before_tax_usd_cents": 1440,
+  "checkout_tax_itemized": false,
+  "host_access": {
+    "key_name": "wan-controller-deploy",
+    "fingerprint": "SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA",
+    "public_key_registered": false,
+    "private_key_secret_installed": false,
+    "proposed_secret_destination": "hoyosgarciajohn-png/wan-video-generation:WAN_HOST_SSH_KEY",
+    "action_time_confirmation_pending": true
+  },
   "droplet_id": null,
   "public_origin": null,
   "created": false,
@@ -41,7 +56,7 @@
     "No extra volume, managed database, domain purchase or paid builder"
   ],
   "acceptance_pending": [
-    "Account access and regional availability",
+    "Dedicated SSH access confirmation and server creation",
     "Scoped host administration and HTTPS hostname",
     "Controller installation with disarmed startup",
     "2 GiB host memory/disk behavior under fictional workload",
