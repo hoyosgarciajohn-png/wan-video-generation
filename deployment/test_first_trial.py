@@ -24,11 +24,21 @@ class FirstTrialGates(unittest.TestCase):
     def test_quote_requires_available_region_and_ceiling(self):
         value = {'id':first_trial.GPU, 'secure':True, 'price':{'secure':0.89},
                  'dataCenters':[{'id':'US-IL-1','availability':'LOW'}]}
-        with patch.object(first_trial,'provider_get', return_value=value):
+        with patch.object(first_trial,'catalog_snapshot', return_value=value):
             self.assertEqual(first_trial.checked_quote()['region'],'US-IL-1')
             with self.assertRaises(AssertionError): first_trial.checked_quote('unavailable')
             value['price']['secure']=1.01
             with self.assertRaises(AssertionError): first_trial.checked_quote()
+
+    def test_catalog_record_cannot_be_reused_after_freshness_window(self):
+        with tempfile.TemporaryDirectory() as t:
+            path=Path(t)/'quote.json'
+            with patch.object(first_trial,'QUOTE_FILE',path):
+                path.write_text(json.dumps({'observed_at':time.time(),'data':{'id':'fictional'}}))
+                self.assertEqual(first_trial.catalog_snapshot()['id'],'fictional')
+                for observed in (time.time()-181,time.time()+30):
+                    path.write_text(json.dumps({'observed_at':observed,'data':{}}))
+                    with self.assertRaises(AssertionError): first_trial.catalog_snapshot()
 
     def test_guard_receipt_is_bound_and_fresh(self):
         with tempfile.TemporaryDirectory() as t, patch.object(first_trial,'TRIAL',Path(t)):

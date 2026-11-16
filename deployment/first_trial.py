@@ -41,6 +41,7 @@ ORIGIN = 'https://wan-64-225-114-46.sslip.io'
 IMAGE = 'ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2'
 GPU = 'NVIDIA GeForce RTX 4090'
 REGISTRY = 'cmwik8xrr008eoog7l16ldqug'
+QUOTE_FILE = Path('/etc/wan/connected-runpod-quote.json')
 
 
 def read(path):
@@ -78,8 +79,17 @@ def provider_get(path):
         return json.loads(data)
 
 
+def catalog_snapshot():
+    envelope = read(QUOTE_FILE)
+    assert set(envelope) == {'observed_at', 'data'}
+    assert type(envelope['observed_at']) in (int, float) and 0 <= time.time() - envelope['observed_at'] < 180
+    return envelope['data']
+
+
 def checked_quote(region=None):
-    value = provider_get('/catalog/gpus/' + quote(GPU, safe='') + '?include=AVAILABILITY&product=POD&cloud=SECURE&count=1&minCudaVersion=12.8')
+    # Supplied by the authorized connected Runpod read, via pinned operator SSH.
+    # The existing cleanup credential deliberately has no catalog/billing access.
+    value = catalog_snapshot()
     price = Decimal(str(value['price']['secure']))
     assert value['id'] == GPU and value['secure'] and 0 < price <= Decimal('1.00')
     available = [x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH', 'MEDIUM', 'LOW')]
@@ -208,7 +218,10 @@ def guard_ready(job):
 
 def bill_snapshot(c, e, job, pod):
     try:
-        raw = provider_get('/billing/pods?bucketSize=hour&lastN=24&podId=' + quote(pod, safe=''))
+        envelope = read(TRIAL / 'connected-billing.json')
+        assert set(envelope) == {'observed_at', 'data'}
+        assert type(envelope['observed_at']) in (int, float) and 0 <= time.time() - envelope['observed_at'] < 3600
+        raw = envelope['data']
         assert raw['metadata']['query']['podId'] == pod
         assert raw['metadata']['recordCount'] == len(raw['records'])
         assert all(x['podId'] == pod for x in raw['records'])
@@ -224,7 +237,7 @@ def bill_snapshot(c, e, job, pod):
         atomic_json(TRIAL / 'provider-billing.json', {'observed_at':time.time(), 'cumulative_cents':amount, 'raw':raw, 'final':False})
         return {'status':'RETRIEVED_NOT_FINAL', 'observed_cents':amount}
     except Exception:
-        return {'status':'UNVERIFIED', 'reservation_retained':True}
+        return {'status':'AWAITING_CONNECTED_BILLING_RECORD', 'reservation_retained':True}
 
 
 def observe():

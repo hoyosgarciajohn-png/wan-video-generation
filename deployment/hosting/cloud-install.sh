@@ -62,6 +62,15 @@ if [[ "$operation" == recovery || "$operation" == recovery-copy ]]; then
     exit
 fi
 if [[ "$operation" == trial-* ]]; then
+    if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then
+        [[ -n ${WAN_GPU_QUOTE:-} ]] || fail 'Fresh connected GPU quote required'
+        printf '%s' "$WAN_GPU_QUOTE" > "$temp_dir/quote.json"
+        scp "${ssh_options[@]}" "$temp_dir/quote.json" "root@$host:/etc/wan/connected-runpod-quote.json"
+    fi
+    if [[ "$operation" == trial-observe && -n ${WAN_BILLING_RECORD:-} ]]; then
+        printf '%s' "$WAN_BILLING_RECORD" > "$temp_dir/billing.json"
+        scp "${ssh_options[@]}" "$temp_dir/billing.json" "root@$host:/var/lib/wan/live-trial-20261116/connected-billing.json"
+    fi
     [[ "$operation" == trial-observe ]] || ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
     guard_run=''
     if [[ "$operation" == trial-launch ]]; then

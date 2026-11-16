@@ -17,6 +17,14 @@ on:
         description: Base64 RSA 3072 public PEM key for sealed existing owner-token delivery
         type: string
         required: false
+      gpu_quote:
+        description: Fresh connected Runpod GPU quote JSON (trial prepare, admit, launch)
+        type: string
+        required: false
+      billing_record:
+        description: Connected Runpod billing JSON for the exact Pod (observe only)
+        type: string
+        required: false
 permissions:
   contents: read
   actions: read
@@ -51,4 +59,6 @@ jobs:
           WAN_HOST_OPERATION: ${{ inputs.operation }}
           WAN_HOST_FINGERPRINT: ${{ inputs.host_fingerprint }}
           WAN_ACCESS_PUBLIC_KEY: ${{ inputs.access_public_key }}
+          WAN_GPU_QUOTE: ${{ inputs.gpu_quote }}
+          WAN_BILLING_RECORD: ${{ inputs.billing_record }}
         run: bash deployment/hosting/cloud-install.sh
