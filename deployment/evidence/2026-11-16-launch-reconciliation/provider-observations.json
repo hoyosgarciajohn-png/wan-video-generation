@@ -1,0 +1,47 @@
+{
+  "observed_at": "2026-11-16T16:17:28.818Z",
+  "scope": "Repair request 249c50635ec84ac38cef0eb66232efed",
+  "inventory": {
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    },
+    "pods": []
+  },
+  "audit": {
+    "auditLogs": [],
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    }
+  },
+  "billing": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-16T17:00:00Z",
+        "startTime": "2026-11-16T15:00:00Z"
+      },
+      "recordCount": 0,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0,
+        "gpuAmount": 0,
+        "totalAmount": 0
+      },
+      "uniquePodCount": 0
+    },
+    "records": []
+  },
+  "final_billing": false,
+  "cleanup_confirmed": false,
+  "reservation_released": false,
+  "console": {
+    "balance_usd": "9.35",
+    "key_label": "wan-cleanup",
+    "pods_read": true,
+    "pods_write": true,
+    "changes_made": false
+  },
+  "interpretation": "No allocation or billing record observed. Original POST response missing; provider confirmation required."
+}

@@ -15,6 +15,7 @@ from services.controller.live_billing import BILLING_DOMAIN
 from services.controller.live_execution import LiveExecution, WORKER_CMD
 from services.controller.service import canonical, stamp
 from services.controller.worker_transport import WorkerTransport
+from services.controller import backup
 from workers.gpu.common import utcnow
 
 
@@ -83,6 +84,53 @@ class LiveExecutionTests(unittest.TestCase):
         with self.control.transaction() as db:
             for table in ('live_approvals','live_execution_bindings','pod_batches'):
                 self.assertNotIn(self.credential['token'],str(db.execute('SELECT * FROM '+table).fetchall()))
+
+    def test_rejection_preserves_billing_reservation_and_private_diagnostic(self):
+        calls=[]
+        def rejected(request,timeout):
+            calls.append(request.get_method())
+            raise HTTPError(request.full_url,402,'ignored',{'x-request-id':'fictional-balance'},
+                            io.BytesIO(b'{"detail":"Insufficient balance"}'))
+        self.execution._transport=rejected
+        before=self.execution.status(self.owner,self.project,self.job)['budget']
+        result=self.provision()
+        self.assertEqual(result['batch']['state'],'failed')
+        self.assertEqual(result['batch']['cleanup_state'],'confirmed')
+        self.assertEqual(result['budget'],before)
+        self.assertNotIn('Insufficient balance',json.dumps(result['batch']))
+        self.execution.provision(self.owner,self.project,self.job)
+        self.assertEqual(calls,['POST'])
+        with self.control.transaction() as db:
+            diagnostic=db.execute('SELECT create_diagnostic FROM pod_batches WHERE id=?',(self.job,)).fetchone()[0]
+        self.assertEqual(json.loads(diagnostic)['http_status'],402)
+        destination=self.control.asset_root.parent/'rejected-backup'
+        backup.create_backup(self.control.db_path,self.control.asset_root,destination)
+        restored=backup.restore_backup(destination,self.control.asset_root.parent/'rejected-restore')
+        import sqlite3
+        with sqlite3.connect(restored['database']) as db:
+            self.assertEqual(db.execute('SELECT create_diagnostic FROM pod_batches WHERE id=?',
+                                       (self.job,)).fetchone()[0],diagnostic)
+
+    def test_multi_location_grant_is_frozen_and_covered_by_host_signature(self):
+        self.live.cancel(self.owner,self.project,self.job)
+        self.payload['id']='multiple-locations'
+        self.payload['launch_profile']['dataCenterIds'].append('fictional-second-location')
+        self.live.approve(self.owner,self.project,self.signed())
+        self.job=self.live.submit(self.owner,self.project,dict(self.request,approval_id=self.payload['id'],
+                                 idempotency_key='multiple-locations'))['batch']['id']
+        self.credential=self.workers.issue(self.owner,self.project,self.job,'worker',ttl_seconds=300)
+        with self.assertRaises(ValueError): self.provision()
+        self.assertEqual(self.http.posts,0)
+        self.host=self.signed(dict(self.host['payload'],config_hash=configuration_hash(
+            self.profile,self.payload['launch_profile'])),HOST_DOMAIN)
+        captured=[]
+        self.http.on_create=lambda request:captured.append(json.loads(request.data)['dataCenterIds'])
+        self.assertEqual(self.provision()['batch']['state'],'rendering')
+        self.assertEqual(captured,[self.payload['launch_profile']['dataCenterIds']])
+        self.execution.cancel(self.owner,self.project,self.job)
+        self.assertEqual(self.execution.watchdog(),[])
+        backup.create_backup(self.control.db_path,self.control.asset_root,
+                             self.control.asset_root.parent/'multiple-location-backup')
 
     def test_unknown_create_restart_cleanup_after_revoke_source_change_and_settle(self):
         self.http.unknown=True

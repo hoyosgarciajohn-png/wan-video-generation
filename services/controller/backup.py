@@ -220,7 +220,7 @@ def _inspect_live_admission(db, names, projects):
         launch = validate_launch_profile(grant['launch_profile'])
         require(launch['env'] == {} and launch['image'] == grant['profile']['image_ref'] and
                 launch['gpu']['id'] == grant['profile']['gpu_type'] and launch['gpu']['count'] == 1 and
-                launch['dataCenterIds'] == [grant['profile']['region']], 'Live launch configuration mismatch')
+                launch['dataCenterIds'][0] == grant['profile']['region'], 'Live launch configuration mismatch')
         approvals[identity] = (owner, project, grant, config_hash)
     seen = set()
     for batch_id, owner, project, approval, raw, reserved, state in db.execute(

@@ -1,0 +1,20 @@
+{
+  "as_of": "2026-11-16",
+  "fictional_only": true,
+  "root_suite": {
+    "command": "python -m unittest discover -s tests -q",
+    "passed": 172,
+    "seconds": 126.135
+  },
+  "deployment_suite": {
+    "command": "python -m unittest deployment.test_first_trial deployment.test_deadline_guard deployment.test_hosting -q",
+    "passed": 41,
+    "seconds": 19.192
+  },
+  "contract_validation": "PASS",
+  "shell_syntax": "PASS",
+  "diff_check": "PASS",
+  "unchanged_ui_tests": "NOT_REPEATED",
+  "real_gpu_attempts_started": 0,
+  "deployed": false
+}

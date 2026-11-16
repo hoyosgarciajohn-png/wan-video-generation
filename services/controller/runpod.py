@@ -15,7 +15,37 @@ from src.wan_platform.fake_provider import Pod
 
 _ABSENT = object()
 MAX_RESPONSE = 8 * 1024 * 1024
+MAX_ERROR_RESPONSE = 16 * 1024
+REJECTED_CREATE_STATUSES = frozenset({400, 401, 402, 403, 404, 409, 413, 422, 429})
 LOGGER = logging.getLogger(__name__)
+
+
+class ProviderCreateError(ConnectionError):
+    def __init__(self, diagnostic):
+        self.diagnostic = diagnostic
+        super().__init__('Runpod creation ' + diagnostic['outcome'])
+
+
+class ProviderCreateUncertain(ProviderCreateError):
+    """Transport/server/response failure that may have allocated a resource."""
+
+
+class ProviderCreateRejected(ProviderCreateError):
+    """A documented rejection of this POST, never a transport timeout."""
+
+
+def safe_provider_text(value, secrets):
+    if not isinstance(value, str):
+        return None
+    for secret in sorted(set(secrets), key=len, reverse=True):
+        if secret:
+            value = value.replace(secret, '[redacted]')
+    value = re.sub(r'https?://\S+', '[redacted-url]', value, flags=re.I)
+    value = re.sub(r'(?i)\bBearer\s+\S+', 'Bearer [redacted]', value)
+    value = re.sub(r'''(?i)\b(?:token|password|secret|api[_-]?key|authorization)\b["']?\s*[:=]\s*\S+''',
+                   '[redacted-credential]', value)
+    value = re.sub(r'\b(?:sk-[A-Za-z0-9_-]+|gh[pousr]_[A-Za-z0-9]+)\b', '[redacted]', value)
+    return ''.join(c if ord(c) >= 32 and ord(c) != 127 else ' ' for c in value)[:2048]
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -49,8 +79,9 @@ def validate_launch_profile(profile):
     if profile['cloud'] != 'SECURE' or type(profile['disk']) is not int or not 1 <= profile['disk'] <= 1000:
         raise ValueError('Secure cloud and bounded disk are required')
     dc = profile['dataCenterIds']
-    if not isinstance(dc, list) or len(dc) != 1 or not _text(dc[0]):
-        raise ValueError('Exactly one data center is required')
+    if (not isinstance(dc, list) or not 1 <= len(dc) <= 8 or
+            any(not _text(x) for x in dc) or len(set(dc)) != len(dc)):
+        raise ValueError('One to eight distinct data centers are required')
     if profile['ports'] != []:
         raise ValueError('Inbound ports are disabled for outbound workers')
     env = profile['env']
@@ -99,6 +130,34 @@ class RunpodProvider:
         self._transport = transport
         self._expected_names = expected_names
         self._known = {}
+        self._create_request_id = None
+
+    def _diagnostic(self, kind, status=None, *, headers=None, body=None):
+        secrets = [self._token, *((self._profile or {}).get('env', {}).values())]
+        clean = lambda value: safe_provider_text(value, secrets)
+        request_id = clean((headers or {}).get('x-request-id'))
+        if request_id is not None and not re.fullmatch(r'[A-Za-z0-9_.:-]{1,200}', request_id):
+            request_id = None
+        result = dict(kind=kind, http_status=status, request_id=request_id,
+                      outcome='rejected' if kind == 'http_error' and status in REJECTED_CREATE_STATUSES else 'unknown')
+        if isinstance(body, dict):
+            # Never persist the raw body, validation input/context, arbitrary
+            # headers, request payload, URLs or exception text.
+            for field in ('title', 'detail'):
+                value = clean(body.get(field))
+                if value:
+                    result[field] = value
+            errors = body.get('errors')
+            if isinstance(errors, list):
+                result['validation_messages'] = [clean(e['msg']) for e in errors[:8]
+                    if isinstance(e, dict) and isinstance(e.get('msg'), str)]
+        return result
+
+    @staticmethod
+    def _raise_create(diagnostic):
+        LOGGER.warning('WAN_PROVIDER_CREATE_RESULT %s', json.dumps(diagnostic))
+        error = ProviderCreateRejected if diagnostic['outcome'] == 'rejected' else ProviderCreateUncertain
+        raise error(diagnostic) from None
 
     def _request(self, method, path, data=None):
         if self._transport is None or self._scope is None:
@@ -111,6 +170,8 @@ class RunpodProvider:
         try:
             with self._transport(request, timeout=15) as response:
                 status = response.status
+                if method == 'POST':
+                    self._create_request_id = self._diagnostic('response', status, headers=getattr(response, 'headers', None))['request_id']
                 expected = {'GET': 200, 'POST': 201, 'DELETE': 204}[method]
                 if response.status != expected:
                     raise ValueError('Unexpected status')
@@ -121,18 +182,26 @@ class RunpodProvider:
                     raise ValueError('Oversized response')
                 return json.loads(body)
         except HTTPError as error:
+            diagnostic = None
+            if method == 'POST':
+                body = None
+                try:
+                    raw = error.read(MAX_ERROR_RESPONSE + 1)
+                    if len(raw) <= MAX_ERROR_RESPONSE:
+                        body = json.loads(raw)
+                except (OSError, ValueError, TypeError, RecursionError):
+                    pass
+                diagnostic = self._diagnostic('http_error', error.code, headers=error.headers, body=body)
             error.close()
             if error.code == 404 and path.startswith('/pods/') and method in ('GET', 'DELETE'):
                 return _ABSENT
             if method == 'POST':
-                LOGGER.warning('WAN_PROVIDER_CREATE_UNCONFIRMED %s', json.dumps(
-                    {'kind': 'http_error', 'http_status': error.code}))
+                self._raise_create(diagnostic)
             raise ConnectionError(f'Runpod request failed with HTTP {error.code}') from None
         except (URLError, OSError, ValueError, RecursionError):
             if method == 'POST':
-                # No body, URL, exception text, headers or worker credentials.
-                LOGGER.warning('WAN_PROVIDER_CREATE_UNCONFIRMED %s', json.dumps(
-                    {'kind': 'transport_or_response', 'http_status': status}))
+                self._raise_create(self._diagnostic('transport_or_response', status,
+                    headers={'x-request-id': self._create_request_id}))
             raise ConnectionError('Runpod transport or response failure') from None
 
     def _name(self, batch_id, request_key):
@@ -158,8 +227,13 @@ class RunpodProvider:
         if self._profile is None:
             raise ConnectionError('Runpod launch profile is unavailable')
         name = self._name(batch_id, request_key)
+        self._create_request_id = None
         record = self._request('POST', '/pods', {**self._profile, 'name': name})
-        return Pod(self._bind(record, name), batch_id, request_key)
+        try:
+            return Pod(self._bind(record, name), batch_id, request_key)
+        except ConnectionError:
+            self._raise_create(self._diagnostic('invalid_identity', 201,
+                headers={'x-request-id': self._create_request_id}))
 
     def find(self, batch_id, request_key):
         name = self._name(batch_id, request_key)

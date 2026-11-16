@@ -27,12 +27,19 @@ resetting either consumed scope. This scope authorizes only one new one-second
 validation; later paid stages need measured budgets and separate scoped authority.
 The exporter and isolated fictional one-minute rehearsal are authorized implementation.
 
-Progressive operational release 42b3e993 is installed and verified. The hosted
-one-minute synthetic rehearsal passed in run 43890910756. Repair preparation
-43891758558 completed for project-10088bb273fb41d78399957f2dc8cd83 in EU-RO-1.
-Admission 43892215902 created batch 249c50635ec84ac38cef0eb66232efed, fixed
-deadline 2026-11-16T15:33:20Z. Guard 43892343231 protects launch 43892451814.
-One create was attempted; no allocation has yet been observed. Preserve the
-reservation and unresolved cleanup; do not repeat prepare/admit/launch or deploy
-over the admitted source. Observe through the deadline plus five-minute guard
-window, then reconcile. No fourth create or five-second grant is authorized.
+Progressive operational release 42b3e993 is installed; the hosted one-minute
+synthetic rehearsal passed in run 43890910756. Repair batch
+249c50635ec84ac38cef0eb66232efed consumed its sole POST at 15:04:38 UTC.
+Launch 43892451814 and guard 43892343231 finished with failure, with no Pod ever
+observed. Preserve its reservation and unresolved cleanup. Empty inventory and
+missing billing are not definitive rejection; the original response was lost.
+
+John now explicitly approved finishing PR #76, reconciling that request before
+another submission, allowing multiple eligible data centers under unchanged
+hardware/spending limits, and resuming one second, five seconds, then one minute.
+The fresh validation scope is prepared at $5 total / 1800 seconds / one create /
+one render, but cannot be admitted until all three historical requests are closed.
+Do not ask for the same approval again. Deployment is authorized after the existing
+cleanup gate passes; do not bypass that gate or rewrite a consumed grant. Subsequent
+stages must use measured costs and separate scopes inside the retained limits.
+A provider-support reconciliation inquiry is drafted but has not been sent.

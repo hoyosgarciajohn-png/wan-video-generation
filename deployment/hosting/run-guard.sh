@@ -6,7 +6,8 @@ umask 0077
 case "${WAN_TRIAL:-first}" in
     first) trial_dir=/var/lib/wan/live-trial-20261116 ;;
     diagnostic) trial_dir=/var/lib/wan/diagnostic-trial-20261116 ;;
-        repair) trial_dir=/var/lib/wan/repair-trial-20261116 ;;
+    repair) trial_dir=/var/lib/wan/repair-trial-20261116 ;;
+    validation) trial_dir=/var/lib/wan/validation-trial-20261116 ;;
     *) exit 1 ;;
 esac
 task_dir=$(mktemp -d)
