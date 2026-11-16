@@ -121,10 +121,30 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(self.client.failures, ['render_failed'])
 
     def test_child_failure_classification_never_returns_private_log_text(self):
-        from workers.gpu.worker import process_failure
+        from workers.gpu.worker import process_failure, process_phase
         import io
         self.assertEqual(process_failure(io.BytesIO(b'WAN_STAGE:generation\nCUDA out of memory\nprivate prompt')), 'gpu_out_of_memory')
         self.assertEqual(process_failure(io.BytesIO(b'WAN_STAGE:video_encode\nprivate diagnostic')), 'video_encode_failed')
+        log = io.BytesIO(b'WAN_STAGE:video_decode\nCUDA out of memory\nWAN_STAGE:private prompt\n')
+        self.assertEqual(process_failure(log), 'gpu_out_of_memory')
+        self.assertEqual(process_phase(log), 'video_decode')
+
+    def test_child_oom_phase_survives_journal_and_safe_terminal_log(self):
+        from workers.gpu.worker import execute, RenderProcessFailed
+        import contextlib
+        import io
+        def fails(claim, destination, lease, input_root, weights):
+            execute(['python', '-c', "print('WAN_STAGE:video_decode',flush=True); "
+                     "raise RuntimeError('CUDA out of memory: fictional private diagnostic')"], lease)
+        log = io.StringIO()
+        with patch('workers.gpu.worker.render', side_effect=fails), contextlib.redirect_stderr(log):
+            with self.assertRaises(RenderProcessFailed): self.run_job()
+        failure = json.loads(next(self.root.rglob('failure.json')).read_text())
+        self.assertEqual(failure['phase'], 'video_decode')
+        self.assertEqual(failure['code'], 'gpu_out_of_memory')
+        self.assertNotIn('private diagnostic', log.getvalue())
+        self.assertEqual(json.loads(log.getvalue())['phase'], 'video_decode')
+        self.assertEqual(self.client.failures, ['gpu_out_of_memory'])
 
     def test_invalid_claims_rejected(self):
         mutations = [

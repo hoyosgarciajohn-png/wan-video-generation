@@ -19,20 +19,32 @@ class LeaseLost(RuntimeError):
 
 
 class RenderProcessFailed(RuntimeError):
-    def __init__(self, code):
+    def __init__(self, code, phase=None):
         super().__init__(code)
         self.code = code
+        self.phase = phase
+
+
+def process_tail(log):
+    log.seek(0, os.SEEK_END)
+    log.seek(max(0, log.tell() - 65536))
+    return log.read().decode('utf-8', errors='replace')
+
+
+def process_phase(log):
+    allowed = {'model_load', 'text_encode', 'generation', 'video_decode', 'video_encode'}
+    stages = [line.split(':', 1)[1] for line in process_tail(log).splitlines()
+              if line.startswith('WAN_STAGE:') and line.split(':', 1)[1] in allowed]
+    return stages[-1] if stages else None
 
 
 def process_failure(log):
-    log.seek(0, os.SEEK_END)
-    log.seek(max(0, log.tell() - 65536))
-    tail = log.read().decode('utf-8', errors='replace')
+    tail = process_tail(log)
     if 'CUDA out of memory' in tail or 'torch.OutOfMemoryError' in tail:
         return 'gpu_out_of_memory'
-    stages = [line.split(':', 1)[1] for line in tail.splitlines() if line.startswith('WAN_STAGE:')]
     return {'model_load': 'model_load_failed', 'generation': 'generation_failed',
-            'video_encode': 'video_encode_failed'}.get(stages[-1] if stages else '', 'render_failed')
+            'text_encode': 'generation_failed', 'video_decode': 'generation_failed',
+            'video_encode': 'video_encode_failed'}.get(process_phase(log), 'render_failed')
 
 
 class Lease:
@@ -87,7 +99,7 @@ def execute(command, lease):
                 lease.check()
                 time.sleep(0.1)
             if process.returncode != 0:
-                raise RenderProcessFailed(process_failure(log))
+                raise RenderProcessFailed(process_failure(log), process_phase(log))
             lease.check()
         finally:
             if process.poll() is None:
@@ -227,8 +239,11 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
             except Exception as error:
                 code = error.code if isinstance(error, RenderProcessFailed) else (
                     'output_validation_failed' if stage == 'output_validation' else 'render_failed')
-                atomic_json(failure, {'identity': identity(claim), 'code': code, 'failed_at': stamp()})
-                print(json.dumps({'event': 'wan_attempt_failed', 'code': code}), file=sys.stderr, flush=True)
+                phase = error.phase if isinstance(error, RenderProcessFailed) else stage
+                atomic_json(failure, {'identity': identity(claim), 'code': code,
+                                      'phase': phase, 'failed_at': stamp()})
+                print(json.dumps({'event': 'wan_attempt_failed', 'code': code, 'phase': phase}),
+                      file=sys.stderr, flush=True)
                 try:
                     client.fail(a, code)
                 except Exception:
