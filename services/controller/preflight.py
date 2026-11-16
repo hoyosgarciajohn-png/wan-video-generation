@@ -104,6 +104,25 @@ def _intent(intent, model):
     return result
 
 
+def _published_identity(directory, manifest, image_ref):
+    """Check separate publication evidence without rewriting pre-push build logs."""
+    publication_path = directory / 'publication.json'
+    publication = _json(publication_path)
+    require(isinstance(publication, dict) and publication.get('registry_status') == 'PASS' and
+            publication.get('visibility_after') == 'private' and publication.get('anonymous_access') == 'DENIED' and
+            publication.get('authenticated_manifest') == 'PASS' and publication.get('image') == image_ref and
+            publication.get('source_commit') == manifest.get('source_commit') and
+            publication.get('image_id') == manifest.get('image_id'), 'Publication evidence binding mismatch')
+    registry_path = directory / 'registry-manifest.json'
+    registry = _json(registry_path)
+    registry_digest = 'sha256:' + digest(registry_path)
+    require(publication.get('registry_digest') == registry_digest and image_ref.endswith('@' + registry_digest) and
+            isinstance(registry, dict) and registry.get('schemaVersion') == 2 and
+            isinstance(registry.get('config'), dict) and registry['config'].get('digest') == manifest['image_id'],
+            'Published manifest does not identify the tested image')
+    return dict(publication_sha256=digest(publication_path), registry_manifest_sha256=registry_digest)
+
+
 def _build(directory, image_ref):
     """Validate consistency of existing verifier evidence; never execute its argv."""
     directory = Path(directory).resolve()
@@ -123,6 +142,7 @@ def _build(directory, image_ref):
     commands = manifest.get('executed_commands')
     require(isinstance(commands, list), 'Executed command evidence missing')
     logs = {}
+    recorded_directory = None
     for gate in required:
         items = [item for item in commands if isinstance(item, dict) and item.get('gate') == gate]
         require(len(items) == 1 and manifest.get('gates', {}).get(gate) == 'PASS', 'Image verification gate lacks one executed record')
@@ -134,10 +154,16 @@ def _build(directory, image_ref):
         argv = item.get('argv')
         require(isinstance(argv, list) and all(isinstance(a, str) for a in argv), 'Invalid executed command')
         if gate == 'image_build':
+            # Build paths identify the original runner workspace. Evidence may be
+            # relocated, but every recorded path must retain its original relation.
+            context = Path(argv[-1]) if argv else Path('.')
+            require(context.is_absolute() and context.name == 'context' and '..' not in context.parts,
+                    'Original build context path is invalid')
+            recorded_directory = context.parent
             require(argv[:2] == ['docker','build'] and '--platform' in argv and
                     argv[argv.index('--platform') + 1] == 'linux/amd64' and
-                    '-f' in argv and argv[argv.index('-f') + 1] == str(directory / 'context/workers/gpu/Dockerfile') and
-                    argv[-1] == str(directory / 'context'), 'Executed build did not use the captured GPU context')
+                    '-f' in argv and argv[argv.index('-f') + 1] == str(context / 'workers/gpu/Dockerfile'),
+                    'Executed build did not use the captured GPU context')
         elif gate == 'image_identity':
             require(argv == ['docker','image','inspect', image_id], 'Image inspection must bind the built image ID')
         else:
@@ -147,7 +173,7 @@ def _build(directory, image_ref):
                     'NVIDIA_VISIBLE_DEVICES=void' in argv and 'CUDA_VISIBLE_DEVICES=' in argv, 'Smoke command provenance is incomplete')
             if gate == 'runtime_smoke':
                 require(argv[-2:] == ['/check.py','gpu'] and
-                        f'type=bind,src={directory / "container_smoke.py"},dst=/check.py,readonly' in argv,
+                        f'type=bind,src={recorded_directory / "container_smoke.py"},dst=/check.py,readonly' in argv,
                         'Runtime smoke helper is not bound to evidence')
             else:
                 require(argv[-7:] == ['-m','workers.gpu.cli','fixture','--output-root','/outputs','--result','/outputs/result.json'],
@@ -156,9 +182,11 @@ def _build(directory, image_ref):
     identities = _json(directory / 'image_identity.log')
     require(isinstance(identities, list) and len(identities) == 1 and isinstance(identities[0], dict), 'Invalid image identity record')
     identity = identities[0]
-    require(identity.get('Id') == image_id and identity.get('Architecture') == 'amd64' and identity.get('Os') == 'linux' and
-            image_ref in (identity.get('RepoDigests') or []) and image_ref in manifest.get('repo_digests', []),
-            'Selected registry digest is not in inspected image evidence')
+    require(identity.get('Id') == image_id and identity.get('Architecture') == 'amd64' and identity.get('Os') == 'linux',
+            'Inspected image identity mismatch')
+    publication = {}
+    if not (image_ref in (identity.get('RepoDigests') or []) and image_ref in manifest.get('repo_digests', [])):
+        publication = _published_identity(directory, manifest, image_ref)
     fixture = build_verify.verify_fixture(directory)
     require(fixture == manifest.get('fixture_evidence'), 'Fixture artifact evidence changed')
     runtime = _json(directory / 'runtime_smoke.log')
@@ -166,7 +194,7 @@ def _build(directory, image_ref):
     model = _json(ROOT / 'workers/gpu/model.lock.json')
     require(runtime.get('source_revision') == model['profile']['code_revision'] and runtime.get('runtime_import') == 'PASS',
             'Runtime import evidence does not match pinned Wan source')
-    return dict(manifest_sha256=digest(manifest_path), image_id=image_id, image_ref=image_ref,
+    return dict(manifest_sha256=digest(manifest_path), image_id=image_id, image_ref=image_ref, **publication,
                 log_sha256=logs, fixture_sha256=fixture['asset_sha256'],
                 assurance='local_evidence_consistency_only_not_registry_or_gpu_acceptance')
 
@@ -194,9 +222,9 @@ def evaluate_plan(intent, *, build_evidence=None, approval=None, now=None):
             evidence['image'] = _build(build_evidence, valid_intent['image_ref'])
             gate('built_image_evidence', 'CONSISTENT', 'Registry pull and real GPU behavior remain unverified; this only checks supplied local build evidence.')
         except (OSError, ValueError, TypeError, KeyError, IndexError):
-            gate('built_image_evidence', 'MISSING_OR_INVALID', 'Provide current deployment.build_verify GPU LOCAL_EXECUTION evidence with source/context, command logs, image inspect registry digest and actual fixture output; PASS text alone is insufficient.')
+            gate('built_image_evidence', 'MISSING_OR_INVALID', 'Provide current deployment.build_verify GPU LOCAL_EXECUTION evidence with source/context, command logs, image identity with inspected digest or separately bound publication evidence, and actual fixture output; PASS text alone is insufficient.')
     else:
-        gate('built_image_evidence', 'MISSING_OR_INVALID', 'Build and verify the reviewed GPU image on an explicitly selected compatible host; then supply its evidence directory and immutable registry digest.')
+        gate('built_image_evidence', 'MISSING_OR_INVALID', 'Supply the reviewed published GPU image evidence directory and immutable registry digest after providing the exact deployment intent; existing build records do not establish hosting or Runpod acceptance.')
     if approval is not None and valid_intent:
         try:
             value = _json(approval)
@@ -211,18 +239,18 @@ def evaluate_plan(intent, *, build_evidence=None, approval=None, now=None):
                     isinstance(value['reference'], str) and 0 < len(value['reference']) <= 500, 'Attestation is expired or terms insufficient')
             evidence['owner_attestation'] = dict(sha256=digest(approval), approved_cents=value['approved_cents'],
                 max_runtime_seconds=value['max_runtime_seconds'], expires_at=value['expires_at'], assurance='content_consistency_not_authenticated_authority')
-            gate('owner_attestation', 'CONSISTENT', 'This file is not authenticated spending authority; the live approval verifier is not implemented.')
+            gate('owner_attestation', 'CONSISTENT', 'This file is not authenticated spending authority; installed live signature verification and operator trust remain separate requirements.')
         except (OSError, ValueError, TypeError, KeyError):
             gate('owner_attestation', 'MISSING_OR_INVALID', 'Provide an unexpired owner/project attestation bound to this intent_sha256 with exact USD cap, runtime and approval reference; simulated budget records are not accepted.')
     else:
-        gate('owner_attestation', 'MISSING_OR_INVALID', 'John must choose the specific project, maximum dollar budget and runtime window after reviewing the exact intent; no live approval has been inferred.')
+        gate('owner_attestation', 'MISSING_OR_INVALID', 'The first $5 / 1800-second / one-attempt trial is already approved; bind its documented approval to the exact deployment intent and install authenticated runtime authority. Do not request the same numeric approval again.')
     for name, action in (
         ('live_admission_not_implemented', 'Source now verifies installed signed owner authority and atomically queues live jobs with separate reservations; provision actual operator trust and owner cap/runtime, then install and independently validate the gated live worker/provider coordinator, watchdog and signed billing reconciler. No live transport is installed.'),
-        ('real_worker_bridge_not_implemented', 'Canonical real-profile lifecycle/worker/storage wiring exists only behind an explicit synthetic test authority. Implement authenticated live activation with verified build/config evidence; default WorkerTransport still rejects non-fixture batches.'),
+        ('real_worker_bridge_not_implemented', 'Source includes a live admission/execution coordinator, but the hosted entry point has no installed live transport. Install and verify authenticated activation with actual build/host/storage evidence; default WorkerTransport rejects non-fixture batches.'),
         ('host_storage_acceptance_unverified', 'Select and verify a durable controller/storage host, real TLS endpoint, owner-scoped output retention and disaster recovery; an HTTPS string is not deployment evidence.'),
         ('registry_weights_gpu_unverified', 'Verify registry access to the exact digest, every locked model file on the selected volume, CUDA inference and measured cold/warm behavior on the selected GPU.'),
         ('billing_cleanup_acceptance_unverified', 'Implement authoritative provider usage/final-invoice ingestion, stable receipts and independently observed cleanup; budget estimates are not guaranteed dollar hard stops.'),
-        ('specific_execution_authorization_missing', 'After code and evidence review, obtain explicit approval for the specific benchmark release and capped resource action; this plan cannot launch it.'),
+        ('specific_execution_authorization_missing', 'Preserve the approved first-trial cap and one-attempt envelope; bind the exact reviewed release/resource intent to installed authority after infrastructure acceptance. This plan cannot launch it.'),
     ):
         gate(name, 'BLOCKED', action)
     plan = dict(schema_version=1, mode='PLAN_ONLY', execution_authorized=False, ready_for_live_run=False,

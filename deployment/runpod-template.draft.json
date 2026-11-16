@@ -1,0 +1,42 @@
+{
+  "status": "DRAFT_NOT_CREATED_NOT_LAUNCHABLE",
+  "missing": [
+    "registry credential",
+    "controller HTTPS and live authority",
+    "model/journal mounts",
+    "scoped worker bootstrap credential",
+    "funded account",
+    "verified primary and independent deadline monitors"
+  ],
+  "template_body": {
+    "name": "WAN TI2V5B private worker - deployment pending",
+    "public": false,
+    "serverless": false,
+    "category": "NVIDIA",
+    "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+    "disk": 80,
+    "ports": [],
+    "env": {},
+    "startJupyter": false,
+    "startSsh": false,
+    "allowedCudaVersions": [
+      "12.8"
+    ],
+    "entrypoint": [
+      "python",
+      "-m",
+      "workers.gpu.cli"
+    ],
+    "cmd": [
+      "worker",
+      "--output-root",
+      "/worker",
+      "--weights",
+      "/models",
+      "--result",
+      "/worker/result.json",
+      "--claim-wait-seconds",
+      "60"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-11-16T00:02:14.770073+00:00",
+  "target": "gpu",
+  "source_commit": "e9f37eddf3297695af7f4f2ed5544c17f0885039",
+  "run_id": "43777990153",
+  "run_attempt": "1",
+  "status": "PASS",
+  "removed_unused_sdks": [
+    "/usr/share/dotnet",
+    "/usr/local/lib/android",
+    "/usr/local/share/powershell",
+    "/usr/share/swift",
+    "/usr/lib/jvm",
+    "/opt/hostedtoolcache/CodeQL",
+    "/usr/local/.ghcup"
+  ],
+  "required_free_bytes": 42949672960,
+  "docker_endpoint": "unix:///var/run/docker.sock",
+  "docker_root": "/var/lib/docker",
+  "free_bytes_before": 13522395136,
+  "free_bytes_after": 44157444096,
+  "memory_bytes": 8316895232
+}
