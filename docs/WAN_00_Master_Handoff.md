@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.28 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.29 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -24,18 +24,18 @@ The private Runpod template lehfc5qf3s binds that registry credential to the exa
 published image digest. Template creation does not verify an actual image pull.
 The manual read-only credential probe passed in GitHub Actions run 43784863537.
 This establishes authenticated Pod read access; deletion and shutdown remain unverified.
-John rejected DigitalOcean and additional recurring controller-hosting charges.
-The paid-host proposal is withdrawn; its sign-in tab is closed. The controller
-budget is $0 additional recurring cost. First assess reuse of existing Vercel /
-ChatGPT Sites and Supabase services; connected inventory confirms those services
-already host other projects. This requires backend adaptation and verified spare
-allowances. Oracle Always Free is the persistent-server alternative, subject to
-capacity and ARM acceptance; the existing Windows PC is the fallback. No hosting
-route for Wan is installed or accepted. The prepared
-installer remains amd64-only and must be adapted before an Oracle A1 deployment.
-See deployment/hosting/HOSTING_DECISION.md for the current free-only plan.
+John subsequently approved starting with DigitalOcean Basic Regular bundled:
+1 vCPU, 2 GiB RAM, 50 GiB SSD, $12/month plus weekly backups at $2.40/month,
+total $14.40/month before expected tax. This specific approval replaces the
+free-only controller restriction; the former larger-server proposal remains
+withdrawn. Capacity can be reviewed later, but no priced upgrade is approved.
+The connected browser is at https://cloud.digitalocean.com/login and is retained
+for owner sign-in. Account inventory, regional capacity and checkout remain
+unverified. No server or subscription was created. The existing amd64 installer
+is prepared; actual 2 GiB host performance and installed cleanup need acceptance.
+See deployment/hosting/HOSTING_DECISION.md and digitalocean-controller-proposal.json.
 The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries
-below are chronological; this checkpoint supersedes earlier hosting proposals.
+below are chronological; this checkpoint supersedes earlier hosting directions.
 
 ## Ownership and source of truth
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
@@ -68,27 +68,23 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Command Center: compare reuse of existing Vercel / Sites plus a durable backend
-against the Oracle Always Free and Windows options. Verify incremental cost,
-storage isolation/quotas, independent cleanup and CPU export placement. Do not
-open a new hosting account until the existing services have been assessed.
-If Oracle is selected, verify account capacity and ARM support; if Windows is
-selected, verify WSL, power/network reliability and secure worker access.
-No paid account upgrade or replacement VPS is authorized. Install HTTPS,
-persistent state/restore evidence, live authority and both cleanup layers; then
-verify the exact private image on Runpod within the approved trial.
-John approved $5 total, 30 minutes from admission, one five-second clip and one
-attempt on November 15, 2026. Do not request the same numeric approval again.
-The $10 prepaid balance does not expand the $5 consumption cap.
+Owner: sign in to DigitalOcean in the retained browser page. Command Center:
+inspect existing resources, confirm the exact approved $14.40/month before tax
+configuration and available region, then create the dedicated controller with
+weekly backups. Build Studio off-host; install the reviewed amd64 release,
+HTTPS, persistent state and both cleanup layers. Verify fictional workload memory,
+restart/restore, credential access and cleanup freshness before live authority.
+Do not request the same initial hosting approval again. No larger plan or paid
+add-on is included; capacity upgrades require a concrete later decision.
 
-Remaining inputs: verified free controller host and secure HTTPS reachability;
-controller credential storage and installed authority; model/journal mounts and
-worker bootstrap credential; verified primary plus independent cleanup. The cleanup
-key is stored only in GitHub Actions, not yet on a controller. Recheck compatible
-RTX 4090 capacity and price when ready. Model checksums, Wan CUDA import, inference
-and authoritative application billing collection remain open. The private image
-contains no model weights. Template lehfc5qf3s is saved but not launch-ready;
-no GPU, volume, endpoint or model-download job has been created.
+John's GPU approval remains $5 total, 30 minutes from admission, one five-second
+clip and one attempt. The $10 prepaid balance does not expand that cap. Actual
+Runpod private image download, model checksums, CUDA/Wan inference and authoritative
+billing collection remain open. The private image contains no model weights.
+Template lehfc5qf3s is saved but not launch-ready; model/journal mounts, worker
+bootstrap and installed runtime authority remain pending. No GPU, volume, endpoint
+or model-download job was created. Cleanup credentials are still in GitHub Actions,
+not on a controller. Actual shutdown operation remains unverified.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -795,6 +791,8 @@ No additional payment, recurring host, GPU or storage resource was created.
 
 ## Paid controller proposal withdrawn; free route selected — November 15, 2026
 
+**Historical direction; superseded by the lower-cost DigitalOcean approval below.**
+
 John explicitly rejected DigitalOcean and requested a free alternative. Additional
 recurring controller budget is now $0. The previous $32/month approval request is
 withdrawn. No paid replacement VPS or paid account upgrade is authorized. The
@@ -825,3 +823,31 @@ The approved $5 / 1,800-second / one-attempt GPU trial remains unused.
 Next recipient: Command Center to compare reuse of existing hosting with the free
 server alternatives, verify the chosen route, and complete existing launch gates.
 No existing project data or deployment was changed during the inventory review.
+
+## Lower-cost DigitalOcean approved; account sign-in pending — November 15, 2026
+
+John selected the proposed $12/month Basic Regular bundled server plus weekly
+backups at 20%: $14.40/month before expected tax, one host, 1 vCPU, 2 GiB RAM,
+50 GiB SSD. He intends to consider an upgrade if more capacity is needed. This
+is initial-host authorization, not unlimited future capacity spending. The prior
+free-only rule and larger $24 server proposal are superseded for this purchase.
+
+Current tool discovery found no DigitalOcean management integration. Connected
+Chrome reached the DigitalOcean login form with blank fields. The page is marked
+for owner sign-in. No account inventory, billing state, region capacity, checkout
+or host creation was verified. No server, paid subscription, credential, volume,
+GPU or model download was created. No other project was changed.
+
+Prepared a non-executable exact configuration in
+ deployment/hosting/digitalocean-controller-proposal.json and revised installation
+instructions: off-host Studio build, one-at-a-time exports, actual memory/disk and
+cleanup acceptance before GPU use, no automatic upgrades. The current fixture
+export profile is 320x180; production-quality long-form exports are not established
+by choosing this host. Source behavior and contract 0.1.0 are unchanged.
+
+Baseline remote main c5e6a5687802c9f137cf19ad34a819b36aaef498 / PR #50.
+Validation: JSON amounts/scope/status and handoff consistency, plus whitespace.
+Existing runtime tests were retained without repetition. The $5 / 1,800-second /
+one-attempt trial remains unused. No DigitalOcean charge was initiated here.
+Next recipient: owner for sign-in, then Command Center for actual host provisioning,
+installation and acceptance. No repeat numeric hosting approval is required.

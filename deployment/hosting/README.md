@@ -4,27 +4,23 @@ Updated November 15, 2026 (owner local date). **Not deployed.** Runpod has $10
 prepaid credit, zero observed Pods, saved private registry credential wan-ghcr-pull,
 and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions;
 its Pod read access passed run 43784863537. No credential is installed on a
-controller. John rejected paid controller hosting. The DigitalOcean proposal is
-withdrawn and its sign-in tab is closed. Controller hosting must add $0 recurring
-cost. First assess reuse of existing Vercel / ChatGPT Sites and Supabase services.
-The current backend needs adaptation for those runtimes. Oracle Always Free is
-the persistent-server alternative, subject to capacity and ARM compatibility;
-the existing Windows PC is the fallback. No route is installed or accepted.
-See [the hosting decision](HOSTING_DECISION.md).
+controller. John approved one DigitalOcean Basic Regular bundled server: 1 vCPU,
+2 GiB RAM, 50 GiB SSD, $12/month plus $2.40/month weekly backups, before tax.
+This replaces the earlier free-only direction. Account access is currently blocked
+at the DigitalOcean sign-in page; no server was created or installed.
+See [the approved hosting decision](HOSTING_DECISION.md) and
+[non-executable configuration](digitalocean-controller-proposal.json).
 
-## Prepared deployment shape and portability gap
+## Approved starting deployment shape
 
-Use a Linux amd64 CPU host with Python 3.11+, Node 22 for the Studio build, Git,
-FFmpeg/ffprobe, persistent disk and Caddy TLS. Start with 2 vCPU, 4 GB RAM and
-40 GB disk for the trial. This is not a capacity claim for 30-minute production
-exports. Retain a complete reviewed Git checkout for source-bound admission;
-the earlier local-staging container does not contain that checkout.
-
-This describes the existing **amd64** source package, not an approved paid host.
-The installer currently rejects ARM. Oracle A1 requires a reviewed portability
-change and actual ARM dependency, FFmpeg, service and recovery acceptance before
-use. The Runpod GPU image remains amd64. Windows hosting similarly requires WSL,
-persistence, secure worker reachability and power/sleep verification.
+Use Linux amd64 with Python 3.11+, Git, FFmpeg/ffprobe, persistent disk and Caddy
+TLS. Build Studio with Node 22 outside the small host. Keep the full reviewed Git
+checkout for source-bound admission; the earlier staging container lacks it.
+The selected 1 vCPU / 2 GiB / 50 GiB configuration still needs actual memory,
+load and recovery acceptance. It is not a verified capacity claim for 30-minute
+production exports. Existing exports run one at a time; measure upload concurrency
+and keep the independent cleanup process healthy under load. Do not automatically
+upgrade capacity or add storage. The current amd64 installer fits this architecture.
 
 The new Waitress 3.0.2 WSGI adapter binds only to 127.0.0.1:8080, behind Caddy.
 It preserves strict Host/Origin checks, secure cookies, scoped media, bounded
@@ -38,8 +34,9 @@ before the GPU trial. There is no public provider-create HTTP endpoint.
 ## Install on an approved host
 
 1. Check out the reviewed release under `/opt/wan/current`; create a dedicated
-   `wan` service user and `/var/lib/wan` owned by it. Build Studio with `npm ci`
-   and `npm run build` in `apps/studio`. Verify installed FFmpeg/ffprobe.
+   `wan` service user and `/var/lib/wan` owned by it. Build Studio off-host with `npm ci`
+   and `npm run build` in `apps/studio`, then transfer the verified output.
+   Verify installed FFmpeg/ffprobe.
 2. Create `/opt/wan/venv` and install
    `python -m pip install --require-hashes --only-binary=:all: -r deployment/hosting/requirements.lock`.
 3. Provision `/etc/wan/controller.env` from the example and install the existing
@@ -105,7 +102,7 @@ approved **fresh dedicated Linux amd64/systemd host**. Before running it:
 2. Create the dedicated `wan` system user/group. Place the complete reviewed
    checkout at `/opt/wan/current`, checked out to the exact merged release SHA.
    Do not give the service user write access to source or the virtual environment.
-   Build Studio from package-lock with Node 22, preferably on the build host.
+   Build Studio from package-lock with Node 22 on the build host.
    Copy verified build assets to apps/studio/dist. No live credential belongs in
    the source checkout or cloud-init/user-data.
 3. Install the hash-locked hosting dependencies into `/opt/wan/venv`. Create
@@ -133,9 +130,9 @@ web app remains fixture-only, and no provider creation route is enabled.
 
 ## Inputs still required
 
-- Host spending decision and account access; final capacity/price and tax must be
-  checked after sign-in before purchase. Existing suitable servers may avoid a
-  new charge but must be inspected for capacity and workload isolation first.
+- DigitalOcean account sign-in; the $14.40/month pre-tax configuration is already
+  approved. Inspect existing resources and verify actual capacity/checkout price
+  and expected tax before creation. Do not repeat the initial approval request.
 - Approved hostname and DNS control; no domain purchase is included.
 - Host-side operator and cleanup credentials and installed live authority.
 - Off-host recovery arrangement, monitor acceptance, exact image pull and model setup.

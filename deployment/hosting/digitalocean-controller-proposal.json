@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_AWAITING_ACCOUNT_SIGN_IN",
+  "executable": false,
+  "owner": "John Hoyos",
+  "approval_date_local": "2026-11-15",
+  "approval_timezone": "America/New_York",
+  "approval_text": "Lets start with this option and if we need more capacity then we can upgrade.",
+  "provider": "digitalocean",
+  "resource_type": "cpu_droplet",
+  "quantity": 1,
+  "name": "wan-controller-01",
+  "plan_family": "Basic Regular bundled",
+  "architecture": "amd64",
+  "image_preference": "Ubuntu 24.04 LTS",
+  "vcpu": 1,
+  "memory_mib": 2048,
+  "disk_gib": 50,
+  "included_outbound_transfer_gib_per_month": 2000,
+  "monthly_base_usd_cents": 1200,
+  "backup": {
+    "enabled": true,
+    "plan": "weekly_percentage",
+    "percentage": 20,
+    "monthly_usd_cents": 240
+  },
+  "monthly_subtotal_before_tax_usd_cents": 1440,
+  "expected_tax_additional": true,
+  "provider_hard_account_spending_cap": false,
+  "automatic_capacity_upgrade": false,
+  "region": null,
+  "droplet_id": null,
+  "public_origin": null,
+  "created": false,
+  "installed_runtime_authority": false,
+  "paid_gpu_dispatch_enabled": false,
+  "checkout_requirements": [
+    "Inspect existing account resources to avoid duplication",
+    "Match exact bundled plan and weekly percentage-based backups",
+    "Confirm displayed recurring price and expected tax; do not substitute higher-priced plans",
+    "No extra volume, managed database, domain purchase or paid builder"
+  ],
+  "acceptance_pending": [
+    "Account access and regional availability",
+    "Scoped host administration and HTTPS hostname",
+    "Controller installation with disarmed startup",
+    "2 GiB host memory/disk behavior under fictional workload",
+    "Restart persistence and consistent off-host restore",
+    "Primary cleanup and independent deadline guard",
+    "Installed live authority and worker bootstrap",
+    "Actual Runpod private image pull, Wan inference and shutdown",
+    "Authoritative billing collection"
+  ],
+  "gpu_trial_unchanged": {
+    "total_usd_cents": 500,
+    "runtime_seconds": 1800,
+    "render_attempts": 1,
+    "pod_create_attempts": 1,
+    "unused": true
+  }
+}
