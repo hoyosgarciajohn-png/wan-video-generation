@@ -208,7 +208,8 @@ def _inspect_live_admission(db, names, projects):
                 isinstance(envelope['key_id'], str) and bool(envelope['key_id']) and hex_hash(envelope['signature']),
                 'Malformed signed approval history')
         grant = envelope['payload']
-        require(isinstance(grant, dict) and set(grant) in (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'}) and
+        from services.controller.live_admission import GRANT_SHAPES
+        require(isinstance(grant, dict) and set(grant) in GRANT_SHAPES and
                 (grant['id'],grant['owner'],grant['project']) == (identity,owner,project) and grant['currency'] == 'USD' and
                 type(grant['approved_cents']) is int and 0 < grant['approved_cents'] <= 2**53-1 and
                 type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= 3600,
@@ -219,7 +220,7 @@ def _inspect_live_admission(db, names, projects):
         timestamp(grant['valid_until'])
         require(isinstance(grant['source_sha256'], dict) and bool(grant['source_sha256']) and
                 all(isinstance(k,str) and hex_hash(v) for k,v in grant['source_sha256'].items()), 'Invalid signed source inventory')
-        config_hash = configuration_hash(grant['profile'], grant['launch_profile'])
+        config_hash = configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'))
         launch = validate_launch_profile(grant['launch_profile'])
         require(launch['env'] == {} and launch['image'] == grant['profile']['image_ref'] and
                 launch['gpu']['id'] == grant['profile']['gpu_type'] and launch['gpu']['count'] == 1 and
@@ -302,9 +303,15 @@ def _inspect_live_admission(db, names, projects):
             require(isinstance(history,list) and len(history) <= (policy['max_attempts'] if policy else 0),
                     'Allocation history exceeds signed policy')
             for index,event in enumerate(history):
+                plan = approvals[approval][2].get('allocation_plan')
+                fields = {'attempt','started_at'} | ({'candidate'} if plan else set())
                 require(isinstance(event,dict) and type(event.get('attempt')) is int and event['attempt'] == index+1 and
-                        set(event) in ({'attempt','started_at'}, {'attempt','started_at','result','finished_at'}),
+                        set(event) in (fields, fields | {'result','finished_at'}),
                         'Invalid allocation audit event')
+                if plan:
+                    require(type(event['candidate']) is int and 0 <= event['candidate'] < len(plan['candidates']) and
+                            event['candidate'] not in {h['candidate'] for h in history[:index]},
+                            'Invalid or repeated allocation candidate')
                 timestamp(event['started_at'])
                 if 'result' in event:
                     require(isinstance(event['result'],dict), 'Invalid allocation result')

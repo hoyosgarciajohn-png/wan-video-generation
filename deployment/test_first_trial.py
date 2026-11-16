@@ -211,6 +211,35 @@ class FirstTrialGates(unittest.TestCase):
             value['dataCenters'][0]['availability']='NONE'
             with self.assertRaises(AssertionError):first_trial.checked_quote(selected)
 
+    def test_allocation_scope_keeps_limits_and_five_prior_scopes(self):
+        first_trial.select_trial('fallback')
+        previous=(first_trial.TRIAL,first_trial.AUTH,first_trial.APPROVAL_ID)
+        first_trial.select_trial('allocation')
+        self.assertTrue(all(a!=b for a,b in zip(previous,(first_trial.TRIAL,first_trial.AUTH,first_trial.APPROVAL_ID))))
+        self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),5)
+        self.assertEqual(str(first_trial.HOURLY_CEILING),'4.50')
+        self.assertTrue(first_trial.MULTI_GPU and first_trial.ALLOW_KNOWN_UNKNOWN)
+        self.assertEqual(first_trial.DURATION_MS,1000)
+
+    def test_allocation_quotes_rank_capacity_and_preserve_admitted_plan(self):
+        first_trial.select_trial('allocation')
+        def gpu(identity,price,stock,locations):
+            return dict(id=identity,secure=True,availability=stock,price=dict(secure=price),
+                        dataCenters=[dict(id=x,availability='LOW') for x in locations])
+        values=dict(gpus=[gpu('NVIDIA A100-SXM4-80GB',2.19,'LOW',['fictional-a']),
+                          gpu('NVIDIA H100 80GB HBM3',4.39,'MEDIUM',['fictional-b','fictional-c']),
+                          gpu('NVIDIA H100 NVL',4.51,'LOW',['fictional-d'])])
+        with patch.object(first_trial,'catalog_snapshot',return_value=values):
+            selected=first_trial.checked_quote()
+            self.assertEqual(selected['gpu'],'NVIDIA H100 80GB HBM3')
+            self.assertEqual(len(selected['allocation_plan']['candidates']),2)
+            frozen=json.loads(json.dumps(selected['allocation_plan']))
+            values['gpus'][1]['availability']='NONE'
+            self.assertEqual(first_trial.checked_quote(frozen)['allocation_plan'],frozen)
+            self.assertFalse(first_trial.candidate_available(frozen['candidates'][0],450))
+            values['gpus'][0]['price']['secure']=4.51
+            with self.assertRaises(AssertionError):first_trial.checked_quote(frozen)
+
     def test_guard_receipt_is_bound_and_fresh(self):
         with tempfile.TemporaryDirectory() as t, patch.object(first_trial,'TRIAL',Path(t)):
             job={'batch':'fictional-batch','scope':canonical(['fictional-owner','fictional-project']), 'deadline':int(time.time())+600}
