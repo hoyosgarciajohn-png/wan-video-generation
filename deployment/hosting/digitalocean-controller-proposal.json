@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "APPROVED_AWAITING_SSH_ACCESS_CONFIRMATION",
+  "status": "HOST_CREATED_INSTALLATION_PENDING",
   "executable": false,
   "owner": "John Hoyos",
   "approval_date_local": "2026-11-15",
@@ -22,7 +22,8 @@
     "enabled": true,
     "plan": "weekly_percentage",
     "percentage": 20,
-    "monthly_usd_cents": 240
+    "monthly_usd_cents": 240,
+    "enabled_verified": true
   },
   "monthly_subtotal_before_tax_usd_cents": 1440,
   "expected_tax_additional": true,
@@ -39,14 +40,15 @@
   "host_access": {
     "key_name": "wan-controller-deploy",
     "fingerprint": "SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA",
-    "public_key_registered": false,
-    "private_key_secret_installed": false,
+    "public_key_registered": true,
+    "private_key_secret_installed": true,
     "proposed_secret_destination": "hoyosgarciajohn-png/wan-video-generation:WAN_HOST_SSH_KEY",
-    "action_time_confirmation_pending": true
+    "action_time_confirmation_pending": false,
+    "approval_text": "yes"
   },
-  "droplet_id": null,
+  "droplet_id": 619703894,
   "public_origin": null,
-  "created": false,
+  "created": true,
   "installed_runtime_authority": false,
   "paid_gpu_dispatch_enabled": false,
   "checkout_requirements": [
@@ -56,7 +58,7 @@
     "No extra volume, managed database, domain purchase or paid builder"
   ],
   "acceptance_pending": [
-    "Dedicated SSH access confirmation and server creation",
+    "Cloud runner SSH access and host identity recording",
     "Scoped host administration and HTTPS hostname",
     "Controller installation with disarmed startup",
     "2 GiB host memory/disk behavior under fictional workload",
@@ -72,5 +74,7 @@
     "render_attempts": 1,
     "pod_create_attempts": 1,
     "unused": true
-  }
+  },
+  "ipv4": "64.225.114.46",
+  "temporary_hostname": "wan-64-225-114-46.sslip.io"
 }
