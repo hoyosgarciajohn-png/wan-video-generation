@@ -37,6 +37,11 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
+      - name: Install media decoder for independent recovery
+        if: inputs.operation == 'recovery' || inputs.operation == 'recovery-copy'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Inspect, install or verify exact approved host
         env:
           WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
