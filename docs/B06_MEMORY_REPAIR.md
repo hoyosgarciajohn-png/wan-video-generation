@@ -1,4 +1,4 @@
-# B06 memory repair candidate — GPU validation pending
+# B06 memory repair — image verified, GPU validation pending
 
 The November 16 one-second diagnostic failed with `gpu_out_of_memory`. No take was
 saved. It reached a captured 39/50 sampling steps; the exact failing allocation and
@@ -43,11 +43,18 @@ upstream/CUDA compatibility, a successful video, or improved creative quality.
 
 ## Release boundary
 
-This is a source candidate only: not built, published, installed or GPU-validated.
-The installed worker image is still the diagnostic image ending `f993b`.
-Changed worker sources invalidate its source-bound build evidence. Before another
-trial, build and attest a new immutable private image, finish source review, and
-prepare a fresh isolated runtime grant. Both earlier attempts are consumed.
+PR #69 merged as `2e1676f2d1d2c77f06e5814b8af923f6151b8342`. Run
+43864992211 built and published the repaired image privately. Its immutable digest is
+`sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50`.
+Build, identity, offline runtime, synthetic-video decode, source/log checksums and
+private authenticated registry checks pass. See
+[full evidence](../deployment/evidence/2026-11-16-memory-repair-build/README.md).
+
+This is not GPU acceptance or a verified OOM fix. Runpod download and actual CUDA
+execution for this digest remain unverified. The controller remains at `8e07ba3`
+and both consumed trial records still identify their original images. A later trial
+requires matching reviewed host source and a fresh isolated runtime grant; neither
+historical grant may be reset or reused.
 No third Pod create or render is authorized. Do not reset either historical job,
 change its deadline or reuse an existing grant. Keep current billing liabilities.
 

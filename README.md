@@ -45,14 +45,19 @@ records the initial hosted release and resource/cost. Later [access and recovery
 
 ## Current continuation status
 
-[Resumed deployment](deployment/evidence/2026-11-16-resumed-deployment/README.md)
-installed failure-handling and backup compatibility fixes. Final host verification
-passed, owner browser access works and no Runpod Pods are active. The first trial
-failed without output; automatic deadline deletion passed, and its one-attempt
-approval is consumed. Billing observations are provisional and the remaining
-reservation is retained. [The new private worker](deployment/evidence/2026-11-16-private-rebuild/README.md)
-passed build/runtime/fixture and registry checks; its Runpod pull and CUDA render
-are still unverified. [A one-second diagnostic proposal](deployment/diagnostic-trial-proposal.json)
-is disabled pending new specific owner approval. The public Studio still uses
-synthetic rendering. See the master handoff for exact installed/build/verification
-commits and outstanding operational work.
+The controller, owner sign-in and synthetic recovery are verified. Two bounded live
+attempts are consumed: the first failed without a detailed cause; the one-second
+diagnostic confirmed GPU out of memory. Both Pods were automatically deleted, and
+the independent deadline guard completed. No real Wan video has been saved yet.
+Prior billing observations remain provisional and reservations are retained.
+
+[The memory repair](docs/B06_MEMORY_REPAIR.md) is merged. Its
+[new private image](deployment/evidence/2026-11-16-memory-repair-build/README.md)
+passed build, offline runtime, synthetic-video, source/log integrity and private
+registry checks in run 43864992211. This verifies the image artifact, not CUDA
+memory fit or a successful Wan render. No new GPU trial or controller deployment
+was performed. A later trial needs separate owner approval and fresh isolated
+host/job authority. Public Studio rendering remains synthetic.
+
+See the [master handoff](docs/WAN_00_Master_Handoff.md) for exact identities and
+remaining deployment, billing and operational work.

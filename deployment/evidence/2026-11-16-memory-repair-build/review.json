@@ -1,0 +1,30 @@
+{
+  "reviewed_at": "2026-11-16T12:24:03.744577+00:00",
+  "run_id": 43864992211,
+  "artifact_id": 14225002489,
+  "artifact_zip_sha256": "8cd4f536078b3fed012de9f53616b089d3688556c63f25123e526c78ca318c4c",
+  "source_commit": "2e1676f2d1d2c77f06e5814b8af923f6151b8342",
+  "source_inventory_matches_current_worker": true,
+  "log_hashes_verified": 4,
+  "fixture_checksum": "PASS",
+  "downloaded_fixture_decode": "PASS",
+  "offline_build_consistency_verifier": "PASS",
+  "registry_digest": "sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50",
+  "registry_visibility": "private",
+  "anonymous_registry_access": "DENIED",
+  "runpod_pull": "UNVERIFIED",
+  "gpu_inference": "UNVERIFIED",
+  "manifest_sha256": "b980738d91f5d5870be6061ff8306137b931109a43c8cb52247e1d2b71d5cb18",
+  "image_id": "sha256:423869b663a14557115ada15e6f8ed5a7fc7935a76a38379c1eb929d1db330c3",
+  "image_ref": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50",
+  "publication_sha256": "8645d915e53ed9ae0715d1ae0feadb5a4cfde65a95e177dbe3ea78791cbcc360",
+  "registry_manifest_sha256": "sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50",
+  "log_sha256": {
+    "image_build": "37d687c66c6df65ed658d57512e5e6be96b36d2955b268c2582347592d4e5d04",
+    "image_identity": "6d0e31229b9177c106453e4708b531119f8500865c0141416a7cdf413c085281",
+    "runtime_smoke": "9a6ca20c5f03e0a72f0e4e20ce622247fae3f41d08f0417412cc6ac478fbcb55",
+    "fixture_smoke": "86a88dd4ec20de59459fe0a2896d0af005d91f59ede5aef55c8546dcc74f0e5e"
+  },
+  "fixture_sha256": "63f8cba3f302ad274ba4c8ed16c375ce0cd05130aa09482dd4be3f9f8bb0b8cd",
+  "assurance": "local_evidence_consistency_only_not_registry_or_gpu_acceptance"
+}
