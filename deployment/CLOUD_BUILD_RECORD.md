@@ -34,19 +34,16 @@ four command logs and output hashes were verified after artifact download.
 The original image existed only on the temporary runner and was not published.
 A local image content ID is not an available registry digest.
 
-## Next deployment work
+## Current deployment work
 
-1. Publish the verified image privately, capture its registry digest, and verify
-   an authenticated pull. Keep credentials out of source and evidence.
-2. Verify controller HTTPS, durable storage, independent watchdog and actual
-   installed authority before using the approved $5 / 1,800-second / one-attempt
-   Runpod trial. The trial has not been used.
+Private publication is complete; see the latest record below. Runpod's actual
+layer download is still unverified. Finish the private pull credential, funded
+account, approved controller host, HTTPS/storage and installed live authority
+plus both cleanup monitors before using the approved $5 / 1,800-second /
+one-attempt trial. The trial remains unused.
 
-GitHub Container Registry is a suitable next candidate: its official billing
-page currently states that container image storage and bandwidth are free,
-including private images. New packages default to private. This is a researched
-option, not a registry already configured for Runpod. External private pulls
-require scoped credentials; no new token or broader access was created here.
+GHCR publication used the workflow's temporary GITHUB_TOKEN. External Runpod
+pulls require a separately provisioned scoped credential; none has been installed.
 
 Sources reviewed November 15, 2026:
 - https://docs.github.com/en/billing/concepts/product-billing/github-packages
@@ -81,3 +78,31 @@ At the pre-dispatch billing review, $4.91 included compute and 0.5 GB artifact
 allowance remained, with $0 billable Actions usage and an existing $0 paid budget.
 Only small artifacts were retained for one day. These are allowance observations,
 not a finalized post-run bill. No billing limit, plan or subscription was changed.
+
+
+## Private publication accepted — November 16 UTC
+
+[Run 43777990153](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43777990153)
+completed successfully in 12 minutes 28 seconds on source
+`e9f37eddf3297695af7f4f2ed5544c17f0885039` (PR #42). This publication workflow has
+50-minute job, 30-minute build and 17-minute push/verification limits. It uses the
+existing standard CPU runner and never receives a Runpod credential or GPU.
+The tested image is now retained privately:
+
+`ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2`
+
+Private visibility, denied anonymous access and authenticated registry manifest/
+config verification passed. Registry config matches tested Docker image ID
+`sha256:a613ab8cf437275833720e431538d87df9164e31bdf7509733cd6f1fcce9f5d0`.
+Compressed layers are 5,220,107,260 bytes without model weights. Runpod layer
+pull remains unverified. Original build/publication evidence and fixture bytes
+are retained in `deployment/evidence/2026-11-15-private-publication`; all 32 source
+files, four log hashes, helper hashes, image identity and fixture checksum matched,
+and the actual downloaded synthetic fixture fully decoded.
+
+PR #43 prepared the production WSGI host and two cleanup layers. Their source
+checks pass, but no host, TLS, storage recovery or shutdown service is installed.
+Runpod currently shows zero balance and no private registry credential. The
+minimum top-up displayed is $10; none was submitted. No GPU, network volume,
+hosting subscription or paid builder was purchased. Final post-run GitHub billing
+was not retrieved. The approved $5 / 30-minute / one-attempt trial is unused.

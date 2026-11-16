@@ -2,6 +2,8 @@
 from copy import deepcopy
 from datetime import timedelta
 import json
+import hashlib
+import shutil
 from pathlib import Path
 import tempfile
 import unittest
@@ -127,8 +129,31 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(self.gate(plan, 'built_image_evidence'), 'CONSISTENT')
         self.assertFalse(plan['ready_for_live_run'])
         self.assertIn('local_evidence_consistency_only', plan['evidence']['image']['assurance'])
+        relocated = self.root / 'relocated-evidence'
+        shutil.copytree(directory, relocated)
+        self.assertEqual(self.gate(self.evaluate(build_evidence=relocated), 'built_image_evidence'), 'CONSISTENT')
         (directory / 'runtime_smoke.log').write_text('modified')
         self.assertEqual(self.gate(self.evaluate(build_evidence=directory), 'built_image_evidence'), 'MISSING_OR_INVALID')
+
+    def test_separate_private_publication_must_match_build_and_manifest_bytes(self):
+        image_id = 'sha256:' + 'b' * 64
+        manifest = {'source_commit': 'c' * 40, 'image_id': image_id}
+        raw = json.dumps({'schemaVersion': 2, 'config': {'digest': image_id}}).encode()
+        digest = 'sha256:' + hashlib.sha256(raw).hexdigest()
+        image_ref = 'ghcr.io/fictional/image@' + digest
+        publication = dict(registry_status='PASS', visibility_after='private', anonymous_access='DENIED',
+                           authenticated_manifest='PASS', image=image_ref, source_commit=manifest['source_commit'],
+                           image_id=image_id, registry_digest=digest)
+        (self.root / 'registry-manifest.json').write_bytes(raw)
+        path = self.root / 'publication.json'
+        path.write_text(json.dumps(publication))
+        self.assertEqual(preflight._published_identity(self.root, manifest, image_ref)['registry_manifest_sha256'], digest)
+        for changes in ({'visibility_after': 'public'}, {'image_id': 'sha256:' + 'a' * 64}, {'source_commit': 'd' * 40}):
+            path.write_text(json.dumps(dict(publication, **changes)))
+            with self.assertRaises(ValueError): preflight._published_identity(self.root, manifest, image_ref)
+        path.write_text(json.dumps(publication))
+        (self.root / 'registry-manifest.json').write_bytes(raw + b' ')
+        with self.assertRaises(ValueError): preflight._published_identity(self.root, manifest, image_ref)
 
     def test_malformed_evidence_shapes_are_actionable_failures(self):
         directory = self.root / 'bad-evidence'

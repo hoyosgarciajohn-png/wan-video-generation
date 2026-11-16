@@ -1,0 +1,16 @@
+{
+  "reviewed_at": "2026-11-16T00:19:21.823046+00:00",
+  "run_id": 43777990153,
+  "artifact_id": 14187433438,
+  "artifact_zip_sha256": "e5f2bf648e324dc384521b51f9514f168afe81db91515a70bb72b0d3993a1bb3",
+  "source_inventory_matches_current_checkout": true,
+  "source_files": 32,
+  "log_hashes_verified": 4,
+  "registry_config_matches_tested_image": true,
+  "fixture_checksum": "PASS",
+  "downloaded_fixture_decode": "PASS",
+  "offline_build_consistency_verifier": "PASS",
+  "registry_digest": "sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+  "runpod_pull": "UNVERIFIED",
+  "gpu_inference": "UNVERIFIED"
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "as_of": "2026-11-15",
-  "evidence_type": "observed_cloud_builds_and_offline_container_checks",
+  "as_of": "2026-11-16",
+  "evidence_type": "observed_cloud_builds_private_publication_and_offline_checks",
   "local_tools": {
     "docker": "NOT_FOUND",
     "podman": "NOT_FOUND",
@@ -21,25 +21,33 @@
     "cpu_image_fixture_smoke": "PASS",
     "wan_source_syntax": "PASS",
     "wan_cuda_import": "UNVERIFIED",
-    "registry_publication_and_pull": "UNVERIFIED"
+    "registry_publication_and_pull": "UNVERIFIED",
+    "private_registry_publication": "PASS",
+    "authenticated_registry_manifest": "PASS",
+    "anonymous_registry_access": "DENIED",
+    "runpod_image_pull": "UNVERIFIED",
+    "hosting_source_checks": "PASS",
+    "installed_shutdown_services": "UNVERIFIED"
   },
   "image_ids": {
     "cpu": "sha256:b3d35b89b04d8e093ca9de9d96757ae70f69df13d27c1ffa3e54a78343d11fc3",
-    "gpu": "sha256:675bc872719b715352ccb0f55fc1ad6ed9936bca36a509d1d932dfda1d677fe2"
+    "gpu": "sha256:a613ab8cf437275833720e431538d87df9164e31bdf7509733cd6f1fcce9f5d0"
   },
   "remote_ci_triggered": true,
   "provider_spend": 0,
-  "note": "Actual images built and checked on disposable GitHub CPU runners. Downloaded source/log/image/output evidence verified; synthetic clips fully decoded. Image IDs are local content IDs, not available registry digests. No model weights, CUDA inference, Runpod resource or production deployment. Existing $0 Actions paid budget was not changed.",
+  "note": "Private worker image published to GHCR. Manifest/config match tested image; anonymous access denied. Actual Runpod pull, model/CUDA inference, controller hosting and installed shutdown remain unverified. No Runpod resources, top-up or paid builder purchased; approved $5 / 1800s / one-attempt trial unused.",
   "evidence": {
     "cpu": "deployment/evidence/2026-11-15-cpu-final",
     "gpu": "deployment/evidence/2026-11-15-gpu-final",
     "cpu_run_id": 43773935725,
-    "gpu_run_id": 43774509988
+    "gpu_run_id": 43774509988,
+    "private_publication": "deployment/evidence/2026-11-15-private-publication",
+    "publication_run_id": 43777990153
   },
   "gpu_runtime_import_scope": "torch_and_flash_attn_only",
   "registry_digests": {
     "cpu": null,
-    "gpu": null
+    "gpu": "sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2"
   },
   "paid_builder_purchased": false
 }
