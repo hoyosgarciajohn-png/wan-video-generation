@@ -5,7 +5,7 @@ on:
       trial:
         description: Exact approved trial scope for readiness receipt
         type: choice
-        options: [first, diagnostic]
+        options: [first, diagnostic, repair]
         default: first
         required: true
       scope:

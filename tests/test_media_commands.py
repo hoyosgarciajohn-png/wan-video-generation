@@ -11,7 +11,7 @@ from services.controller.commands import RenderCommands
 from services.controller.export_runner import ExportRunner
 from services.controller.media_commands import MediaCommands
 from services.controller.runner import FixtureRunner
-from services.controller.service import ControlService
+from services.controller.service import ControlService, canonical
 from services.controller.studio import StudioWorkspace, StudioConflict
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -126,6 +126,37 @@ class MediaCommandTests(unittest.TestCase):
         self.assertEqual(self.media.export(self.owner, self.project, export_request)['export'], job)
         self.assertFalse(ExportRunner(restarted).tick())
         self.assertEqual(len([a for a in bundle['assets'] if a['id'] == output['id']]), 1)
+
+    def test_hd_export_and_legacy_snapshot_keep_their_own_resolution(self):
+        audio, take, state = self.ready()
+        assembled = self.media.assemble(self.owner, self.project, dict(
+            expected_revision=state['revision'], idempotency_key='hd-timeline', audio_asset_id=audio['id']))
+        request = dict(timeline_id=assembled['timeline']['id'], timeline_revision=1, idempotency_key='hd-export')
+        queued = self.media.export(self.owner, self.project, request)['export']
+        self.assertEqual((queued['profile']['width'],queued['profile']['height']),(1280,704))
+        self.assertTrue(ExportRunner(self.control).tick())
+        bundle = self.control.bundle(self.owner,self.project)
+        output = next(a for a in bundle['assets'] if a['id']==bundle['exports'][0]['output_asset_id'])
+        path=self.control.asset_root/output['object_key']
+        ExportRunner.verify(path,assembled['timeline'],queued['profile'])
+        legacy=deepcopy(queued['profile']); legacy.update(width=320,height=180)
+        with self.assertRaises(ValueError): ExportRunner.verify(path,assembled['timeline'],legacy)
+        subprocess.run(['ffmpeg','-nostdin','-v','error','-xerror','-i',str(path),'-f','null','-'],check=True)
+        # Simulate an old persisted queued job; upgrading must not rewrite it.
+        old=self.media.export(self.owner,self.project,dict(request,idempotency_key='old-queued'))['export']
+        with self.control.transaction() as db:
+            saved=self.control._load(db,self.owner,self.project)
+            next(e for e in saved['exports'] if e['id']==old['id'])['profile']=legacy
+            self.control._save(db,saved)
+            db.execute('UPDATE export_jobs SET snapshot=? WHERE id=?',(canonical(saved),old['id']))
+        self.assertTrue(ExportRunner(self.control).tick())
+        bundle=self.control.bundle(self.owner,self.project)
+        old_job=next(e for e in bundle['exports'] if e['id']==old['id'])
+        self.assertEqual(old_job['state'],'succeeded')
+        output=next(a for a in bundle['assets'] if a['id']==old_job['output_asset_id'])
+        ExportRunner.verify(self.control.asset_root/output['object_key'],assembled['timeline'],legacy)
+        with self.assertRaises(ValueError):
+            ExportRunner.verify(self.control.asset_root/output['object_key'],assembled['timeline'],queued['profile'])
 
     def test_assembly_requires_selection_and_export_project_scope(self):
         with self.assertRaises(ValueError):

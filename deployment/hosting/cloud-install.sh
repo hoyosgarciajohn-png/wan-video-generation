@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy|trial-prepare|trial-admit|trial-launch|trial-observe) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy|scale-rehearsal|trial-prepare|trial-admit|trial-launch|trial-observe) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -61,11 +61,17 @@ if [[ "$operation" == recovery || "$operation" == recovery-copy ]]; then
     scp "${ssh_options[@]}" "$temp_dir/acceptance/off-host-result.json" "root@$host:/var/lib/wan/acceptance-20261116/off-host-result.json"
     exit
 fi
+if [[ "$operation" == scale-rehearsal ]]; then
+    ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
+    ssh "${ssh_options[@]}" "root@$host" 'cd /opt/wan/current; umask 077; runuser -u wan -- /opt/wan/venv/bin/python -u -m deployment.scale_rehearsal --directory /var/lib/wan/scale-rehearsal-20261116-one-minute'
+    exit
+fi
 if [[ "$operation" == trial-* ]]; then
     trial=${WAN_TRIAL:-first}
     case "$trial" in
         first) trial_dir=/var/lib/wan/live-trial-20261116 ;;
         diagnostic) trial_dir=/var/lib/wan/diagnostic-trial-20261116 ;;
+        repair) trial_dir=/var/lib/wan/repair-trial-20261116 ;;
         *) fail 'Unknown trial scope' ;;
     esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then

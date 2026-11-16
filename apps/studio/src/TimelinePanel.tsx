@@ -27,7 +27,8 @@ export function TimelinePanel({
         starts at the beginning and is trimmed to the timeline length. If it is
         shorter, the remaining video is silent. This version supports one
         soundtrack without manual trim controls. Exports use the frozen timeline
-        revision.
+        revision. New exports are 1280 × 704 at 24 fps. Enlarging synthetic test
+        clips does not add real image detail.
       </p>
       {!clean && <p>Save pending edits before assembling or exporting.</p>}
       {!complete && <p>Accept a take for every shot before assembling.</p>}
@@ -84,6 +85,8 @@ export function TimelinePanel({
           <p>
             Timeline {item.timeline_id} · Revision {item.timeline_revision} ·{" "}
             <strong>{item.state}</strong>
+            {" · "}
+            {item.profile.width} × {item.profile.height}
           </p>
           {item.state === "succeeded" && item.output_asset_id && (
             <a

@@ -98,3 +98,11 @@ No cloud resources, GPU spend or production deployment. Next: deployment/storage
 readiness, larger durable media uploads, hosted lifecycle/budget wiring and a buildable
 pinned Wan runtime. Paid B06 benchmarking still requires an explicit dollar ceiling
 and runtime envelope. Full B05 remains open until its hosted/browser gates are met.
+
+## November 16 HD export update
+
+New exports now capture 1280x704 at 24fps. Existing exports retain their original
+profile and output verification follows that immutable profile. FFmpeg uses one
+codec/filter thread for the small controller. Studio shows per-export dimensions.
+Synthetic source enlargement proves assembly mechanics only. See
+PROGRESSIVE_VALIDATION.md for separate local/hosted and real-GPU acceptance.

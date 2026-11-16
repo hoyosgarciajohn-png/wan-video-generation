@@ -34,3 +34,13 @@ prepare/admit/launch operations. `trial-observe --trial diagnostic` remains the
 inspection and connected billing import path. The source proposal is a validated
 description, not an executable grant; its approved status does not reset the
 durable single-attempt runtime ledger.
+
+## Repaired-worker validation
+
+Select `trial=repair` for the separately isolated repaired one-second stage.
+Its fixed limits remain $5 total, 1800 seconds and one attempt. It requires both
+historical batches terminal with confirmed cleanup, the image ending `ed50`, and
+new source-bound grant/host evidence. `first` and `diagnostic` are consumed; never
+reuse their prepare/admit/launch operations. Follow the same prepare → admit →
+independent guard → launch sequence above. This does not install a five-second or
+one-minute paid grant.

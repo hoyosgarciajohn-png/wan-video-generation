@@ -24,7 +24,9 @@ def encode(target, args):
     partial = target.with_suffix(".partial.mp4")
     try:
         subprocess.run([
-            "ffmpeg", "-nostdin", "-v", "error", "-y", *args, str(partial),
+            "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "1",
+            "-filter_threads", "1", "-filter_complex_threads", "1",
+            *args, "-threads", "1", str(partial),
         ], check=True)
         partial.replace(target)
     finally:
