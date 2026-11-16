@@ -7,6 +7,7 @@ import json
 import os
 import re
 import time
+from pathlib import Path
 from deployment.cleanup_monitor import CleanupOnlyProvider
 from services.controller.runpod import https_transport
 
@@ -45,8 +46,15 @@ def main():
     observed = set()
     # Verify credentials/inventory before announcing readiness. No POST occurs.
     for pod in provider.find(batch, batch): observed.add(pod.id)
-    print(json.dumps({'status': 'READY', 'batch': batch, 'deadline': deadline,
-                      'provider_name': provider._name(batch, batch)}), flush=True)
+    ready = {'status': 'READY', 'batch': batch, 'deadline': deadline,
+             'scope': scope, 'provider_name': provider._name(batch, batch),
+             'checked_at': time.time(), 'run_id': os.environ.get('GITHUB_RUN_ID')}
+    if os.environ.get('WAN_GUARD_READY_FILE'):
+        path = Path(os.environ['WAN_GUARD_READY_FILE'])
+        temporary = path.with_suffix('.tmp')
+        temporary.write_text(json.dumps(ready))
+        temporary.replace(path)
+    print(json.dumps(ready), flush=True)
     confirmed = False
     # Keep reconciling for five minutes after the deadline to catch late creates.
     while time.time() < deadline + 300:

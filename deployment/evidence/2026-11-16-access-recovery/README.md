@@ -1,0 +1,9 @@
+# Browser access and recovery evidence — 2026-11-16
+
+Browser sign-in was observed in John's connected Chrome session at https://wan-64-225-114-46.sslip.io. The native `fetch` receiver defect is fixed by PR59, deployed at source `1a26af63e90193411c15a083c9bb1c84277d0b8e`, run [43798882856](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43798882856). The existing owner token was delivered through RSA-OAEP encryption, exchanged for the app session cookie, and never logged in plaintext. The connected workspace showed the recovered synthetic project and a succeeded MP4 export. Human creative acceptance is not implied.
+
+Hosted recovery run [43798724454](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43798724454) proved authenticated HTTPS create/upload/render/review/export/download, complete MP4 decode, saved-history persistence after a controller restart, a fresh independent cleanup heartbeat while the controller was stopped, same-host backup restore and owner isolation. Its later copy step timed out; the original successful rehearsal was retained.
+
+Independent runner [43800008304](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43800008304), job133077711269, then completed the preserved-backup restore, media checksum/full decode, history preservation and owner isolation at 03:46:04 UTC. `off-host-result.json` contains the exact returned verification fields. An earlier copy-only run lacked FFmpeg and the next failed during repository checkout; neither repeated the original hosted workflow.
+
+The restored export is **synthetic fixture media**, not Wan output. No Runpod Pod was created by any recovery operation. The cleanup heartbeat establishes process independence, not actual GPU deletion. Weekly provider backup remains separately enabled; the first scheduled snapshot and scheduled offsite application backups are not proved by this drill.

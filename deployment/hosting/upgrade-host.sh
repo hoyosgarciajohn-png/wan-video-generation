@@ -7,7 +7,7 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-[[ $old_sha == e3fb08512ffa07c5bb6531c324d33c5d13e1a4e5 ]]
+[[ $old_sha == 1a26af63e90193411c15a083c9bb1c84277d0b8e ]]
 git diff --quiet && git diff --cached --quiet
 [[ ! -L /opt/wan/current ]]
 bootstrap_dir=/root/wan-bootstrap-$release_sha

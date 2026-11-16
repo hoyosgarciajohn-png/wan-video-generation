@@ -29,7 +29,8 @@ CRITICAL = ('services/controller/live_execution.py','services/controller/live_bi
             'deployment/hosting/cloud-install.sh','deployment/hosting/bootstrap-host.sh',
             'deployment/hosting/verify-host.sh','.github/workflows/install-controller.yml',
             'deployment/hosting/upgrade-host.sh','deployment/host_acceptance.py',
-            '.github/workflows/deadline-guard.yml')
+            '.github/workflows/deadline-guard.yml', 'deployment/first_trial.py',
+            'deployment/hosting/run-guard.sh')
 
 
 def _hash(value):

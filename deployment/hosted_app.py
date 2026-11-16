@@ -136,7 +136,15 @@ def main():
     origin = _origin(os.environ['WAN_STUDIO_ORIGIN'])
     tokens = json.loads(Path(os.environ['WAN_STUDIO_TOKEN_FILE']).read_text())
     control = open_control(os.environ)
-    api = StudioAPI(StudioWorkspace(control), tokens, origin)
+    studio = StudioWorkspace(control)
+    execution = None
+    if os.environ.get('WAN_WORKER_EXECUTION') == '1':
+        # Receive already-authorized worker claims/results, without provider
+        # credentials, approval keys, admission or a public provisioning route.
+        from services.controller.live_admission import LiveAdmission
+        from services.controller.live_execution import LiveExecution
+        execution = LiveExecution(LiveAdmission(studio))
+    api = StudioAPI(studio, tokens, origin, real_jobs=execution)
     stop = threading.Event()
     threads = [threading.Thread(target=runner.serve, args=(stop,), daemon=True)
                for runner in (FixtureRunner(control), ExportRunner(control))]
