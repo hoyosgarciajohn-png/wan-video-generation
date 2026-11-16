@@ -150,13 +150,17 @@ authority remains unchanged. Restoring with the same installed key cannot replay
 an old envelope to clear that revocation or create a new reservation. Recovery
 requires fresh, separately authorized grants.
 
-## Settled execution history
+## Closed execution history
 
-Backups now also retain terminal live jobs after confirmed resource cleanup and
-explicit signed final settlement. Validation checks exact owner/project/resource
-receipts, cumulative settlement deltas, subsequent late charges, frozen launch and
-host bindings, worker credential scope and canonical budget totals. Unsettled or
-uncertain liabilities still prevent backup. Older admission-only databases remain
+Backups retain terminal live jobs after confirmed resource cleanup, including
+reserved liabilities whose provider bill has not reached final settlement. The
+snapshot preserves cumulative charges and the remaining reservation; backup never
+converts missing billing into zero spend or releases money. Validation checks exact
+owner/project/resource receipts, settlement deltas, subsequent late charges, frozen
+launch and host bindings, worker credential scope and canonical budget totals.
+Unknown or unconfirmed provider cleanup still prevents backup. Optional validated
+GPU RAM/CUDA requirements remain bound to the original launch configuration.
+Older admission-only databases remain
 supported without an execution-binding table. All restored grants and worker
 credentials remain revoked; keys stay external. Current pinned-model validation
 remains conservative, so migrating old-model history requires separate review.

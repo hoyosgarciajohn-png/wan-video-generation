@@ -1,8 +1,8 @@
 # Wan Video Generation · Master handoff
-Version 1.32 | November 16, 2026 (UTC) | Owner: John Hoyos
+Version 1.33 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
-Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
+Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
 The dedicated controller is live at https://wan-64-225-114-46.sslip.io. Owner browser
@@ -26,12 +26,14 @@ has not been retrieved. Weekly backups are enabled for Wednesday 04:00–08:00 U
 the first scheduled snapshot and recurring offsite application backup remain pending.
 No extra host, volume, managed database or domain was purchased.
 
-Installed controller release: 387555fd40a57f1fcda2d0abff1fff20d93e4075 (PR #63),
-upgrade 43801074417. Controller, separate cleanup and Caddy remain boot-enabled.
-Live worker reception is installed; paid web provisioning remains disabled.
-Private trial authority is restricted to the already-approved $5 total,
-1,800 seconds from admission, one five-second shot and one create/render attempt.
-The $10 prepaid Runpod balance does not expand this authority.
+Installed controller release: 45559974d44797e26fb543c6e5ff9e4f75344dcb (PRs #64/#65),
+upgrade 43808938735. Its obsolete final check was corrected in PR #66; verification
+43809179887 passed from 19c7d8fc537354a656e6f438d524dd66d5cfb410 without replacing
+services again. Controller, separate cleanup and Caddy are active and boot-enabled;
+external HTTPS and authenticated provider read pass. Paid public dispatch remains disabled.
+The browser is reconnected and owner sign-in after restart is verified. Saved project
+history remains intact. The consumed first-trial state and unsettled billing are preserved.
+The $10 prepaid Runpod balance does not expand the one-attempt authority.
 
 The trial was admitted at 03:58:34 UTC with fixed deadline 04:28:34 UTC on November 16.
 Project project-d5ec9ddbe55c4e12901fc2273bc4ea3d; batch 7c811e6ab21a4392b0e3a80e331fc57a.
@@ -50,13 +52,35 @@ after the deadline), and the controller confirmed cleanup at 04:28:40.386 UTC, f
 by empty Runpod inventory and an exact-Pod 404. No manual deletion was used. Final
 batch: failed; cleanup: confirmed; one failed attempt; zero active Pods.
 
-Estimated GPU compute was about $0.35 plus disk charges; actual billing remains
-unavailable/lagging. The $4 reservation remains unsettled, not released as zero spend.
-Source corrections now close exhausted failed batches promptly, preserve safe failure
-codes and block container rerender after a terminal failure. Guard readiness/observation
-is also corrected. These post-trial changes are prepared but not deployed. The browser
-connection disconnected; reconnect it to dispatch the deployment and rebuilt private
-worker. A second paid attempt needs fresh owner authority after its concrete proposal.
+Estimated GPU compute was about $0.35 plus disk charges; the final bill remains pending.
+The connected provider observation imported by run 43808824454 at 00:13 Eastern
+(05:13 UTC) reported $0.1475849028211087. The ledger conservatively records 15 cents
+and retains 385 cents of the original $4 Pod reservation. Earlier observations were
+partial; this is not final settlement or permission for another attempt.
+
+Post-trial failure closure and safe diagnostic reception are now installed. Backup
+compatibility now accepts the valid GPU constraints and preserves unsettled liabilities
+only for terminal jobs with confirmed cleanup; copied execution authority is revoked.
+Fourteen backup/live integration tests and eight hosting checks passed, along with
+shell/whitespace checks and four fictional host-verification query cases.
+
+The private worker was rebuilt and published by run 43808492420 from source
+0f94a1754d03818c04f4376c905a735fd45fa033. New immutable digest:
+`sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b`.
+Build, runtime imports, synthetic video, artifact checksums, private visibility and
+authenticated registry manifest/config checks pass. Worker source matches the installed
+release. The new image has not yet been pulled by Runpod or used for real inference.
+The earlier failure's exact cause remains unknown. New diagnostics and immediate
+failure cleanup still need live GPU validation; automatic deadline deletion was proved
+by the original trial. Zero new Pods or renders were created in this continuation.
+
+A disabled, concrete additional diagnostic proposal is in
+`deployment/diagnostic-trial-proposal.json`: one one-second shot (25 frames),
+1280×704/24fps/50 steps, same Wan model, one RTX 4090 create/render attempt,
+maximum $5 additional / 1,800 seconds from admission, no new paid services.
+A new owner approval and isolated runtime grant are required; do not reset/reuse
+the first trial. One second reduces diagnostic workload but does not establish
+five-second output acceptance or guarantee success.
 
 Detailed outcomes are recorded in deployment/evidence/2026-11-16-first-live-trial/README.md. Connected billing reads
 are supported; automatic application-side bill retrieval is not installed. A missing
@@ -70,7 +94,7 @@ Historical entries below are chronological; this checkpoint supersedes them.
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
 
 ## Batch register
-B00 is complete. B01–B04 source snapshots and review fixes are combined in the B05 local fixture checkpoint. B04 CPU export and QA preparation pass; B01/B02/B03 remain partial. Full hosted B05 is open. Exact completion evidence and branch assignments are in docs/B00_EVIDENCE.md and docs/WORKSTREAMS.md.
+B00 is complete. B01–B04 source snapshots and review fixes are combined in the B05 local fixture checkpoint. B04 CPU export and QA preparation pass; B01/B02/B03 remain partial. The B05 hosted synthetic workflow, restart and independent recovery are verified; human creative acceptance is pending. B06 remains open after its failed first render. Exact completion evidence and branch assignments are in docs/B00_EVIDENCE.md and docs/WORKSTREAMS.md.
 
 | Batch | Lead | Depends on | Evidence needed to close |
 |---|---|---|---|
@@ -97,25 +121,23 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Command Center: finish owner access to the installed host. Trace the browser's
-403 session rejection without weakening Host/Origin or cross-site protection;
-complete secure delivery of the existing owner token. Then run a fictional hosted
-upload/render/export rehearsal, verify cleanup remains healthy during controller
-failure/load, and verify consistent backup/restore with retained media. Human and
-creative acceptance remain pending in John's live session until observed.
+Command Center preparation is complete for the installed failure/recovery fixes and
+new private worker publication. Review the pending additional diagnostic proposal
+with John. Its $5 / 30-minute / one-attempt envelope is NEW authority because the
+first trial was consumed, even though final charges are below its dollar ceiling.
 
-Complete installed live authority and worker bootstrap, model/journal paths and
-the independent deadline guard for the exact admitted scope before provisioning.
-Use the existing private template and digest; do not rebuild/download by default.
-Only then use the already approved $5 total / 1,800 seconds / one five-second shot /
-one Pod-create and render attempt. Actual image pull, model checksums, CUDA/Wan
-inference, output retention, confirmed shutdown and authoritative bill retrieval
-must be recorded. The $10 prepaid balance is not additional spending approval.
-No Runpod job, volume, endpoint or model download has been created by this step.
+After specific approval, prepare a new isolated job/grant bound to the current
+controller and verified image, obtain a fresh capacity/price quote, verify persistent
+cleanup plus the independent guard, then run one one-second diagnostic. Preserve
+all first-trial history. Verify upload, full decode, post-deletion retention and actual
+billing; stop after that attempt regardless of result. Do not call the old
+`first_trial.prepare/admit/launch` flow again or enable general paid web rendering.
 
-Keep exactly one approved $14.40/month-before-tax DigitalOcean host. No repeat
-hosting or SSH approval is required. Do not automatically upgrade, add paid
-storage or rotate the existing credentials. Next recipient: Command Center.
+Remaining independent operations: final provider bill reconciliation, an automatic
+application-side billing collector, the first completed weekly backup, recurring
+offsite application backup and restore of the new post-trial snapshot. Existing
+synthetic hosted recovery and deadline shutdown evidence remain valid. Human creative
+acceptance is pending in John's live session.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -998,3 +1020,19 @@ known evidence limitation is addressed in the prepared source; no GPU remains.
 Post-trial validation passed29worker/execution/integration tests,8hosting tests plus
 the safe-code cleanup regression,3guard tests and1freshness regression, syntax/compile
 and whitespace checks. Billing at04:33UTC still had no records; final charge is pending.
+
+Prepared corrections and full evidence: PR #64, https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/64, head d29cfdd869f347195ce4c68151b88ac936a324fd. This source is not yet installed on the controller or rebuilt into the private worker.
+
+PR #64 merged as 0f94a1754d03818c04f4376c905a735fd45fa033. Installed production source remains 387555fd40a57f1fcda2d0abff1fff20d93e4075; no post-trial deployment or new GPU image build has run. Reconnect the existing browser to resume the authorized deployment/build preparation. A new paid render remains outside the consumed one-attempt authority.
+
+## November 16 continuation — deployment resumed (00:09–00:18 Eastern)
+
+PR #65 fixed a backup compatibility failure exposed by the live trial; PR #66 fixed
+a host-verification assumption that the database had no live history. The corrected
+controller is installed at 4555997 and final verification 43809179887 passed.
+The new private worker was published and independently reviewed from build 43808492420;
+see `deployment/evidence/2026-11-16-private-rebuild/` and
+`deployment/evidence/2026-11-16-resumed-deployment/`. Existing encrypted owner access
+was restored after restart. No extra GPU trial was launched. The first-trial billing
+observation was imported as provisional 15 cents, with 385 cents still reserved.
+The next paid diagnostic is documented but disabled pending fresh specific approval.

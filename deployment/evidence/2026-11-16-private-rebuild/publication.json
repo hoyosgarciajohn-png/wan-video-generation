@@ -1,0 +1,14 @@
+{
+  "source_commit": "0f94a1754d03818c04f4376c905a735fd45fa033",
+  "image_id": "sha256:e0b3493001c7fb69c8a5a3fcff71f6bdd9f1ba23a39070751e603805f51ac03b",
+  "registry_status": "PASS",
+  "runpod_pull": "UNVERIFIED",
+  "run_id": "43808492420",
+  "visibility_before": "private",
+  "visibility_after": "private",
+  "registry_digest": "sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b",
+  "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b",
+  "anonymous_access": "DENIED",
+  "authenticated_manifest": "PASS",
+  "scope": "Registry manifest/config verification; not a fresh layer download"
+}

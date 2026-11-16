@@ -1,0 +1,49 @@
+The push refers to repository [ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu]
+63a2162530df: Preparing
+5f70bf18a086: Preparing
+ea8f1ab165e0: Preparing
+8b4ca9f8b541: Preparing
+038c0511b6e4: Preparing
+c6f60c5a9cce: Preparing
+df6a29f7208e: Preparing
+b4fbe5aa480b: Preparing
+10736bc160dd: Preparing
+2bafce70ab62: Preparing
+35ef24a48de2: Preparing
+d39452f9e9e0: Preparing
+47e708599d83: Preparing
+026db0275804: Preparing
+5f70bf18a086: Preparing
+99a4f2df9c93: Preparing
+574501c8d7d0: Preparing
+3cc982388b71: Preparing
+c6f60c5a9cce: Waiting
+df6a29f7208e: Waiting
+b4fbe5aa480b: Waiting
+10736bc160dd: Waiting
+2bafce70ab62: Waiting
+35ef24a48de2: Waiting
+d39452f9e9e0: Waiting
+47e708599d83: Waiting
+026db0275804: Waiting
+99a4f2df9c93: Waiting
+574501c8d7d0: Waiting
+3cc982388b71: Waiting
+5f70bf18a086: Layer already exists
+8b4ca9f8b541: Pushed
+63a2162530df: Pushed
+038c0511b6e4: Pushed
+ea8f1ab165e0: Pushed
+c6f60c5a9cce: Pushed
+b4fbe5aa480b: Pushed
+2bafce70ab62: Pushed
+47e708599d83: Pushed
+026db0275804: Layer already exists
+99a4f2df9c93: Layer already exists
+574501c8d7d0: Layer already exists
+3cc982388b71: Layer already exists
+35ef24a48de2: Pushed
+d39452f9e9e0: Pushed
+10736bc160dd: Pushed
+df6a29f7208e: Pushed
+sha-0f94a1754d03818c04f4376c905a735fd45fa033: digest: sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b size: 4090
