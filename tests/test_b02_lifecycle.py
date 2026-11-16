@@ -1,4 +1,5 @@
 import tempfile
+import sqlite3
 import unittest
 from pathlib import Path
 
@@ -31,6 +32,18 @@ class LifecycleTests(unittest.TestCase):
             self.controller.admit("project-a", "request-a", {"shot": 2}, 50, 1)
         with self.assertRaises(KeyError):
             self.controller.cancel("project-b", self.batch)
+
+    def test_old_unknown_history_migrates_without_inventing_rejection(self):
+        legacy=self.path.parent/'legacy.sqlite'
+        with sqlite3.connect(legacy) as db:
+            db.execute('''CREATE TABLE pod_batches(id TEXT PRIMARY KEY,project TEXT,idem TEXT,
+                snapshot TEXT,deadline INTEGER,state TEXT,cleanup TEXT,pod_id TEXT)''')
+            db.execute("INSERT INTO pod_batches VALUES ('old','project','key','{}',1,'failed','failed',NULL)")
+        life=Lifecycle(legacy,self.provider)
+        row=life.status('project','old')
+        self.assertIsNone(row['create_diagnostic'])
+        self.assertEqual(life.watchdog(100),['old'])
+        self.assertEqual(life.status('project','old')['cleanup'],'failed')
 
     def test_ambiguous_create_reconciles_after_restart(self):
         self.provider.timeout_after_create = True

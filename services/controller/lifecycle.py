@@ -6,6 +6,7 @@ from typing import Protocol
 from uuid import uuid4
 
 from src.wan_platform.fake_provider import Pod
+from services.controller.runpod import ProviderCreateError, ProviderCreateRejected
 
 
 class Provider(Protocol):
@@ -30,6 +31,8 @@ class Lifecycle:
                     UNIQUE(project, idem)
                 )
             """)
+            if 'create_diagnostic' not in {row[1] for row in db.execute('PRAGMA table_info(pod_batches)')}:
+                db.execute('ALTER TABLE pod_batches ADD COLUMN create_diagnostic TEXT')
 
     @contextmanager
     def transaction(self):
@@ -118,6 +121,18 @@ class Lifecycle:
                 if not pods:
                     return
                 pod = pods[0]
+        except ProviderCreateError as error:
+            # Only this process's single POST can establish explicit rejection.
+            # A GET error or an old missing diagnostic cannot close an allocation.
+            if dispatch:
+                with self.transaction() as db:
+                    db.execute('UPDATE pod_batches SET create_diagnostic=? WHERE id=?',
+                               (json.dumps(error.diagnostic, sort_keys=True), batch))
+                    if isinstance(error, ProviderCreateRejected):
+                        db.execute("""UPDATE pod_batches SET
+                            state=CASE WHEN state='provisioning' THEN 'failed' ELSE state END,
+                            cleanup='confirmed' WHERE id=? AND pod_id IS NULL""", (batch,))
+            return
         except (TimeoutError, ConnectionError):
             return
         with self.transaction() as db:

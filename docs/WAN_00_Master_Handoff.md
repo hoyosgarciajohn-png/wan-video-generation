@@ -1,10 +1,69 @@
 # Wan Video Generation · Master handoff
-Version 1.35 | November 16, 2026 | Owner: John Hoyos
+Version 1.37 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
+John approved finishing the launch fix, reconciling the uncertain request before
+another submission, allowing multiple suitable data centers under unchanged GPU
+requirements and spending limits, and resuming one second → five seconds → one
+minute of real Wan footage. This supersedes the earlier statement that no new
+attempt was authorized; it does not waive the reconciliation prerequisite or reset
+any consumed scope.
+
+**PR #76 now contains the completed launch-error and multiple-location changes.**
+Documented explicit rejections fail immediately; bounded redacted detail, HTTP
+status and request ID persist privately across restart. Timeouts, 408, 5xx and
+malformed successes remain ambiguous, without automatic create retry. Historical
+missing diagnostics remain null and cannot be promoted to definitive rejection.
+One to eight eligible data centers can be frozen into the signed request. GPU,
+RAM, CUDA, disk, price and runtime limits remain unchanged. The fresh `validation`
+scope is isolated from all three consumed scopes and refuses preparation until
+all three previous requests are definitively closed. No runtime grant is installed.
+
+**The old repair request remains unresolved.** Batch
+`249c50635ec84ac38cef0eb66232efed`, project
+`project-10088bb273fb41d78399957f2dc8cd83`, had one POST at 15:04:38 UTC.
+Launch 43892451814 and guard 43892343231 both finished with failure. The guard
+never observed an allocation through its deadline-plus-five-minute watch ending
+about 15:38:23 UTC. Zero worker attempts and zero takes exist. The controller's
+$4 reservation remains retained and cleanup remains unconfirmed. The original
+HTTP status/detail/request ID cannot be recovered from the installed adapter.
+
+Fresh connected inventory and audit reads are empty; trial-window Pod billing has
+zero records but is not final. The console shows $9.35 balance and the enabled
+wan-cleanup key has Pod read/write. These observations do not establish the old
+POST outcome. A complete support inquiry is drafted, not sent, in
+`deployment/evidence/2026-11-16-launch-reconciliation/support-request.md`.
+Provider confirmation is needed before closing this exact unknown request.
+
+Installed operational source remains
+`42b3e993dc8ac3540d1ae450d287c1a90b555338`. No deployment, new GPU allocation,
+permission expansion or billing release occurred in this continuation. The
+existing upgrade/backup gate still blocks replacing source while cleanup is
+unresolved. PR #76 must not be described as deployed. Contract remains 0.1.0.
+
+Verification: 172 root fictional checks and 41 deployment/guard/hosting checks
+passed, along with contract validation, shell syntax and whitespace checks.
+Backup/restore preserves rejection diagnostics, multi-location signatures and
+retained billing reservations. Unchanged Studio tests were not repeated.
+
+**The 1280x704/24fps exporter is already deployed.** Frozen legacy 320x180 jobs
+retain their original profile. Hosted fictional one-minute rehearsal 43890910756
+passed: twelve five-second blue clips, 1440 frames, H.264/AAC, full decode and
+restart/idempotency; export 17.517 seconds, whole rehearsal 27.158 seconds, peak
+child RSS 110680 KiB. It does not prove one minute of generated Wan footage.
+Actual repaired one-second/five-second output and the real one-minute project
+remain unproved. Public Studio dispatch remains synthetic; live creative acceptance
+is pending. Historical GPU failures and billing records below are preserved.
+
+Next: obtain provider confirmation, reconcile the old exact request, deploy and
+verify PR #76, then prepare/admit/guard/launch the newly approved one-second scope.
+Subsequent stages need measured feasibility inside the unchanged cost/runtime
+limits and their own isolated grants; no larger budget is inferred.
+
+## Previous checkpoint — before progressive implementation
 The controller is live at https://wan-64-225-114-46.sslip.io. Owner sign-in after the
 latest restart is verified. Saved synthetic and real-trial history remain available.
 Installed source: `8e07ba3e8dfb9a250424bb4c8607cd1cac36cfe6` (PR #68), upgrade run
@@ -129,18 +188,18 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-The repaired image build and offline/private registry verification are complete.
-Prepare the next isolated validation scope using the immutable image ending `ed50`.
-Before actual admission, install and verify reviewed matching controller source and
-fresh host/build authority, confirm current GPU price/availability and cleanup health,
-and obtain a separately approved spending/runtime/attempt envelope. Then bind an
-independent guard to the new original deadline before any single Pod creation.
+Observe launch 43892451814 and guard 43892343231 through the original deadline
+and post-deadline watch. Retrieve final logs/status and reconcile this exact
+request before any deployment or new launch. Do not repeat prepare/admit/launch,
+silently reset the attempted grant, mark an unobserved allocation cleaned, or
+extend the original deadline. Install reviewed diagnostic changes only after
+the active request and cleanup obligation are resolved.
 
-Both existing attempts are consumed. No third Pod or render is authorized. Preserve
-all prior outcomes, fixed deadlines, image references and unsettled liabilities.
-The proposed later validation remains one one-second shot, one create/render,
-at most $5 additional and 1,800 seconds from its own admission; this handoff does
-not approve it. Do not reset or rerun either historical prepare/admit/launch flow.
+After successful inference, verify saved output and full decode after confirmed
+Pod deletion, retain billing liabilities until final settlement, then measure and
+scope the five-second stage. A later one-minute Wan project requires 12 generated
+five-second shots. Its CPU assembly rehearsal is already complete and should not
+be repeated without a relevant change or failure.
 
 Other pending operations: final provider bill reconciliation, automatic billing
 collection, the first completed weekly backup, recurring offsite application backup

@@ -1,0 +1,21 @@
+{
+  "as_of": "2026-11-16T15:11:41.219Z",
+  "installed_source": "42b3e993dc8ac3540d1ae450d287c1a90b555338",
+  "project": "project-10088bb273fb41d78399957f2dc8cd83",
+  "batch": "249c50635ec84ac38cef0eb66232efed",
+  "prepare_run": 43891758558,
+  "admit_run": 43892215902,
+  "launch_run": 43892451814,
+  "guard_run": 43892343231,
+  "deadline": "2026-11-16T15:33:20Z",
+  "guard_watch_until": "2026-11-16T15:38:20Z",
+  "single_create_submitted": true,
+  "provider_id_observed": false,
+  "inventory_pod_count": 0,
+  "worker_validated": false,
+  "cleanup": "PENDING_UNCONFIRMED_ALLOCATION",
+  "reservation_cents": 400,
+  "overall_cap_cents": 500,
+  "billing_final": false,
+  "warning": "Empty inventory is not proof of definitive rejection or completed cleanup. No retry or source replacement while this request is unresolved."
+}

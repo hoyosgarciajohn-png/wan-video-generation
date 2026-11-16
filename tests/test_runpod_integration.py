@@ -22,6 +22,47 @@ PROFILE = {'image':'example/wan@sha256:'+'a'*64,'gpu':{'id':'fictional-gpu','cou
 
 
 class RunpodHTTPIntegrationTests(unittest.TestCase):
+    def test_explicit_rejection_closes_immediately_and_survives_restart_without_retry(self):
+        for status in (400,401,402,403,404,409,413,422,429):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as root:
+                calls = []
+                def transport(request, timeout):
+                    calls.append(request.get_method())
+                    raise HTTPError(request.full_url,status,'ignored',{'x-request-id':'fictional-rejection'},
+                                    io.BytesIO(b'{"detail":"No deployment was accepted"}'))
+                provider=RunpodProvider('fictional',launch_profile=PROFILE,scope='project',transport=transport)
+                path=Path(root)/'state.sqlite'
+                life=Lifecycle(path,provider)
+                batch=life.admit('project','one',{},100,0)
+                life.provision('project',batch,1)
+                restarted=Lifecycle(path,provider)
+                row=restarted.status('project',batch)
+                self.assertEqual((row['state'],row['cleanup'],row['pod_id']),('failed','confirmed',None))
+                self.assertEqual(json.loads(row['create_diagnostic'])['http_status'],status)
+                restarted.provision('project',batch,2)
+                self.assertEqual(restarted.watchdog(101),[])
+                self.assertEqual(calls,['POST'])
+
+    def test_unknown_without_allocation_never_closes_from_empty_inventory(self):
+        for status in (408,500):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as root:
+                calls=[]
+                def transport(request,timeout):
+                    calls.append(request.get_method())
+                    if request.get_method()=='POST':
+                        raise HTTPError(request.full_url,status,'secret',{},io.BytesIO(b'{}'))
+                    return Reply({'pods':[],'pagination':{'hasNextPage':False,'nextCursor':None}})
+                provider=RunpodProvider('fictional',launch_profile=PROFILE,scope='project',transport=transport)
+                path=Path(root)/'state.sqlite'
+                life=Lifecycle(path,provider); batch=life.admit('project','one',{},10,0)
+                life.provision('project',batch,1)
+                life=Lifecycle(path,provider); life.provision('project',batch,2)
+                self.assertEqual(life.watchdog(11),[batch])
+                row=life.status('project',batch)
+                self.assertEqual(row['cleanup'],'failed')
+                self.assertEqual(json.loads(row['create_diagnostic'])['outcome'],'unknown')
+                self.assertEqual(calls.count('POST'),1)
+
     def test_ambiguous_create_restart_transient_inventory_and_confirmed_absence(self):
         with tempfile.TemporaryDirectory() as root:
             pods, calls = {}, []

@@ -45,19 +45,21 @@ records the initial hosted release and resource/cost. Later [access and recovery
 
 ## Current continuation status
 
-The controller, owner sign-in and synthetic recovery are verified. Two bounded live
-attempts are consumed: the first failed without a detailed cause; the one-second
-diagnostic confirmed GPU out of memory. Both Pods were automatically deleted, and
-the independent deadline guard completed. No real Wan video has been saved yet.
-Prior billing observations remain provisional and reservations are retained.
+The 1280x704/24fps exporter and hosted one-minute synthetic rehearsal passed.
+No real Wan clip has been saved: the original trial failed without a retained
+cause, the diagnostic failed with GPU out of memory, and the repaired-worker
+attempt never produced an observed allocation. Its original create response was
+lost; both monitoring workflows finished and cleanup remains unresolved.
 
-[The memory repair](docs/B06_MEMORY_REPAIR.md) is merged. Its
-[new private image](deployment/evidence/2026-11-16-memory-repair-build/README.md)
-passed build, offline runtime, synthetic-video, source/log integrity and private
-registry checks in run 43864992211. This verifies the image artifact, not CUDA
-memory fit or a successful Wan render. No new GPU trial or controller deployment
-was performed. A later trial needs separate owner approval and fresh isolated
-host/job authority. Public Studio rendering remains synthetic.
+[PR #76](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/76)
+adds durable redacted create diagnostics, explicit-rejection handling, signed
+multiple-data-center placement and an isolated next validation scope. The changes
+pass 172 root and 41 deployment fictional checks. They are not deployed over the
+unresolved request. See [reconciliation evidence](deployment/evidence/2026-11-16-launch-reconciliation/README.md)
+and the [master handoff](docs/WAN_00_Master_Handoff.md).
 
-See the [master handoff](docs/WAN_00_Master_Handoff.md) for exact identities and
-remaining deployment, billing and operational work.
+John authorized continuing one second → five seconds → one minute within unchanged
+limits, after reconciling the prior request. No new GPU attempt or larger budget
+was used. Public Studio dispatch remains synthetic. The repaired worker image is
+[verified offline](deployment/evidence/2026-11-16-memory-repair-build/README.md),
+with actual memory fit and successful output still pending.

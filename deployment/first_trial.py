@@ -59,6 +59,9 @@ def select_trial(name):
         return
     if name == 'repair':
         return select_repair_trial()
+    if name == 'validation':
+        select_repair_trial('validation')
+        return
     assert name == 'diagnostic', 'Unknown trial scope'
     proposal = read(ROOT / 'deployment/diagnostic-trial-proposal.json')
     assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION'
@@ -81,10 +84,10 @@ def select_trial(name):
     EXPECTED_PRIOR_BATCHES = {'7c811e6ab21a4392b0e3a80e331fc57a'}
 
 
-def select_repair_trial():
+def select_repair_trial(scope='repair'):
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
-    proposal = read(ROOT / 'deployment/repair-trial-proposal.json')
+    proposal = read(ROOT / f'deployment/{scope}-trial-proposal.json')
     assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION'
     assert proposal['execution_enabled'] is False
     terms = proposal['proposed_additional_terms']
@@ -103,6 +106,14 @@ def select_repair_trial():
     IDEMPOTENCY_KEY = 'john-repair-validation-single-attempt'
     WORKER_ID = 'john-repair-validation-worker'
     EXPECTED_PRIOR_BATCHES = {'7c811e6ab21a4392b0e3a80e331fc57a','def5478dc85949139ca1c0ae404f9d1f'}
+    if scope == 'validation':
+        TRIAL = STATE / 'validation-trial-20261116'
+        AUTH = Path('/etc/wan/validation-trial-authority-20261116.json')
+        TITLE = 'Wan progressive validation after allocation reconciliation · one second'
+        APPROVAL_ID = 'john-progressive-validation-20261116'
+        IDEMPOTENCY_KEY = 'john-progressive-validation-single-attempt'
+        WORKER_ID = 'john-progressive-validation-worker'
+        EXPECTED_PRIOR_BATCHES.add('249c50635ec84ac38cef0eb66232efed')
 
 
 def prior_history_closed(db):
@@ -165,10 +176,16 @@ def checked_quote(region=None):
     if region is None:
         # The approval bounds GPU, cloud, price and runtime, not geography.
         # Prefer previous locations, then bind any currently quoted location.
-        region = next((x for x in ('EU-RO-1', 'US-IL-1', 'EUR-IS-1', 'EUR-IS-2') if x in available),
-                      next(iter(available), None))
-    assert region in available, 'Approved GPU region has no current capacity'
-    return {'checked_at': time.time(), 'gpu': GPU, 'region': region, 'usd_per_hour': str(price), 'min_cuda': '12.8'}
+        preferred = ('EU-RO-1', 'US-IL-1', 'EUR-IS-1', 'EUR-IS-2')
+        regions = list(dict.fromkeys([x for x in preferred if x in available] + available))[:8]
+    else:
+        # Recheck the signed list without expanding, reordering or migrating it.
+        regions = [region] if isinstance(region, str) else list(region)
+    assert 1 <= len(regions) <= 8 and len(set(regions)) == len(regions)
+    assert all(isinstance(x, str) and x for x in regions)
+    assert any(x in available for x in regions), 'Approved GPU regions have no current capacity'
+    return {'checked_at': time.time(), 'gpu': GPU, 'region': regions[0], 'data_center_ids': regions,
+            'usd_per_hour': str(price), 'min_cuda': '12.8'}
 
 
 def materialize_build(destination):
@@ -233,7 +250,7 @@ def prepare():
     profile = dict(model_profile=deepcopy(LOCK['profile']), image_ref=IMAGE, gpu_type=GPU, gpu_count=1,
         region=pricing['region'], worker_endpoint=ORIGIN, storage_id='wan-controller-01-artifacts')
     launch = dict(image=IMAGE, gpu={'id': GPU, 'count': 1, 'minCudaVersion': '12.8', 'minRamPerGpu': 64}, cloud='SECURE',
-        disk=80, dataCenterIds=[pricing['region']], mounts={}, ports=[], env={}, registry=REGISTRY,
+        disk=80, dataCenterIds=pricing['data_center_ids'], mounts={}, ports=[], env={}, registry=REGISTRY,
         entrypoint=BOOTSTRAP_ENTRYPOINT, cmd=BOOTSTRAP_CMD)
     expires = stamp(utcnow() + timedelta(hours=6))
     grant = dict(id=APPROVAL_ID, owner=OWNER, project=project, currency='USD', approved_cents=400,
@@ -267,7 +284,7 @@ def admit():
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
-    pricing = checked_quote(saved['pricing']['region'])
+    pricing = checked_quote(saved['pricing'].get('data_center_ids', [saved['pricing']['region']]))
     request = dict(approval_id=APPROVAL_ID, shot_ids=[saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
         reservation_cents=400, runtime_seconds=1800, idempotency_key=IDEMPOTENCY_KEY)
     result = a.submit(OWNER, saved['project'], request)
@@ -339,11 +356,26 @@ def observe():
     unresolved = e.watchdog()
     result = e.status(OWNER, job['project'], job['batch'])
     bundle = c.bundle(OWNER, job['project'])
+    with c.transaction() as db:
+        raw_diagnostic = db.execute('SELECT create_diagnostic FROM pod_batches WHERE id=?', (job['batch'],)).fetchone()[0]
     summary = dict(checked_at=time.time(), batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
-        provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'])
+        provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'],
+        provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None)
     atomic_json(TRIAL / 'status.json', summary)
-    print(json.dumps(summary), flush=True)
+    # Keep complete evidence on disk, but put lifecycle fields first in a short
+    # live log line so the Actions viewer does not truncate the useful status.
+    print(json.dumps(operator_summary(summary)), flush=True)
     return summary
+
+
+def operator_summary(summary):
+    batch = summary['batch']
+    return dict(checked_at=summary['checked_at'], batch=batch['id'], state=batch['state'],
+        cleanup=batch['cleanup_state'], pod=batch['provider_resource_id'], deadline=batch['deadline_at'],
+        takes=len(summary['takes']), attempts=len(summary['attempts']),
+        failure_codes=[a['failure_reason'] for a in summary['attempts'] if a.get('failure_reason')],
+        billing=summary['billing'], reservation_state=summary['reservation_state'],
+        provider_create=summary.get('provider_create'))
 
 
 def launch():
@@ -352,7 +384,7 @@ def launch():
     ready = guard_ready(job)
     # The CI caller supplies a live GitHub API observation before this SSH call.
     assert os.environ.get('WAN_VERIFIED_GUARD_RUN') == ready['run_id']
-    checked_quote(job['pricing']['region'])
+    checked_quote(job['pricing'].get('data_center_ids', [job['pricing']['region']]))
     c, a, e = services()
     with c.transaction() as db:
         assert db.execute("SELECT dispatch_state FROM live_job_links WHERE batch=?",(job['batch'],)).fetchone()[0] == 'disabled'
@@ -376,7 +408,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
-    parser.add_argument('--trial', choices=['first','diagnostic','repair'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()

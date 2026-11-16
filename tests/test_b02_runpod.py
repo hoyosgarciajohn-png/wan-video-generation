@@ -4,7 +4,8 @@ import json
 import unittest
 from urllib.error import HTTPError
 
-from services.controller.runpod import RunpodProvider, validate_launch_profile, https_transport, NoRedirect
+from services.controller.runpod import (RunpodProvider, validate_launch_profile, https_transport, NoRedirect,
+                                       ProviderCreateRejected, ProviderCreateUncertain, MAX_ERROR_RESPONSE)
 
 PROFILE = {'image': 'example/wan@sha256:' + 'a' * 64,
            'gpu': {'id': 'fictional-gpu', 'count': 1}, 'cloud': 'SECURE',
@@ -75,6 +76,73 @@ class RunpodTests(unittest.TestCase):
             with self.assertRaises(ConnectionError) as caught:
                 call()
             self.assertNotIn('fictional-secret', str(caught.exception))
+
+    def test_create_error_retains_safe_status_without_retry_or_secret(self):
+        for status in (400, 403, 429, 500):
+            with self.subTest(status=status):
+                self.replies = iter([(status, None)])
+                before = len(self.calls)
+                with self.assertLogs('services.controller.runpod', level='WARNING') as logs:
+                    with self.assertRaises(ConnectionError):
+                        self.provider.create('batch', 'key')
+                self.assertEqual(len(self.calls), before + 1)
+                event = json.loads(logs.output[0].split('WAN_PROVIDER_CREATE_RESULT ', 1)[1])
+                self.assertEqual(event, {'kind': 'http_error', 'http_status': status,
+                    'request_id': None, 'outcome': 'unknown' if status == 500 else 'rejected'})
+                self.assertNotIn('fictional-key', logs.output[0])
+                self.assertNotIn('fictional-secret-diagnostic', logs.output[0])
+                self.assertEqual(self.provider._known, {})
+
+    def test_rejection_keeps_detail_and_request_id_redacts_secrets_and_input(self):
+        self.provider._profile['env'] = {'WAN_WORKER_TOKEN': 'fictional-worker-secret'}
+        payload = dict(title='Bad Request', detail='No capacity. fictional-key fictional-worker-secret '
+                       'https://private.invalid?token=hidden Bearer other-secret\nnext line',
+                       errors=[{'msg':'Invalid configuration', 'input':'private-input', 'ctx':{'secret':'hidden'}}],
+                       ignored='private-extra')
+        def reject(request, timeout):
+            raise HTTPError(request.full_url, 400, 'private-exception', {'x-request-id':'req-fictional-123'},
+                            io.BytesIO(json.dumps(payload).encode()))
+        self.provider._transport = reject
+        with self.assertRaises(ProviderCreateRejected) as caught:
+            self.provider.create('batch','key')
+        diagnostic = caught.exception.diagnostic
+        self.assertIn('No capacity', diagnostic['detail'])
+        self.assertEqual(diagnostic['request_id'], 'req-fictional-123')
+        self.assertEqual(diagnostic['validation_messages'], ['Invalid configuration'])
+        raw = json.dumps(diagnostic)
+        for secret in ('fictional-key','fictional-worker-secret','private.invalid','other-secret',
+                       'private-input','private-extra','private-exception'):
+            self.assertNotIn(secret, raw)
+
+    def test_oversized_or_non_json_error_is_bounded_without_changing_rejection(self):
+        for raw in (b'private-html', b'x' * (MAX_ERROR_RESPONSE + 1)):
+            def reject(request, timeout):
+                raise HTTPError(request.full_url, 422, 'secret', {}, io.BytesIO(raw))
+            self.provider._transport = reject
+            with self.assertRaises(ProviderCreateRejected) as caught:
+                self.provider.create('batch','key')
+            self.assertNotIn('detail', caught.exception.diagnostic)
+
+    def test_timeout_408_5xx_and_invalid_success_stay_unknown(self):
+        for status in (408, 500, 503):
+            self.replies = iter([(status,None)])
+            with self.assertRaises(ProviderCreateUncertain) as caught:
+                self.provider.create('batch','key')
+            self.assertNotIsInstance(caught.exception, ProviderCreateRejected)
+            self.assertEqual(caught.exception.diagnostic['outcome'], 'unknown')
+        def timeout(*args, **kwargs): raise TimeoutError('secret transport text')
+        self.provider._transport = timeout
+        with self.assertRaises(ProviderCreateUncertain) as caught:
+            self.provider.create('batch','key')
+        self.assertEqual(caught.exception.diagnostic['kind'], 'transport_or_response')
+
+    def test_multiple_data_centers_are_explicit_unique_and_bounded(self):
+        profile = copy.deepcopy(PROFILE)
+        profile['dataCenterIds'] = ['fictional-a','fictional-b']
+        self.assertEqual(validate_launch_profile(profile)['dataCenterIds'], profile['dataCenterIds'])
+        for regions in ([], ['duplicate','duplicate'], list(map(str,range(9))), ['ok',None], 'anywhere'):
+            profile['dataCenterIds'] = regions
+            with self.assertRaises(ValueError): validate_launch_profile(profile)
 
     def test_bad_or_repeated_pagination_never_returns_partial_matches(self):
         name = self.provider._name('batch', 'key')

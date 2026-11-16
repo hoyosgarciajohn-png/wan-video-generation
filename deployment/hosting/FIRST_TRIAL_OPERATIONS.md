@@ -44,3 +44,22 @@ new source-bound grant/host evidence. `first` and `diagnostic` are consumed; nev
 reuse their prepare/admit/launch operations. Follow the same prepare → admit →
 independent guard → launch sequence above. This does not install a five-second or
 one-minute paid grant.
+
+## Allocation-reconciliation continuation
+
+The repair scope is consumed and unresolved. John has authorized the next
+isolated one-second `validation` scope under the same $5/1800-second/one-attempt
+limits, conditional on definitive reconciliation first. Its proposal does not
+install authority. Do not rerun repair prepare/admit/launch. The source upgrade
+baseline is now the observed 42b3e993 release; the unresolved-cleanup gate stays.
+
+New preparations freeze up to eight eligible locations into one signed request.
+Admission and launch recheck that at least one frozen member still has capacity;
+neither check expands the set or submits another create. Explicit rejection is
+saved immediately with redacted diagnostics; ambiguous outcomes retain cleanup
+and billing obligations. Independent guard absence-only evidence remains
+conservative and cannot reconstruct a lost original response.
+
+See ../evidence/2026-11-16-launch-reconciliation/ for the exact blocker and the
+unsent support request. Five-second and real-minute stages remain gated on a
+successful one-second result and measured feasibility under unchanged limits.

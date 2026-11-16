@@ -66,6 +66,27 @@ class FirstTrialGates(unittest.TestCase):
             db.execute("INSERT INTO live_job_links VALUES ('already-repair')")
             with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
 
+    def test_validation_is_isolated_and_blocked_by_unknown_repair_request(self):
+        first_trial.select_trial('repair')
+        previous=(first_trial.TRIAL,first_trial.AUTH,first_trial.APPROVAL_ID)
+        first_trial.select_trial('validation')
+        self.assertTrue(all(a!=b for a,b in zip(previous,(first_trial.TRIAL,first_trial.AUTH,first_trial.APPROVAL_ID))))
+        self.assertEqual(first_trial.DURATION_MS,1000)
+        self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),3)
+        with sqlite3.connect(':memory:') as db:
+            db.execute('CREATE TABLE live_job_links(batch TEXT)')
+            db.execute('CREATE TABLE pod_batches(id TEXT,state TEXT,cleanup TEXT)')
+            for batch in first_trial.EXPECTED_PRIOR_BATCHES:
+                db.execute('INSERT INTO live_job_links VALUES (?)',(batch,))
+                cleanup='failed' if batch=='249c50635ec84ac38cef0eb66232efed' else 'confirmed'
+                db.execute("INSERT INTO pod_batches VALUES (?,'failed',?)",(batch,cleanup))
+            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+            # Only a definitive reconciliation may change this in real state.
+            db.execute("UPDATE pod_batches SET cleanup='confirmed'")
+            first_trial.prior_history_closed(db)
+            db.execute("INSERT INTO live_job_links VALUES ('already-validation')")
+            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+
     def test_diagnostic_requires_exact_closed_prior_trial(self):
         first_trial.select_trial('diagnostic')
         with sqlite3.connect(':memory:') as db:
@@ -117,6 +138,19 @@ class FirstTrialGates(unittest.TestCase):
                     path.write_text(json.dumps({'observed_at':observed,'data':{}}))
                     with self.assertRaises(AssertionError): first_trial.catalog_snapshot()
 
+    def test_quote_freezes_multiple_locations_and_only_rechecks_that_list(self):
+        value = {'id':first_trial.GPU,'secure':True,'price':{'secure':0.89},'dataCenters':[
+            {'id':'US-IL-1','availability':'LOW'}, {'id':'EU-RO-1','availability':'LOW'},
+            {'id':'EUR-IS-1','availability':'NONE'}]}
+        with patch.object(first_trial,'catalog_snapshot',return_value=value):
+            selected=first_trial.checked_quote()['data_center_ids']
+            self.assertEqual(selected,['EU-RO-1','US-IL-1'])
+            value['dataCenters'][1]['availability']='NONE'
+            value['dataCenters'][2]['availability']='HIGH'
+            self.assertEqual(first_trial.checked_quote(selected)['data_center_ids'],selected)
+            value['dataCenters'][0]['availability']='NONE'
+            with self.assertRaises(AssertionError):first_trial.checked_quote(selected)
+
     def test_guard_receipt_is_bound_and_fresh(self):
         with tempfile.TemporaryDirectory() as t, patch.object(first_trial,'TRIAL',Path(t)):
             job={'batch':'fictional-batch','scope':canonical(['fictional-owner','fictional-project']), 'deadline':int(time.time())+600}
@@ -127,6 +161,17 @@ class FirstTrialGates(unittest.TestCase):
             for key,value in [('batch','other'),('scope','[]'),('deadline',job['deadline']+1),('checked_at',time.time()-181),('provider_name','other')]:
                 path.write_text(json.dumps(dict(ready,**{key:value})))
                 with self.assertRaises(AssertionError): first_trial.guard_ready(job)
+
+    def test_operator_line_keeps_status_visible_without_large_prompt(self):
+        summary = dict(checked_at=1, batch=dict(id='fictional',state='provisioning',
+            cleanup_state='pending',provider_resource_id=None,deadline_at='2026-11-16T15:33:20Z',
+            shot_snapshots=[{'prompt':'private-prompt' * 10000}]), takes=[], attempts=[],
+            billing={'status':'NO_POD_ID'},reservation_state='reserved')
+        message=json.dumps(first_trial.operator_summary(summary))
+        self.assertLess(len(message),1000)
+        self.assertIn('provisioning',message)
+        self.assertNotIn('private-prompt',message)
+        self.assertIn('shot_snapshots',summary['batch'])
 
 
 class BootstrapExecutionTests(LiveExecutionTests):

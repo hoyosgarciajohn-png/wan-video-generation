@@ -123,7 +123,7 @@ class LiveAdmission:
         RealJobBridge.configuration_hash(profile)
         launch = validate_launch_profile(grant['launch_profile'])
         require(launch['image'] == profile['image_ref'] and launch['gpu']['id'] == profile['gpu_type'] and launch['gpu']['count'] == 1 and
-                launch['dataCenterIds'] == [profile['region']], 'Launch and worker configuration mismatch')
+                launch['dataCenterIds'][0] == profile['region'], 'Launch and worker configuration mismatch')
         # Approval artifacts are durable audit material: credentials are never signed or stored here.
         require(launch['env'] == {}, 'Approval launch profile must contain no runtime credentials')
         if current:
