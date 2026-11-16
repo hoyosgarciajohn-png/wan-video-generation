@@ -1,0 +1,22 @@
+{
+  "observed_at": 1794803609,
+  "data": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-16T05:00:00Z",
+        "podId": "xhd7cd3nqsrcca",
+        "startTime": "2026-11-16T03:00:00Z"
+      },
+      "recordCount": 0,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0,
+        "gpuAmount": 0,
+        "totalAmount": 0
+      },
+      "uniquePodCount": 0
+    },
+    "records": []
+  }
+}

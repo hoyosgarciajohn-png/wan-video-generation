@@ -130,3 +130,17 @@ class LiveExecutionTests(unittest.TestCase):
         self.execution.cancel(self.owner,self.project,self.job)
         self.assertEqual(self.execution.watchdog(),[])
         self.assertEqual(closed.watchdog(),[])
+
+    def test_last_failed_attempt_closes_batch_and_deletes_without_another_claim(self):
+        self.control.max_attempts = 1
+        self.provision()
+        claim = self.workers.call(self.auth, 'claim', {})
+        attempt = claim['attempt']
+        self.workers.call(self.auth, f"attempts/{attempt['id']}/fail",
+                          {'lease_id':attempt['lease_id'], 'code':'gpu_out_of_memory'})
+        self.assertEqual(self.execution.status(self.owner,self.project,self.job)['batch']['state'], 'failed')
+        self.assertEqual(self.control.bundle(self.owner,self.project)['attempts'][0]['failure_reason'], 'gpu_out_of_memory')
+        self.assertEqual(self.execution.watchdog(), [])
+        self.assertEqual(self.execution.status(self.owner,self.project,self.job)['batch']['cleanup_state'], 'confirmed')
+        self.assertEqual(self.http.pods, {})
+        self.assertEqual(self.http.posts, 1)

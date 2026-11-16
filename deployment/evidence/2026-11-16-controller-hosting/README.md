@@ -1,5 +1,7 @@
 # Controller installation evidence
 
+Historical installation checkpoint. Later [browser/recovery evidence](../2026-11-16-access-recovery/README.md) and [first live trial](../2026-11-16-first-live-trial/README.md) supersede the pending items below. Preserve these original observations as dated evidence.
+
 Recorded November 16 UTC / November 15 owner-local, 2026. Issue #7 remains open.
 Contract 0.1.0. This records an installed disarmed CPU host, not a completed GPU trial.
 

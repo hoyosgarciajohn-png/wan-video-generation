@@ -13,4 +13,4 @@ John authorized $5 total, 1,800 seconds from admission, one five-second shot, on
 
 `trial-observe` can safely inspect/reconcile the same attempt after an operator interruption. It never issues a fresh create. If cleanup is unresolved, use the exact bound Pod identity and preserve the reservation; never start another attempt.
 
-Actual GPU execution, image pull, inference and deletion are unverified until recorded from the live trial. The recovery rehearsal uses synthetic media and does not prove any of those GPU operations.
+The first trial is now consumed. Actual private image pull, pinned model download, worker claim and deadline deletion are verified; inference failed before committing a take. See ../evidence/2026-11-16-first-live-trial/README.md. Recovery uses separate synthetic media. Prepared failure/guard corrections require deployment and a rebuilt private image before a new concretely scoped trial can be approved. Do not rerun prepare/admit/launch for this consumed trial.

@@ -1,0 +1,240 @@
+{
+  "final": {
+    "checked_at": 1794803320.3858654,
+    "batch": {
+      "approved_at": "2026-11-16T03:58:34.129121Z",
+      "budget": {
+        "approved_cents": 400,
+        "currency": "USD",
+        "reserved_cents": 400,
+        "spent_cents": 0
+      },
+      "cleanup_state": "confirmed",
+      "deadline_at": "2026-11-16T04:28:34Z",
+      "execution_mode": "runpod",
+      "id": "7c811e6ab21a4392b0e3a80e331fc57a",
+      "idempotency_key": "john-first-approved-attempt",
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "project_id": "project-d5ec9ddbe55c4e12901fc2273bc4ea3d",
+      "provider_resource_id": "xhd7cd3nqsrcca",
+      "shot_snapshots": [
+        {
+          "prompt": "A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.",
+          "reference_asset_ids": [],
+          "revision": 1,
+          "settings": {
+            "frame_rate": {
+              "denominator": 1,
+              "numerator": 24
+            },
+            "height": 704,
+            "seed": 42,
+            "steps": 50,
+            "width": 1280
+          },
+          "shot_id": "shot-1",
+          "target_duration_ms": 5000
+        }
+      ],
+      "state": "failed"
+    },
+    "budget": {
+      "spent_cents": 0,
+      "reserved_cents": 400,
+      "unsettled_count": 1
+    },
+    "reservation_state": "reserved",
+    "provider": {},
+    "billing": {
+      "status": "AWAITING_CONNECTED_BILLING_RECORD",
+      "reservation_retained": true
+    },
+    "unresolved": [],
+    "takes": [],
+    "attempts": [
+      {
+        "batch_id": "7c811e6ab21a4392b0e3a80e331fc57a",
+        "completed_at": "2026-11-16T04:25:42.605881Z",
+        "failure_reason": "render_failed",
+        "id": "fc4c7cef68ba4c2ab2e217e5ae67f573",
+        "lease_expires_at": "2026-11-16T04:26:08.321877Z",
+        "lease_id": "b632d75433a946dc82fcdfa29f1f0c0c",
+        "model_profile": {
+          "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+          "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+          "id": "wan22-ti2v-5b",
+          "revision": "1"
+        },
+        "project_id": "project-d5ec9ddbe55c4e12901fc2273bc4ea3d",
+        "settings": {
+          "frame_rate": {
+            "denominator": 1,
+            "numerator": 24
+          },
+          "height": 704,
+          "seed": 42,
+          "steps": 50,
+          "width": 1280
+        },
+        "shot_id": "shot-1",
+        "shot_revision": 1,
+        "started_at": "2026-11-16T04:07:51.255587Z",
+        "state": "failed",
+        "worker_id": "john-first-wan-worker"
+      }
+    ]
+  },
+  "inventory": {
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    },
+    "pods": []
+  },
+  "get_pod_404_verified": true,
+  "billing": {
+    "observed_at": 1794803359,
+    "data": {
+      "metadata": {
+        "query": {
+          "bucketSize": "hour",
+          "endTime": "2026-11-16T05:00:00Z",
+          "podId": "xhd7cd3nqsrcca",
+          "startTime": "2026-11-16T03:00:00Z"
+        },
+        "recordCount": 0,
+        "totals": {
+          "cpuAmount": 0,
+          "diskAmount": 0,
+          "gpuAmount": 0,
+          "totalAmount": 0
+        },
+        "uniquePodCount": 0
+      },
+      "records": []
+    }
+  },
+  "direct_log": [
+    {
+      "items": [
+        {
+          "source": "system",
+          "line": "c2f4d33cbb46 Pull complete",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "6838030a1df8 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "6838030a1df8 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "6838030a1df8 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "6838030a1df8 Pull complete",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "4f4fb700ef54 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "4f4fb700ef54 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "4f4fb700ef54 Pull complete",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "2309dcee8115 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "2309dcee8115 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "2309dcee8115 Extracting",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "2309dcee8115 Pull complete",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "Digest: sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "Status: Downloaded newer image for ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+          "ts": "2026-11-16T04:05:33Z"
+        },
+        {
+          "source": "system",
+          "line": "create container ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+          "ts": "2026-11-16T04:05:34Z"
+        },
+        {
+          "source": "system",
+          "line": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2 Pulling from hoyosgarciajohn-png/wan-video-generation-gpu",
+          "ts": "2026-11-16T04:05:34Z"
+        },
+        {
+          "source": "system",
+          "line": "Digest: sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+          "ts": "2026-11-16T04:05:34Z"
+        },
+        {
+          "source": "system",
+          "line": "Status: Image is up to date for ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
+          "ts": "2026-11-16T04:05:34Z"
+        },
+        {
+          "source": "system",
+          "line": "start container for ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2: begin",
+          "ts": "2026-11-16T04:05:35Z"
+        },
+        {
+          "source": "system",
+          "line": "start container for ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2: begin",
+          "ts": "2026-11-16T04:25:52Z"
+        },
+        {
+          "source": "container",
+          "line": "PASS: pinned checkpoint files verified",
+          "ts": "2026-11-16T04:07:50.585687974Z"
+        },
+        {
+          "source": "container",
+          "line": "Worker operation failed; retained journals require reconciliation",
+          "ts": "2026-11-16T04:25:42.715402753Z"
+        }
+      ],
+      "count": 22,
+      "truncated": false
+    }
+  ]
+}

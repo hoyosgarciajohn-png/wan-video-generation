@@ -157,6 +157,18 @@ class ControlService:
                 attempt.update(state='failed', completed_at=stamp(now), failure_reason=reason)
         if batch['state'] == 'rendering' and now >= timestamp(batch['deadline_at']):
             batch['state'] = 'failed'
+        if batch['state'] == 'rendering':
+            for snapshot in batch['shot_snapshots']:
+                attempts = [a for a in bundle['attempts'] if a['batch_id'] == batch['id']
+                            and a['shot_id'] == snapshot['shot_id']]
+                if len(attempts) >= self.max_attempts and all(a['state'] == 'failed' for a in attempts):
+                    batch['state'] = 'failed'
+                    # An exhausted shot closes the batch without requiring a new
+                    # worker claim. Fence any other in-flight shots immediately.
+                    for attempt in bundle['attempts']:
+                        if attempt['batch_id'] == batch['id'] and attempt['state'] in ('claimed','running'):
+                            attempt.update(state='failed', completed_at=stamp(now), failure_reason='batch_closed')
+                    break
 
     def _worker(self, client, action, supplied=None, payload=None):
         with self.transaction() as db:
@@ -215,9 +227,11 @@ class ControlService:
                                                                          timestamp(batch['deadline_at']))))
                 result = {'lease_expires_at': attempt['lease_expires_at']}
             elif action == 'fail':
-                if payload not in ('render_failed','worker_failed'):
+                if payload not in ('render_failed','worker_failed','gpu_out_of_memory','model_load_failed',
+                                   'generation_failed','video_encode_failed','output_validation_failed'):
                     raise ValueError('Unknown failure code')
                 attempt.update(state='failed', completed_at=stamp(now), failure_reason=payload)
+                self._reconcile(bundle, batch, now)
                 result = None
             elif action == 'complete':
                 result = self._complete(db, bundle, batch, attempt, payload, now)

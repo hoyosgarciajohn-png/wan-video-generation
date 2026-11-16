@@ -41,16 +41,19 @@ def main(spec_path):
     require(torch.__version__.split('+')[0] == '2.8.0', 'Unexpected torch version')
     torch.cuda.reset_peak_memory_stats()
     start = time.monotonic()
+    print('WAN_STAGE:model_load', flush=True)
     model = wan.WanTI2V(config=WAN_CONFIGS['ti2v-5B'], checkpoint_dir=spec['weights'],
                        device_id=0, rank=0, t5_cpu=True, convert_model_dtype=True)
     torch.cuda.synchronize()
     loaded = time.monotonic()
+    print('WAN_STAGE:generation', flush=True)
     video = model.generate(s['prompt'], img=image, size=size, max_area=size[0]*size[1],
                            frame_num=spec['frames'], shift=5.0, sample_solver='unipc',
                            sampling_steps=50, guide_scale=5.0, seed=s['settings']['seed'],
                            offload_model=True)
     torch.cuda.synchronize()
     generated = time.monotonic()
+    print('WAN_STAGE:video_encode', flush=True)
     save_video(tensor=video[None], save_file=spec['output'], fps=24, nrow=1,
                normalize=True, value_range=(-1, 1))
     atomic_json(Path(spec['output']).with_suffix('.metrics.json'), {

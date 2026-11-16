@@ -1,48 +1,69 @@
 # Wan Video Generation · Master handoff
-Version 1.31 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.32 | November 16, 2026 (UTC) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
-The Wan worker image is published privately in GHCR at the verified digest recorded
-in deployment/evidence/2026-11-15-private-publication. Runpod template lehfc5qf3s
-and private-pull credential wan-ghcr-pull are saved. Actual Runpod image download
-remains unverified. The $10 prepaid balance does not expand the approved trial.
+The dedicated controller is live at https://wan-64-225-114-46.sslip.io. Owner browser
+sign-in is verified in John's connected Chrome session. The native fetch receiver
+bug was corrected while preserving strict Host/Origin/CSP/CSRF controls. The
+existing owner token was transferred with RSA-OAEP encryption and exchanged for a
+session cookie; it was not printed or committed. Server restart invalidates sessions.
 
-John confirmed dedicated SSH access with “yes”. One approved DigitalOcean host
-is now active: wan-controller-01, Droplet 619703894, SFO2, 64.225.114.46, Ubuntu
-24.04.5 LTS amd64, Basic Regular 1 vCPU / 2 GiB / 50 GiB. The recurring rate is
-$12/month plus $2.40/month weekly backups, $14.40 before expected tax. Server
-billing has begun; the exact accrued charge is not retrieved. Weekly backups are
-enabled for Wednesday 04:00–08:00 UTC; no completed provider backup exists yet.
-No extra host, volume, managed database or domain purchase was added.
+Synthetic hosted acceptance passed: authenticated project creation, upload,
+fixture rendering, review, timeline/export, MP4 download/full decode, saved history
+after a controller restart, cleanup heartbeat while the web service was stopped,
+and same-host restore. A separate GitHub runner then restored the preserved backup,
+verified the exact video checksum, decoded it and checked history and owner isolation.
+Successful independent recovery run: 43800008304. This is synthetic acceptance,
+not human creative review or proof of scheduled backups.
 
-The WAN public SSH key is registered, and its private part is encrypted as
-WAN_HOST_SSH_KEY in the private repository. The unrelated SUMAN key was not used.
-Installed release: 42dbdc127b299b7e11e674630bef8683473f5a7a (PR #55). Controller,
-separate cleanup monitor and Caddy proxy are active and enabled at boot. The
-cleanup credential is installed privately on the host. HTTPS is available at
-https://wan-64-225-114-46.sslip.io without a domain purchase. Verification run
-43795476474 passed: clean source, three active/enabled services, loopback-only app,
-firewall, ready health with paid_dispatch:false, fresh cleanup heartbeat, SQLite
-integrity, zero live-job bindings and authenticated Runpod Pod GET. This proves
-neither Pod deletion nor actual shutdown. The independent deadline guard has not
-been started for an admitted trial.
+One DigitalOcean host remains active: wan-controller-01, Droplet 619703894, SFO2,
+64.225.114.46, Ubuntu 24.04.5 LTS amd64, 1 vCPU / 2 GiB / 50 GiB. Approved recurring cost:
+$12/month plus $2.40/month weekly backups, $14.40 before tax. Accrued hosting billing
+has not been retrieved. Weekly backups are enabled for Wednesday 04:00–08:00 UTC;
+the first scheduled snapshot and recurring offsite application backup remain pending.
+No extra host, volume, managed database or domain was purchased.
 
-The live browser blank screen was fixed by compiling the schema validator at
-build time while retaining strict CSP. The sign-in screen now renders, but its
-browser session request is rejected; a separate browser request returned 403.
-Direct unauthenticated same-origin HTTP correctly returns 401 and cross-site
-returns 403. Browser request provenance and owner token delivery remain unresolved;
-do not mark owner access or the full hosted user journey accepted. No token has
-been printed, committed or handed to the owner yet. Baseline memory was 393 MiB
-used / 1,574 MiB available; disk 2.6 GiB used / 45 GiB available, not workload capacity.
+Installed controller release: 387555fd40a57f1fcda2d0abff1fff20d93e4075 (PR #63),
+upgrade 43801074417. Controller, separate cleanup and Caddy remain boot-enabled.
+Live worker reception is installed; paid web provisioning remains disabled.
+Private trial authority is restricted to the already-approved $5 total,
+1,800 seconds from admission, one five-second shot and one create/render attempt.
+The $10 prepaid Runpod balance does not expand this authority.
 
-The $5 / 1,800-second / one-attempt GPU trial remains unused. Paid dispatch is
-still disabled; installed live authority, worker bootstrap, model weights/checksums,
-actual private image pull, Wan inference, resource closure and bill collection
-remain pending. See deployment/evidence/2026-11-16-controller-hosting/README.md.
+The trial was admitted at 03:58:34 UTC with fixed deadline 04:28:34 UTC on November 16.
+Project project-d5ec9ddbe55c4e12901fc2273bc4ea3d; batch 7c811e6ab21a4392b0e3a80e331fc57a.
+Its sole Pod-create attempt allocated xhd7cd3nqsrcca in EU-RO-1 at 04:04:53.707 UTC,
+RTX 4090 SECURE, $0.89/hour, 80 GB ephemeral container disk, no persistent volume.
+Launch 43801863653 verified fresh independent guard 43801724802 before creating the
+Pod. The earlier guard 43801296860 remained active at the same original deadline.
+The private image was pulled successfully by Runpod at 04:05:33 UTC; all 13 pinned
+model files (34,201,537,147 bytes) passed checksums at 04:07:50.585 UTC. The worker
+claimed the actual shot. The create allowance is used; no second attempt is authorized.
+
+The first render failed at 04:25:42.606 UTC after the last captured sampling progress
+of 49/50. No take or durable video was saved; the original worker discarded detailed
+child diagnostics, so the exact cause is not established. The independent guard confirmed resource absence at 04:28:37.627 UTC (3.627 seconds
+after the deadline), and the controller confirmed cleanup at 04:28:40.386 UTC, followed
+by empty Runpod inventory and an exact-Pod 404. No manual deletion was used. Final
+batch: failed; cleanup: confirmed; one failed attempt; zero active Pods.
+
+Estimated GPU compute was about $0.35 plus disk charges; actual billing remains
+unavailable/lagging. The $4 reservation remains unsettled, not released as zero spend.
+Source corrections now close exhausted failed batches promptly, preserve safe failure
+codes and block container rerender after a terminal failure. Guard readiness/observation
+is also corrected. These post-trial changes are prepared but not deployed. The browser
+connection disconnected; reconnect it to dispatch the deployment and rebuilt private
+worker. A second paid attempt needs fresh owner authority after its concrete proposal.
+
+Detailed outcomes are recorded in deployment/evidence/2026-11-16-first-live-trial/README.md. Connected billing reads
+are supported; automatic application-side bill retrieval is not installed. A missing
+or lagging charge never releases the reservation as a zero-cost final settlement.
+The public Studio's render buttons still submit synthetic fixtures; private operator
+activation does not expose general paid GPU generation to users.
+
 Historical entries below are chronological; this checkpoint supersedes them.
 
 ## Ownership and source of truth
@@ -436,7 +457,7 @@ Previous publication: [authenticated admission PR #30](https://github.com/hoyosg
 
 PR #31 merged at `21a5bcab35db6ef047f9190c4185b38415f8882f`; its tested tree is `0af62a393cfa8eb2ea5b3461ac952099de2c7994`. This follow-up is documentation only. The available Linux workspace has no container engine, NVIDIA device or daemon socket and rejects Unix socket binding. No compatible build host or hosted controller/watchdog has been verified. Runpod is waiting for the owner to sign in; account balance, capacity and pre-existing resources are unknown.
 
-See deployment/FIRST_RENDER_PROPOSAL.md and deployment/first-render-proposal.json for the concrete, unapproved $5/30-minute/one-attempt envelope, current public price assumptions, storage retention, ordered host acceptance and billing follow-up. Approval fields remain null. Shared storage is not covered by the existing Pod ledger; $1 is held separately from the proposed $4 Pod grant. No recurring hosting, paid build service, account top-up or automatic retry is included.
+See deployment/FIRST_RENDER_PROPOSAL.md and deployment/first-render-proposal.json for the concrete, unapproved $5/30-minute / one-attempt envelope, current public price assumptions, storage retention, ordered host acceptance and billing follow-up. Approval fields remain null. Shared storage is not covered by the existing Pod ledger; $1 is held separately from the proposed $4 Pod grant. No recurring hosting, paid build service, account top-up or automatic retry is included.
 
 The independent watchdog is callable source, not a running service. A local deadline is not a provider hard spending stop. Automatic bill retrieval and final-charge reconciliation remain pending; no bill was retrieved. All image/CUDA/host gates remain unverified. Prior 158 controller and 36 worker fictional checks are preserved without rerunning unchanged behavior. No GPU, build, key provisioning or paid resource was started. Next inputs: John’s specific numeric approval, Runpod sign-in and selection of a compatible existing build host; Command Center then coordinates actual image and hosted acceptance before the supervised first render.
 
@@ -939,6 +960,41 @@ were not relaxed. No real media or creative acceptance was claimed.
 
 Active cost/resource: one DigitalOcean CPU host at $14.40/month before expected
 tax, with backups enabled and first scheduled backup pending. No additional
-Runpod charge was incurred; the existing $5/1,800-second/one-attempt trial is unused.
+Runpod charge was incurred; the existing $5/1,800-second / one-attempt trial is unused.
 Exact accrued DigitalOcean billing has not been retrieved. Next: owner access,
 fictional hosted workload/recovery, live execution setup, then the approved trial.
+
+## November 16, 2026 — owner access, recovery and first actual GPU trial
+
+PRs #57–63 resolved owner browser sign-in, added hosted/independent recovery evidence,
+installed the private trial operator and worker receiver, and preserved narrow cleanup
+credentials by accepting fresh catalog/billing reads from the existing connected account.
+Installed release remains 387555fd40a57f1fcda2d0abff1fff20d93e4075. Contract 0.1.0 unchanged.
+
+The native browser fetch receiver bug was fixed without weakening security controls.
+Owner access succeeded and the synthetic project with succeeded MP4 export was visible.
+Hosted acceptance/restart/same-host recovery passed; its copy step failed separately.
+Copy-only recovery then passed on an independent runner 43800008304, with exact media
+hash/full decoding, history and owner isolation. Earlier copy-only failures (missing
+FFmpeg, transient checkout) were retained rather than represented as successful tests.
+
+Trial 43801863653 created exactly one RTX 4090 Pod at $0.89/hour. Private image pull,
+all 13 pinned model-file checksums and scoped worker claim passed. The real shot failed
+before committing output. Automatic deadline cleanup completed; no Pod or persistent
+volume remains. The render and creative/output-retention acceptance gates remain open.
+No retry was launched, and the $5 / 1800-second / one-attempt envelope was not expanded.
+
+Post-trial code addresses delayed failure cleanup, restart replay, safe diagnostics,
+and stale guard readiness. The original child error was not retained, so no root-cause
+fix or second live acceptance is claimed. Deployment and rebuilt image publication are
+pending browser reconnection; the installed image/source remain the measured versions.
+Authoritative billing/final settlement and automatic application-side collection remain
+pending. Weekly provider backups are enabled but the first scheduled snapshot is pending.
+
+Final guard outcomes:43801724802 observed the allocated Pod and confirmed its absence
+at04:28:37.627UTC, then through the post-deadline watch. Earlier guard43801296860
+missed the already-removed allocation and exited with NO_ALLOCATION_OBSERVED. This
+known evidence limitation is addressed in the prepared source; no GPU remains.
+Post-trial validation passed29worker/execution/integration tests,8hosting tests plus
+the safe-code cleanup regression,3guard tests and1freshness regression, syntax/compile
+and whitespace checks. Billing at04:33UTC still had no records; final charge is pending.
