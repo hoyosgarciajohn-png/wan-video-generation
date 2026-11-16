@@ -1,0 +1,15 @@
+{
+  "run_id": 43784863537,
+  "job_id": 133030124483,
+  "source_commit": "365b3f2a6b6ab05f2b1240cc8175b6c9f20aa318",
+  "run_url": "https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43784863537",
+  "conclusion": "success",
+  "status": "AUTHENTICATED_POD_READ_PASS",
+  "requests": 1,
+  "method": "GET",
+  "resources_created": 0,
+  "resources_deleted": 0,
+  "deletion_permission_verified": false,
+  "shutdown_verified": false,
+  "trial_used": false
+}

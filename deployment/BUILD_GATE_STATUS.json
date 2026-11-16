@@ -31,7 +31,7 @@
     "private_pull_credential_saved": "PASS",
     "private_runpod_template_saved": "PASS",
     "cleanup_credential_saved": "PASS",
-    "cleanup_credential_read_access": "PENDING"
+    "cleanup_credential_read_access": "PASS"
   },
   "image_ids": {
     "cpu": "sha256:b3d35b89b04d8e093ca9de9d96757ae70f69df13d27c1ffa3e54a78343d11fc3",
@@ -46,7 +46,9 @@
     "cpu_run_id": 43773935725,
     "gpu_run_id": 43774509988,
     "private_publication": "deployment/evidence/2026-11-15-private-publication",
-    "publication_run_id": 43777990153
+    "publication_run_id": 43777990153,
+    "cleanup_credential_read_access": "deployment/evidence/2026-11-15-cleanup-credential",
+    "cleanup_credential_run_id": 43784863537
   },
   "gpu_runtime_import_scope": "torch_and_flash_attn_only",
   "registry_digests": {
