@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.27 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.28 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -24,13 +24,18 @@ The private Runpod template lehfc5qf3s binds that registry credential to the exa
 published image digest. Template creation does not verify an actual image pull.
 The manual read-only credential probe passed in GitHub Actions run 43784863537.
 This establishes authenticated Pod read access; deletion and shutdown remain unverified.
-No suitable existing controller host or approved recurring hosting budget is established.
-The fresh-host installer is prepared, including disarmed cleanup-schema initialization.
-DigitalOcean is at owner sign-in. Proposed host: Basic Regular 2 vCPU / 4 GiB /
-80 GiB plus weekly backups, $28.80/month before tax; requested ceiling $32/month
-including tax. Neither hosting purchase nor this new monthly ceiling is approved.
-The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries below
-are chronological; this checkpoint supersedes earlier publication status.
+John rejected DigitalOcean and additional recurring controller-hosting charges.
+The paid-host proposal is withdrawn; its sign-in tab is closed. The controller
+budget is $0 additional recurring cost. First assess reuse of existing Vercel /
+ChatGPT Sites and Supabase services; connected inventory confirms those services
+already host other projects. This requires backend adaptation and verified spare
+allowances. Oracle Always Free is the persistent-server alternative, subject to
+capacity and ARM acceptance; the existing Windows PC is the fallback. No hosting
+route for Wan is installed or accepted. The prepared
+installer remains amd64-only and must be adapted before an Oracle A1 deployment.
+See deployment/hosting/HOSTING_DECISION.md for the current free-only plan.
+The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries
+below are chronological; this checkpoint supersedes earlier hosting proposals.
 
 ## Ownership and source of truth
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
@@ -63,16 +68,20 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Command Center: select an available controller host and obtain approval for its
-concrete recurring cost;
-install HTTPS, persistent storage/restore evidence, live authority and both cleanup
-layers; then verify the exact private image on Runpod within the approved trial.
+Command Center: compare reuse of existing Vercel / Sites plus a durable backend
+against the Oracle Always Free and Windows options. Verify incremental cost,
+storage isolation/quotas, independent cleanup and CPU export placement. Do not
+open a new hosting account until the existing services have been assessed.
+If Oracle is selected, verify account capacity and ARM support; if Windows is
+selected, verify WSL, power/network reliability and secure worker access.
+No paid account upgrade or replacement VPS is authorized. Install HTTPS,
+persistent state/restore evidence, live authority and both cleanup layers; then
+verify the exact private image on Runpod within the approved trial.
 John approved $5 total, 30 minutes from admission, one five-second clip and one
 attempt on November 15, 2026. Do not request the same numeric approval again.
-The $10 prepaid balance does not expand the $5 consumption cap. No new recurring
-hosting expense is approved or incurred.
+The $10 prepaid balance does not expand the $5 consumption cap.
 
-Remaining inputs: available Linux amd64 controller host and owned HTTPS hostname;
+Remaining inputs: verified free controller host and secure HTTPS reachability;
 controller credential storage and installed authority; model/journal mounts and
 worker bootstrap credential; verified primary plus independent cleanup. The cleanup
 key is stored only in GitHub Actions, not yet on a controller. Recheck compatible
@@ -738,6 +747,8 @@ GPU/storage allocation, recurring host or paid builder was purchased in this ste
 
 ## Controller installation prepared; hosting decision pending — November 15, 2026
 
+**Historical proposal; superseded by the free-only hosting decision below.**
+
 User requested controller hosting and automatic shutdown installation. Remote main
 baseline c4b6251076797ab7d38f452721b1f8b496b82199 was verified. No compatible
 connected host exists in the known setup. DigitalOcean/Hetzner plugin discovery
@@ -781,3 +792,36 @@ securely install credentials and the prepared release, verify TLS/persistence/
 recovery/monitor operation, then install live authority and use the one-attempt
 GPU trial. The approved $5 / 1,800-second / one-attempt trial remains unused.
 No additional payment, recurring host, GPU or storage resource was created.
+
+## Paid controller proposal withdrawn; free route selected — November 15, 2026
+
+John explicitly rejected DigitalOcean and requested a free alternative. Additional
+recurring controller budget is now $0. The previous $32/month approval request is
+withdrawn. No paid replacement VPS or paid account upgrade is authorized. The
+DigitalOcean login tab was closed. No subscription or server was purchased.
+
+Reviewed official Oracle, Render, Cloudflare, Microsoft WSL and GitHub documentation.
+Oracle Always Free is a persistent-server candidate; the Windows PC is a fallback.
+John then asked what our other projects already use. Connected inventories confirm
+Vercel and ChatGPT Sites host existing websites, with Supabase databases for several
+projects. Existing-service reuse is now the first option to assess before creating
+another hosting account; it requires backend adaptation and quota/cost verification.
+The decision document records exact current allowances, limitations and steps.
+Cloudflare would need a material backend redesign; Render Free does not preserve
+this implementation's SQLite and media filesystem. GitHub Actions remains the
+bounded independent cleanup guard, subject to remaining included usage.
+
+The current installer rejects ARM, so Oracle is not deployment-ready. Account
+eligibility/capacity, ARM dependencies and actual host behavior must be verified.
+Do not weaken source-bound admission or claim hardware acceptance from research.
+The existing Runpod GPU image remains amd64. No signup, account upgrade, runtime
+change, credential creation, GPU or volume allocation occurred in this step.
+
+Source baseline: PR #49 / main 3ac7309a103b9b5bcf0c237aa24d8d6975242355.
+Contract 0.1.0 unchanged. Documentation consistency and whitespace checked;
+previous automated/runtime evidence retained without repeating unaffected tests.
+Actual shutdown, Runpod image pull and authoritative bill retrieval remain open.
+The approved $5 / 1,800-second / one-attempt GPU trial remains unused.
+Next recipient: Command Center to compare reuse of existing hosting with the free
+server alternatives, verify the chosen route, and complete existing launch gates.
+No existing project data or deployment was changed during the inventory review.

@@ -4,17 +4,27 @@ Updated November 15, 2026 (owner local date). **Not deployed.** Runpod has $10
 prepaid credit, zero observed Pods, saved private registry credential wan-ghcr-pull,
 and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions;
 its Pod read access passed run 43784863537. No credential is installed on a
-controller. No compatible existing host or recurring hosting approval is established.
-DigitalOcean's console is at sign-in; existing resources and live capacity have
-not been inspected. See [the concrete hosting decision](HOSTING_DECISION.md).
+controller. John rejected paid controller hosting. The DigitalOcean proposal is
+withdrawn and its sign-in tab is closed. Controller hosting must add $0 recurring
+cost. First assess reuse of existing Vercel / ChatGPT Sites and Supabase services.
+The current backend needs adaptation for those runtimes. Oracle Always Free is
+the persistent-server alternative, subject to capacity and ARM compatibility;
+the existing Windows PC is the fallback. No route is installed or accepted.
+See [the hosting decision](HOSTING_DECISION.md).
 
-## Selected deployment shape
+## Prepared deployment shape and portability gap
 
 Use a Linux amd64 CPU host with Python 3.11+, Node 22 for the Studio build, Git,
 FFmpeg/ffprobe, persistent disk and Caddy TLS. Start with 2 vCPU, 4 GB RAM and
 40 GB disk for the trial. This is not a capacity claim for 30-minute production
 exports. Retain a complete reviewed Git checkout for source-bound admission;
 the earlier local-staging container does not contain that checkout.
+
+This describes the existing **amd64** source package, not an approved paid host.
+The installer currently rejects ARM. Oracle A1 requires a reviewed portability
+change and actual ARM dependency, FFmpeg, service and recovery acceptance before
+use. The Runpod GPU image remains amd64. Windows hosting similarly requires WSL,
+persistence, secure worker reachability and power/sleep verification.
 
 The new Waitress 3.0.2 WSGI adapter binds only to 127.0.0.1:8080, behind Caddy.
 It preserves strict Host/Origin checks, secure cookies, scoped media, bounded
