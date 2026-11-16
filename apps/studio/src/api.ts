@@ -92,9 +92,13 @@ export class StudioClient {
             : { body: JSON.stringify(body) }),
       });
     } catch {
+      console.warn("WAN connection failed before receiving an HTTP response");
       throw new StudioError(503);
     }
-    if (!response.ok) throw new StudioError(response.status);
+    if (!response.ok) {
+      console.warn(`WAN connection returned HTTP ${response.status}`);
+      throw new StudioError(response.status);
+    }
     if (response.status === 204) return undefined as T;
     try {
       return (await response.json()) as T;

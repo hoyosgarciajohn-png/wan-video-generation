@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -29,14 +29,14 @@ ssh_options=(-F /dev/null -i "$temp_dir/key" -o IdentitiesOnly=yes -o BatchMode=
 if [[ "$operation" == diagnose ]]; then
     ssh "${ssh_options[@]}" "root@$host" 'bash -s' <<'REMOTE'
 set -euo pipefail
-journalctl -u wan-controller --since "30 minutes ago" -o cat --no-pager | python3 -c 'import sys; print("".join(line for line in sys.stdin if line.startswith("WARNING:root:WAN_SESSION_REJECT ")))'
+journalctl -u wan-controller --since "30 minutes ago" -o cat --no-pager | python3 -c 'import sys; print("".join(line[line.index("WAN_SESSION_REJECT "):] for line in sys.stdin if "WAN_SESSION_REJECT " in line))'
 REMOTE
     exit
 fi
 if [[ "$operation" == owner-access ]]; then
     [[ -n ${WAN_ACCESS_PUBLIC_KEY:-} ]] || fail 'Encryption recipient required'
-    printf '%s\n' "$WAN_ACCESS_PUBLIC_KEY" > "$temp_dir/recipient.pem"
-    openssl pkey -pubin -in "$temp_dir/recipient.pem" -text -noout | head -1 | grep -Fx 'Public-Key: (3072 bit)' >/dev/null || fail 'RSA 3072 recipient required'
+    printf '%s' "$WAN_ACCESS_PUBLIC_KEY" | base64 --decode > "$temp_dir/recipient.pem"
+    openssl pkey -pubin -in "$temp_dir/recipient.pem" -text -noout | grep -Fx 'Public-Key: (3072 bit)' >/dev/null || fail 'RSA 3072 recipient required'
     scp "${ssh_options[@]}" "$temp_dir/recipient.pem" "root@$host:/root/wan-access-recipient.pem"
     ssh "${ssh_options[@]}" "root@$host" 'bash -s' <<'REMOTE'
 set -euo pipefail
@@ -44,6 +44,17 @@ trap 'rm -f /root/wan-access-recipient.pem' EXIT
 python3 -c 'import json; p=json.load(open("/etc/wan/studio-tokens.json")); assert len(p)==1 and list(p.values())==["john-hoyos"]; print(next(iter(p)),end="")' | openssl pkeyutl -encrypt -pubin -inkey /root/wan-access-recipient.pem -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 | base64 -w0
 printf '\n'
 REMOTE
+    exit
+fi
+if [[ "$operation" == recovery ]]; then
+    scp "${ssh_options[@]}" deployment/host_acceptance.py "root@$host:/root/wan-host-acceptance.py"
+    ssh "${ssh_options[@]}" "root@$host" 'cd /opt/wan/current; PYTHONPATH=/opt/wan/current WAN_SOURCE_ROOT=/opt/wan/current /opt/wan/venv/bin/python /root/wan-host-acceptance.py host'
+    mkdir "$temp_dir/acceptance"
+    scp -r "${ssh_options[@]}" "root@$host:/var/lib/wan/acceptance-20261116/backup" "root@$host:/var/lib/wan/acceptance-20261116/workflow.json" "root@$host:/var/lib/wan/acceptance-20261116/result.json" "$temp_dir/acceptance/"
+    python3 -m venv "$temp_dir/venv"
+    "$temp_dir/venv/bin/pip" install --require-hashes --only-binary=:all: -r deployment/hosting/requirements.lock
+    "$temp_dir/venv/bin/python" -m deployment.host_acceptance off-host --directory "$temp_dir/acceptance"
+    cp "$temp_dir/acceptance/result.json" "$temp_dir/acceptance/off-host-result.json" "$RUNNER_TEMP/"
     exit
 fi
 if [[ "$operation" == inspect ]]; then

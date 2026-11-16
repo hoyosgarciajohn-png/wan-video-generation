@@ -23,6 +23,7 @@ export function errorMessage(error: unknown): string {
     (
       {
         401: "Sign in again to access this project.",
+        403: "This browser request was blocked by the connection security checks.",
         404: "This project or item is unavailable.",
         410: "This upload expired or was canceled. Select the file again to start a new upload.",
         409: "A newer version is available. Reload before saving your changes.",
