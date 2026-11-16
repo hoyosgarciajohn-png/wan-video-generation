@@ -61,5 +61,21 @@
     "The spending ceiling is enforced by admission, pricing, single-attempt and shutdown controls, not a provider-side hard account cap",
     "Automatic application-side provider billing collection remains pending"
   ],
-  "approval_reference": "Command Center chat, November 16 2026: John replied yes i approve to one new one-second diagnostic attempt, maximum 30 minutes and an additional $5 ceiling."
+  "approval_reference": "Command Center chat, November 16 2026: John replied yes i approve to one new one-second diagnostic attempt, maximum 30 minutes and an additional $5 ceiling.",
+  "execution_record": {
+    "authority_consumed": true,
+    "remaining_pod_create_attempts": 0,
+    "remaining_render_attempts": 0,
+    "project_id": "project-894af8d869d6448290d34a762a736781",
+    "batch_id": "def5478dc85949139ca1c0ae404f9d1f",
+    "pod_id": "hzprkb5xllm8p0",
+    "state": "failed",
+    "failure_reason": "gpu_out_of_memory",
+    "takes": 0,
+    "cleanup": "confirmed",
+    "guard_run": 43811980342,
+    "guard_conclusion": "success",
+    "billing_final": false,
+    "evidence": "deployment/evidence/2026-11-16-diagnostic-trial/README.md"
+  }
 }

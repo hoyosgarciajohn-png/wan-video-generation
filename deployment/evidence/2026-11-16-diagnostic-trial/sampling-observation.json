@@ -1,0 +1,8 @@
+{
+  "durationMs": 195,
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "{\"checked_at\": 1794808960.994119, \"gpu\": \"14860 MiB, 100 %\", \"processes\": [{\"pid\": \"68\", \"stages\": [\"model_load\", \"generation\"], \"steps\": [\"76%|\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u258c  | 38/50 [00:58<00:18,  1.54s/it]\", \"78%|\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u2588\\u258a  | 39/50 [01:00<00:16,  1.54s/it]\"], \"cuda_oom\": false, \"traceback\": false}]}\n",
+  "timedOut": false,
+  "truncated": false
+}

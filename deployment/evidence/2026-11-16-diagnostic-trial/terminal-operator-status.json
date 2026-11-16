@@ -1,0 +1,90 @@
+{
+  "checked_at": 1794809099.1127813,
+  "batch": {
+    "approved_at": "2026-11-16T05:42:07.205964Z",
+    "budget": {
+      "approved_cents": 400,
+      "currency": "USD",
+      "reserved_cents": 400,
+      "spent_cents": 0
+    },
+    "cleanup_state": "confirmed",
+    "deadline_at": "2026-11-16T06:12:07Z",
+    "execution_mode": "runpod",
+    "id": "def5478dc85949139ca1c0ae404f9d1f",
+    "idempotency_key": "john-diagnostic-approved-attempt",
+    "model_profile": {
+      "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+      "id": "wan22-ti2v-5b",
+      "revision": "1"
+    },
+    "project_id": "project-894af8d869d6448290d34a762a736781",
+    "provider_resource_id": "hzprkb5xllm8p0",
+    "shot_snapshots": [
+      {
+        "prompt": "A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "settings": {
+          "frame_rate": {
+            "denominator": 1,
+            "numerator": 24
+          },
+          "height": 704,
+          "seed": 42,
+          "steps": 50,
+          "width": 1280
+        },
+        "shot_id": "shot-1",
+        "target_duration_ms": 1000
+      }
+    ],
+    "state": "failed"
+  },
+  "budget": {
+    "spent_cents": 0,
+    "reserved_cents": 400,
+    "unsettled_count": 1
+  },
+  "reservation_state": "reserved",
+  "provider": {},
+  "billing": {
+    "status": "RETRIEVED_NOT_FINAL",
+    "observed_cents": 0
+  },
+  "unresolved": [],
+  "takes": [],
+  "attempts": [
+    {
+      "batch_id": "def5478dc85949139ca1c0ae404f9d1f",
+      "completed_at": "2026-11-16T06:03:11.408283Z",
+      "failure_reason": "gpu_out_of_memory",
+      "id": "2202a1b811f547ee82dd9ec91701abc3",
+      "lease_expires_at": "2026-11-16T06:03:38.605730Z",
+      "lease_id": "2f9f74428fc54a14a46e664968263243",
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "project_id": "project-894af8d869d6448290d34a762a736781",
+      "settings": {
+        "frame_rate": {
+          "denominator": 1,
+          "numerator": 24
+        },
+        "height": 704,
+        "seed": 42,
+        "steps": 50,
+        "width": 1280
+      },
+      "shot_id": "shot-1",
+      "shot_revision": 1,
+      "started_at": "2026-11-16T05:51:39.054441Z",
+      "state": "failed",
+      "worker_id": "john-diagnostic-wan-worker"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "observed_at": 1794809043.586,
+  "data": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-16T07:00:00Z",
+        "podId": "hzprkb5xllm8p0",
+        "startTime": "2026-11-16T05:00:00Z"
+      },
+      "recordCount": 0,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0,
+        "gpuAmount": 0,
+        "totalAmount": 0
+      },
+      "uniquePodCount": 0
+    },
+    "records": []
+  },
+  "final": false,
+  "import_run": 43814346326
+}

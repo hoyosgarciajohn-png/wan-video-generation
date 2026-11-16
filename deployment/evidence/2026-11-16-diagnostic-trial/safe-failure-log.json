@@ -1,0 +1,16 @@
+{
+  "source": "Runpod container log",
+  "pod_id": "hzprkb5xllm8p0",
+  "events": [
+    {
+      "at": "2026-11-16T06:03:10.958921648Z",
+      "event": "wan_attempt_failed",
+      "code": "gpu_out_of_memory"
+    },
+    {
+      "at": "2026-11-16T06:03:11.510484793Z",
+      "message": "Worker operation failed; retained journals require reconciliation"
+    }
+  ],
+  "exact_failing_allocation": "not captured"
+}

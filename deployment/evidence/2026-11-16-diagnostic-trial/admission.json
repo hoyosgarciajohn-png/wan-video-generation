@@ -1,0 +1,20 @@
+{
+  "status": "RUNNING_NOT_ACCEPTED",
+  "owner": "john-hoyos",
+  "project": "project-894af8d869d6448290d34a762a736781",
+  "batch": "def5478dc85949139ca1c0ae404f9d1f",
+  "pod": "hzprkb5xllm8p0",
+  "source_commit": "8e07ba3e8dfb9a250424bb4c8607cd1cac36cfe6",
+  "prepare_run": 43811849345,
+  "admit_run": 43811927800,
+  "guard_run": 43811980342,
+  "launch_run": 43812096376,
+  "deadline": 1794809527,
+  "overall_cap_cents": 500,
+  "runtime_seconds": 1800,
+  "max_attempts": 1,
+  "target_duration_ms": 1000,
+  "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b",
+  "record_type": "historical_admission_snapshot",
+  "terminal_result_reference": "terminal-operator-status.json"
+}
