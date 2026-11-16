@@ -28,12 +28,32 @@ response remains unknown; empty inventory is not definitive rejection.
 This implementation adds a private maintenance database/assets checkpoint while
 leaving cleanup running across the source swap. It is explicitly not an automatic
 restore bundle; normal backup/restore closure requirements remain unchanged.
-PR #76's redacted launch diagnostics and multiple eligible data centers will ship
-with this deployment. Source remains 42b3e993 until the upgrade is verified.
-No new Pod or runtime grant has been created at this implementation checkpoint.
-Contract remains 0.1.0. Fictional checks: 46 targeted deployment/guard/hosting
-checks passed, plus contract and shell syntax validation. 172 root controller regression checks passed in 34.261 seconds. Live execution
-evidence will be recorded after completion.
+PR #76's redacted launch diagnostics and multiple eligible data centers are now
+**deployed**, together with the owner-authorized exception in PR #78. Installed
+source is `3a2f0cafd420a50fc2b744dc0490541f52cbbf87`. Upgrade run
+43926416349 succeeded at 18:13:08 UTC. All three services are active/enabled,
+SQLite integrity and internal/external HTTPS checks pass. The cleanup heartbeat
+still reports only the old repair request unresolved; three historical live jobs
+and all reservations remain. Provider authentication and absence reads passed.
+
+**The new one-second test has not launched: current matching GPU capacity is
+unavailable.** Post-upgrade Secure RTX 4090 / one GPU / CUDA >=12.8 catalog reads
+briefly showed EU-RO-1 LOW, then returned NONE three times. No stale quote was
+admitted. No new trial project, runtime grant, admission, POST, worker attempt or
+Pod was created; the new deadline and budget remain unused. The final complete
+connected inventory is empty, which still does not settle the old unknown POST.
+See `deployment/evidence/2026-11-16-isolated-validation/live-status.json`.
+
+Next: obtain a fresh matching quote, prepare the isolated validation with every
+currently eligible location (up to eight), admit once, start its independent guard,
+and perform one launch. Support reconciliation proceeds independently. Keep main
+at the installed code SHA while dispatching the staged operator; documentation
+follow-up is reviewable separately so it does not invalidate the source binding.
+Then measure one-second result before separately scoping five seconds and one
+minute. Do not broaden GPU/cloud/price limits or silently start a monitoring schedule.
+Contract remains 0.1.0. All 172 root checks and 46 targeted deployment/guard/hosting
+checks passed, plus contract, shell syntax and whitespace validation. Automated
+checks used fictional data; actual repaired-worker GPU output remains unproved.
 
 **The 1280x704/24fps exporter is already deployed.** Frozen legacy 320x180 jobs
 retain their original profile. Hosted fictional one-minute rehearsal 43890910756
