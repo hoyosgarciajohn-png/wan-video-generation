@@ -1,13 +1,16 @@
 # First real Wan run: launch prerequisites
 
-Status on 2026-11-15: **BLOCKED; no image built and no Wan inference run.**
+Current status: **Launch blocked; CPU/GPU image builds passed, no Wan inference run.**
+See `CLOUD_BUILD_RECORD.md` for completed build evidence and `hosting/README.md`
+for prepared HTTPS/cleanup services and remaining deployment inputs. The approved
+$5 / 30-minute / one-attempt envelope remains unused.
 This is an operator handoff, not a launch authorization. The existing public remote
 worker integration renders CPU fixtures only. A separate trusted test bridge can
 rehearse pinned Wan-profile records with synthetic CPU-generated media and a fake
 provider; it has no live-provider factory. Passing that integration does not
 establish CUDA compatibility, creative quality or cost.
 
-## Fresh host investigation
+## Historical workspace investigation (before the successful cloud builds)
 
 The available workspace is Linux x86_64, Python 3.12.14, with approximately
 57 GiB free at inspection. Command lookup found no Docker, Podman, buildctl,
@@ -18,11 +21,10 @@ A temporary AF_UNIX socket bind failed with `PermissionError`, errno 1; the
 probe cleaned up its path. Thus the earlier BuildKit socket restriction still
 applies. Merely installing a client or another BuildKit binary is not a fix.
 
-The currently exposed service tool catalog provides no RunPod, SSH, Docker or
-compute-host connection. No existing compatible free build host was discoverable
-through those capabilities. Account credentials, private hosts and environment
-secret values were not searched. No remote CI, installation, large download,
-container, provider resource or public deployment was started.
+That initial workspace had no compatible builder. Subsequent GitHub-hosted
+Linux CPU runners successfully built and checked both images. The Runpod
+connection is now verified. No Runpod resource or GPU inference has been started;
+the controller host, credentials, model staging and cleanup acceptance remain open.
 
 ## Required inputs and acceptance evidence
 
@@ -96,14 +98,13 @@ size fits; changing this cap requires a coordinated server/client review.
 
 The Dockerfile pins both base images by digest, installs hash-locked dependencies,
 checks Python3.11/Torch2.8/C++11 ABI, verifies the official source archive checksum,
-and imports FlashAttention/WanTI2V during the build. The wheel filename matches
+and imports Torch/FlashAttention during the build. Wan source is compiled without
+importing its CUDA-initializing T5 module on the CPU builder. The wheel filename matches
 that declared Python/Torch/ABI combination. Required local worker contracts,
 fixtures and source are copied. The worker uses `jsonschema` directly and does
 not require the controller's `scripts.validate_contract` module.
 
-No concrete missing local import or conflicting declared pin was found in this
-inspection. The checks in a Dockerfile are executable requirements, not evidence
-that they have passed. Resolving all package wheels, loading shared libraries,
-importing upstream code, runtime CUDA compatibility and sufficient VRAM remain
-unverified until the corresponding commands actually run. Existing image gate
-statuses remain unchanged.
+The real cloud builds verified wheel installation, Torch/FlashAttention loading,
+Wan source syntax and synthetic media. Actual Wan import on CUDA, model loading,
+runtime CUDA compatibility, sufficient VRAM and inference remain unverified.
+Use `BUILD_GATE_STATUS.json` and the retained original logs for current gates.

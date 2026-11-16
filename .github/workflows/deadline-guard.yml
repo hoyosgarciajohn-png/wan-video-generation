@@ -1,0 +1,37 @@
+name: Guard one Runpod deadline
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Exact JSON array of owner ID and project ID
+        required: true
+        type: string
+      batch:
+        description: Admitted batch identifier (no automatic admission)
+        required: true
+        type: string
+      deadline:
+        description: Original absolute Unix deadline, within 1800 seconds
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  cleanup:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 37
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Watch the exact request and terminate at its deadline
+        env:
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          WAN_GUARD_SCOPE: ${{ inputs.scope }}
+          WAN_GUARD_BATCH: ${{ inputs.batch }}
+          WAN_GUARD_DEADLINE: ${{ inputs.deadline }}
+        run: python3 -m deployment.deadline_guard

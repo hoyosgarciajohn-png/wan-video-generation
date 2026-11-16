@@ -20,7 +20,11 @@ FIELDS = {'project_id','owner_id','batch_id','worker_id','provider','region','gp
 CRITICAL = ('services/controller/live_execution.py','services/controller/live_billing.py','services/controller/live_admission.py','services/controller/http_api.py','services/controller/preflight.py','services/controller/service.py',
             'services/controller/worker_transport.py','services/controller/orchestration.py',
             'services/controller/budget.py','services/controller/real_jobs.py','services/controller/lifecycle.py','services/controller/runpod.py',
-            'deployment/build_verify.py','deployment/container_smoke.py')
+            'deployment/build_verify.py','deployment/container_smoke.py',
+            'deployment/hosted_app.py','deployment/cleanup_monitor.py','deployment/deadline_guard.py',
+            'deployment/publish_image.py','deployment/hosting/requirements.lock',
+            'deployment/hosting/wan-controller.service','deployment/hosting/wan-cleanup.service',
+            'deployment/hosting/Caddyfile.example','.github/workflows/deadline-guard.yml')
 
 
 def _hash(value):

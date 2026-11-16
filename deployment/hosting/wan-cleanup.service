@@ -1,0 +1,24 @@
+[Unit]
+Description=WAN independent resource cleanup monitor
+After=network-online.target
+Wants=network-online.target
+# Deliberately no Requires/PartOf relation to the web process.
+
+[Service]
+User=wan
+Group=wan
+WorkingDirectory=/opt/wan/current
+EnvironmentFile=/etc/wan/cleanup.env
+ExecStart=/opt/wan/venv/bin/python -m deployment.cleanup_monitor
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/wan
+
+[Install]
+WantedBy=multi-user.target
