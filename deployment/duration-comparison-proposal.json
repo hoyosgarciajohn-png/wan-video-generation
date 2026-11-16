@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-16",
+  "status": "PREPARED_PENDING_NEW_BUDGET_APPROVAL",
+  "execution_enabled": false,
+  "owner_request": "Let's do the 5 seconds and the 15 seconds test. generate to different test to be able to compare results. organize and improve idea",
+  "purpose": "Compare two independent continuous Wan clips with duration as the primary changed variable",
+  "approval": {
+    "test_intent": "REQUESTED_BY_OWNER",
+    "new_spending_envelope": "PENDING",
+    "existing_consumed_grants_reusable": false
+  },
+  "baseline": {
+    "main_commit": "a746d01714886edf6ae0c900ef9f2e283a82048a",
+    "installed_commit": "84fe9d2d9e2aad680c825069dd5dc5a84f5314f5",
+    "successful_one_second_batch": "0a30c22ff1a8493bbe2714ad36cd0321",
+    "successful_one_second_pod": "ymhk7srf23nend",
+    "final_bill_pending": true,
+    "peak_vram_not_retained": true
+  },
+  "proposed_terms": {
+    "currency": "USD",
+    "overall_additional_cap_cents": 500,
+    "pod_reservation_cents": 400,
+    "storage_allowance_cents": 100,
+    "max_hourly_cents": 450,
+    "runtime_seconds_from_admission": 2700,
+    "allocated_pods": 1,
+    "gpu_count": 1,
+    "gpu_type": "NVIDIA H100 80GB HBM3",
+    "cloud": "SECURE",
+    "minimum_cuda_version": "12.8",
+    "minimum_host_ram_gb": 64,
+    "ephemeral_disk_gb": 80,
+    "persistent_volumes": 0,
+    "max_allocation_requests": 3,
+    "allocation_retry": "Exact explicit HTTP 400 no-capacity only; same signed H100/location profile and deadline; fresh quote; no uncertain-outcome retry",
+    "max_render_attempts": 2,
+    "retries_per_render": 0,
+    "test_order": [
+      "duration-05",
+      "duration-15"
+    ]
+  },
+  "shared_settings": {
+    "prompt": "One small blue sailboat with a single white sail moves slowly from left to right across a calm lake at sunrise. A fixed wide camera keeps the entire boat visible. Keep the boat's shape, sail, colors, shoreline and mountains consistent. Gentle continuous ripples, natural light, one uninterrupted shot, no cuts, no text.",
+    "seed": 42,
+    "width": 1280,
+    "height": 704,
+    "fps": 24,
+    "steps": 50,
+    "solver": "unipc",
+    "shift": 5,
+    "guide_scale": 5,
+    "model_profile": "wan22-ti2v-5b",
+    "checkpoint_revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+    "model_code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+    "memory_policy": "sequential-gpu-text-bf16-vae-v1",
+    "audio": false,
+    "reference_images": []
+  },
+  "cases": [
+    {
+      "id": "duration-05",
+      "target_duration_ms": 5000,
+      "generated_frames": 121,
+      "expected_raw_duration_ms": 5042,
+      "comparison_export_frames": 120,
+      "comparison_export_duration_ms": 5000,
+      "current_worker_duration_support": true,
+      "goal": "Establish quality, runtime and memory baseline"
+    },
+    {
+      "id": "duration-15",
+      "target_duration_ms": 15000,
+      "generated_frames": 361,
+      "expected_raw_duration_ms": 15042,
+      "comparison_export_frames": 360,
+      "comparison_export_duration_ms": 15000,
+      "current_worker_duration_support": false,
+      "goal": "Measure longer-shot continuity, temporal drift and resource growth",
+      "classification": "EXPERIMENTAL_CONTINUOUS_GENERATION"
+    }
+  ],
+  "measurement_rules": {
+    "same_pod_for_both": true,
+    "one_model_download": true,
+    "independent_generation_for_each": true,
+    "matching_seed_does_not_guarantee_identical_first_frames": true,
+    "shared_startup_cost_reported_separately": true,
+    "provider_bill_is_batch_level": true,
+    "per_clip_cost_is_attributed_estimate": true,
+    "required_durable_fields": [
+      "attempt_id",
+      "model_revision",
+      "image_digest",
+      "actual_gpu",
+      "driver",
+      "frame_count",
+      "dimensions",
+      "fps",
+      "model_load_seconds",
+      "generation_seconds",
+      "decode_encode_seconds",
+      "upload_seconds",
+      "gpu_peak_allocated_bytes",
+      "gpu_peak_reserved_bytes",
+      "asset_sha256",
+      "asset_bytes",
+      "cleanup_result"
+    ]
+  },
+  "execution_gates": [
+    "Implement and verify durable benchmark telemetry before any new paid run",
+    "Enable the 15-second experiment only under its separately signed scope; preserve historical five-second limits",
+    "Implement two ordered attempts on one Pod under one shared deadline/reservation",
+    "Five-second output must be valid, saved off-Pod and its telemetry acknowledged before claiming the 15-second attempt",
+    "Check remaining time and measured resource use before the 15-second attempt; skip safely if unsuitable",
+    "Never stitch, loop, stretch or recycle the five-second clip to label it as a continuous 15-second test",
+    "Preserve the exact historical unknown exception, reservations and independent cleanup",
+    "Build and verify the reviewed worker digest; finish fictional checks and host acceptance before admission",
+    "Use one new owner-approved comparison scope; never reset an earlier grant",
+    "Verify both retained outputs after Pod deletion"
+  ],
+  "deliverables": [
+    "5-second MP4 comparison copy and original take",
+    "15-second MP4 comparison copy and original take, if successful",
+    "Common first-five-seconds side-by-side comparison, plus the full long clip",
+    "Timing, memory, cost and technical-validation table",
+    "Owner live-review checklist for continuity and visual quality",
+    "Cleanup and final-billing record"
+  ],
+  "limitations": [
+    "15-second support is not currently enabled or GPU-validated",
+    "Longer duration can require more than proportionally greater compute or memory; no guaranteed 3x cost estimate",
+    "One pair is an exploratory comparison, not a statistical benchmark",
+    "Final one-second billing remains pending; do not equate empty billing records with zero cost",
+    "The proposed application limits are not a provider-side hard account cap"
+  ]
+}
