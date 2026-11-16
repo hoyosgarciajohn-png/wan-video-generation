@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.38 | November 16, 2026 | Owner: John Hoyos
+Version 1.39 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -28,12 +28,35 @@ response remains unknown; empty inventory is not definitive rejection.
 This implementation adds a private maintenance database/assets checkpoint while
 leaving cleanup running across the source swap. It is explicitly not an automatic
 restore bundle; normal backup/restore closure requirements remain unchanged.
-PR #76's redacted launch diagnostics and multiple eligible data centers will ship
-with this deployment. Source remains 42b3e993 until the upgrade is verified.
-No new Pod or runtime grant has been created at this implementation checkpoint.
-Contract remains 0.1.0. Fictional checks: 46 targeted deployment/guard/hosting
-checks passed, plus contract and shell syntax validation. 172 root controller regression checks passed in 34.261 seconds. Live execution
-evidence will be recorded after completion.
+PR #76's redacted launch diagnostics and multiple eligible data centers are now
+**deployed**, together with the owner-authorized exception in PR #78. Installed
+source is `3a2f0cafd420a50fc2b744dc0490541f52cbbf87`. Upgrade run
+43926416349 succeeded at 18:13:08 UTC. All three services are active/enabled,
+SQLite integrity and internal/external HTTPS checks pass. The cleanup heartbeat
+still reports only the old repair request unresolved; three historical live jobs
+and all reservations remain. Provider authentication and absence reads passed.
+
+**Progression resumed on the owner's instruction to run one second, followed
+by five seconds.** Preparation run 43930617081 succeeded at 18:36:46 UTC on
+installed 3a2f0ca. It created project `project-bad45576e6c840cfbf3f4c633c8e3f87`
+and unregistered signed preparation for US-TX-3 at $0.89/hour. No admission,
+deadline, create or render has occurred yet. Texas capacity then disappeared
+while EU-RO-1 and EUR-IS-1 appeared.
+
+The operator is being corrected to refresh only unregistered preparation at
+admission, combining newly available quoted data centers with its previously
+quoted locations (up to eight). Archive the earlier preparation, preserve the
+same project, $400-cent Pod reservation, runtime, hardware and image constraints,
+and refresh source attestation for the reviewed deployment. Once an approval is
+registered or a job exists, it stays immutable. Add the historical-exception
+module to the signed source inventory. This does not retry a consumed grant.
+
+The next deployment starts from observed source 3a2f0ca and retains the old unknown
+request and monitoring. Main must match the installed source for admission and
+launch. After a valid fresh quote, admit once, start the independent guard, then
+launch once. The owner requested five seconds after one-second success; measure
+actual result/time/cost and prepare a separate bounded stage within retained
+spending limits. Contract remains 0.1.0. Live result remains pending.
 
 **The 1280x704/24fps exporter is already deployed.** Frozen legacy 320x180 jobs
 retain their original profile. Hosted fictional one-minute rehearsal 43890910756

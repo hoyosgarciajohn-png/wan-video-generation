@@ -54,3 +54,10 @@ blocks admission. Keep persistent cleanup alive, check provider absence, and bin
 the independent new guard to both the new deadline and immediate old-request
 cleanup. A maintenance forensic checkpoint is not an approved restore bundle.
 The support inquiry was sent to help@runpod.io; see PR #77 delivery evidence.
+
+John next instructed running the one-second GPU test when matching capacity is
+available, followed by five seconds. Preparation for the isolated validation now
+exists but was not admitted. Refreshing only an unregistered preparation to
+include fresh eligible locations is authorized; preserve its previous signed
+preparation as evidence and never mutate registered/admitted grants. Verify the
+one-second result, measured runtime and cost before the separate five-second stage.

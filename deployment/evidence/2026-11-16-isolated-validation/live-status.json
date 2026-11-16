@@ -1,0 +1,62 @@
+{
+  "checked_at": "2026-11-16T18:14:52.549Z",
+  "catalog_query": {
+    "id": "NVIDIA GeForce RTX 4090",
+    "include": [
+      "AVAILABILITY"
+    ],
+    "product": [
+      "POD"
+    ],
+    "cloud": "SECURE",
+    "count": 1,
+    "minCudaVersion": "12.8"
+  },
+  "catalog": {
+    "availability": "NONE",
+    "community": true,
+    "cudaVersions": [
+      {
+        "available": false,
+        "version": "13.2"
+      }
+    ],
+    "id": "NVIDIA GeForce RTX 4090",
+    "manufacturer": "NVIDIA",
+    "maxCount": {
+      "community": 8,
+      "secure": 8
+    },
+    "memory": 24,
+    "name": "RTX 4090",
+    "pool": "ADA_24",
+    "price": {
+      "community": 0.34,
+      "secure": 0.89,
+      "serverless": 1.34
+    },
+    "secure": true
+  },
+  "inventory": {
+    "pagination": {
+      "hasNextPage": false,
+      "nextCursor": null
+    },
+    "pods": []
+  },
+  "installed_commit": "3a2f0cafd420a50fc2b744dc0490541f52cbbf87",
+  "upgrade_run": 43926416349,
+  "new_trial": {
+    "prepared": false,
+    "admitted": false,
+    "pod_create_attempts": 0,
+    "render_attempts": 0,
+    "deadline_started": false
+  },
+  "old_request": {
+    "batch": "249c50635ec84ac38cef0eb66232efed",
+    "cleanup": "unresolved",
+    "reservation_cents": 400,
+    "monitor_active": true
+  }
+}
