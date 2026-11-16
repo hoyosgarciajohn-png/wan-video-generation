@@ -1,0 +1,133 @@
+815487Z   git switch -
+2026-11-16T02:48:29.1816390Z
+2026-11-16T02:48:29.1817676Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-16T02:48:29.1819510Z
+2026-11-16T02:48:29.1820603Z HEAD is now at 58a95be Merge pull request #54 from hoyosgarciajohn-png/fix/b06-host-source-ownership
+2026-11-16T02:48:29.1825140Z ##[endgroup]
+2026-11-16T02:48:29.1852916Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T02:48:29.1884972Z 58a95be200973703658c97e6cbe07f304735f03a
+2026-11-16T02:48:29.1892390Z ##[group]Removing auth
+2026-11-16T02:48:29.1893706Z Removing SSH command configuration
+2026-11-16T02:48:29.1896445Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T02:48:29.1933693Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T02:48:29.2146787Z Removing HTTP extra header
+2026-11-16T02:48:29.2149186Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T02:48:29.2189218Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T02:48:29.2400306Z Removing includeIf entries pointing to credentials config files
+2026-11-16T02:48:29.2402692Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T02:48:29.2436607Z includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path
+2026-11-16T02:48:29.2439155Z includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path
+2026-11-16T02:48:29.2441637Z includeif.gitdir:/github/workspace/.git.path
+2026-11-16T02:48:29.2443639Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-16T02:48:29.2460590Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path
+2026-11-16T02:48:29.2489431Z /home/runner/work/_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.2505658Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path /home/runner/work/_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.2543075Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path
+2026-11-16T02:48:29.2572354Z /home/runner/work/_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.2582994Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.2624467Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-16T02:48:29.2660215Z /github/runner_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.2679065Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.4109344Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-16T02:48:29.4140437Z /github/runner_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.4150061Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config
+2026-11-16T02:48:29.4190553Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T02:48:29.4419246Z Removing credentials config '/home/runner/work/_temp/git-credentials-e05fe474-8d16-4b2f-8fc0-91a787803e3f.config'
+2026-11-16T02:48:29.4427636Z ##[endgroup]
+2026-11-16T02:48:29.4771310Z ##[group]Run bash deployment/hosting/cloud-install.sh
+2026-11-16T02:48:29.4773082Z bash deployment/hosting/cloud-install.sh
+2026-11-16T02:48:29.4795007Z shell: /usr/bin/bash -e {0}
+2026-11-16T02:48:29.4796127Z env:
+2026-11-16T02:48:29.4803391Z   WAN_HOST_SSH_KEY: ***
+
+2026-11-16T02:48:29.4804681Z   RUNPOD_CLEANUP_TOKEN:
+2026-11-16T02:48:29.4805780Z   WAN_HOST_OPERATION: resume
+2026-11-16T02:48:29.4807316Z   WAN_HOST_FINGERPRINT: SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4
+2026-11-16T02:48:29.4808866Z ##[endgroup]
+2026-11-16T02:48:29.7415452Z Host ed25519 fingerprint: SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4
+2026-11-16T02:48:36.7355771Z Collecting attrs==26.1.0 (from -r deployment/hosting/../requirements.lock (line 3))
+2026-11-16T02:48:36.8530846Z   Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-11-16T02:48:36.9319348Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 67.5/67.5 kB 828.1 kB/s eta 0:00:00
+2026-11-16T02:48:37.0705004Z Collecting jsonschema==4.26.0 (from -r deployment/hosting/../requirements.lock (line 6))
+2026-11-16T02:48:37.0955065Z   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+2026-11-16T02:48:37.1396676Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.6/90.6 kB 2.0 MB/s eta 0:00:00
+2026-11-16T02:48:37.2241353Z Collecting jsonschema-specifications==2025.9.1 (from -r deployment/hosting/../requirements.lock (line 9))
+2026-11-16T02:48:37.2506206Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-11-16T02:48:37.4135272Z Collecting referencing==0.37.0 (from -r deployment/hosting/../requirements.lock (line 12))
+2026-11-16T02:48:37.4395980Z   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-11-16T02:48:38.1434737Z Collecting rpds-py==2026.9.1 (from -r deployment/hosting/../requirements.lock (line 15))
+2026-11-16T02:48:38.1682847Z   Downloading rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (371 kB)
+2026-11-16T02:48:38.2300505Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 371.3/371.3 kB 6.2 MB/s eta 0:00:00
+2026-11-16T02:48:38.3019944Z Collecting typing-extensions==4.16.0 (from -r deployment/hosting/../requirements.lock (line 144))
+2026-11-16T02:48:38.3261738Z   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-11-16T02:48:38.3453878Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 2.4 MB/s eta 0:00:00
+2026-11-16T02:48:38.4154970Z Collecting waitress==3.0.2 (from -r deployment/hosting/requirements.lock (line 2))
+2026-11-16T02:48:38.4403588Z   Downloading waitress-3.0.2-py3-none-any.whl (56 kB)
+2026-11-16T02:48:38.4583472Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.2/56.2 kB 3.1 MB/s eta 0:00:00
+2026-11-16T02:48:38.5598376Z Installing collected packages: waitress, typing-extensions, rpds-py, attrs, referencing, jsonschema-specifications, jsonschema
+2026-11-16T02:48:39.1084843Z Successfully installed attrs-26.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 referencing-0.37.0 rpds-py-2026.9.1 typing-extensions-4.16.0 waitress-3.0.2
+2026-11-16T02:48:39.5810924Z Default incoming policy changed to 'deny'
+2026-11-16T02:48:39.5822652Z (be sure to update your rules accordingly)
+2026-11-16T02:48:39.6524484Z Default outgoing policy changed to 'allow'
+2026-11-16T02:48:39.6525214Z (be sure to update your rules accordingly)
+2026-11-16T02:48:39.8285438Z Rules updated
+2026-11-16T02:48:39.8285815Z Rules updated (v6)
+2026-11-16T02:48:39.9362190Z Rules updated
+2026-11-16T02:48:39.9362783Z Rules updated (v6)
+2026-11-16T02:48:40.0456984Z Rules updated
+2026-11-16T02:48:40.0457775Z Rules updated (v6)
+2026-11-16T02:48:40.4935518Z Firewall is active and enabled on system startup
+2026-11-16T02:48:41.3692670Z {"initialized": true, "paid_dispatch": false, "approval_keys_installed": false, "provider_transport_installed": false}
+2026-11-16T02:48:41.4647792Z {"level":"info","ts":1794797321.4580014,"msg":"using config from file","file":"/etc/wan/Caddyfile"}
+2026-11-16T02:48:41.4657534Z {"level":"warn","ts":1794797321.4585335,"logger":"caddyfile","msg":"Unnecessary header_up X-Forwarded-For: the reverse proxy's default behavior is to pass headers to the upstream"}
+2026-11-16T02:48:41.4658472Z {"level":"info","ts":1794797321.4591668,"msg":"adapted config to JSON","adapter":"caddyfile"}
+2026-11-16T02:48:41.4666636Z {"level":"warn","ts":1794797321.4591756,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/wan/Caddyfile","line":3}
+2026-11-16T02:48:41.4667656Z Valid configuration
+2026-11-16T02:48:41.4669120Z {"level":"info","ts":1794797321.4596803,"logger":"http.auto_https","msg":"server is listening only on the HTTPS port but has no TLS connection policies; adding one to enable TLS","server_name":"srv0","https_port":443}
+2026-11-16T02:48:41.4670757Z {"level":"info","ts":1794797321.459808,"logger":"http.auto_https","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+2026-11-16T02:48:41.4672146Z {"level":"info","ts":1794797321.4600935,"logger":"http","msg":"servers shutting down with eternal grace period"}
+2026-11-16T02:48:41.4677555Z {"level":"info","ts":1794797321.4602168,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x3cfc4f59de80"}
+2026-11-16T02:48:41.4678794Z {"level":"info","ts":1794797321.4603508,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0x3cfc4f59de80"}
+2026-11-16T02:48:41.9592880Z Created symlink /etc/systemd/system/multi-user.target.wants/wan-cleanup.service → /etc/systemd/system/wan-cleanup.service.
+2026-11-16T02:48:41.9594757Z Created symlink /etc/systemd/system/multi-user.target.wants/wan-controller.service → /etc/systemd/system/wan-controller.service.
+2026-11-16T02:48:41.9596243Z Created symlink /etc/systemd/system/multi-user.target.wants/wan-proxy.service → /etc/systemd/system/wan-proxy.service.
+2026-11-16T02:48:42.4149497Z Services started. Paid dispatch remains disabled. Complete HTTPS, recovery, credential and monitor acceptance before any GPU admission.
+2026-11-16T02:48:42.4190406Z CONTROLLER_INSTALLED_DISARMED
+2026-11-16T02:48:43.0717900Z e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6
+2026-11-16T02:48:43.0961555Z active
+2026-11-16T02:48:43.0962261Z active
+2026-11-16T02:48:43.0962635Z active
+2026-11-16T02:48:43.1119601Z enabled
+2026-11-16T02:48:43.1119971Z enabled
+2026-11-16T02:48:43.1120674Z enabled
+2026-11-16T02:48:43.1181925Z                total        used        free      shared  buff/cache   available
+2026-11-16T02:48:43.1182568Z Mem:            1967         367         374           4        1400        1599
+2026-11-16T02:48:43.1183110Z Swap:              0           0           0
+2026-11-16T02:48:43.1230246Z Filesystem      Size  Used Avail Use% Mounted on
+2026-11-16T02:48:43.1230735Z /dev/vda1        48G  2.5G   45G   6% /
+2026-11-16T02:48:43.2134492Z Status: active
+2026-11-16T02:48:43.2135033Z
+2026-11-16T02:48:43.2135295Z To                         Action      From
+2026-11-16T02:48:43.2135706Z --                         ------      ----
+2026-11-16T02:48:43.2136102Z 22/tcp                     LIMIT       Anywhere
+2026-11-16T02:48:43.2136523Z 80/tcp                     ALLOW       Anywhere
+2026-11-16T02:48:43.2137201Z 443/tcp                    ALLOW       Anywhere
+2026-11-16T02:48:43.2137643Z 22/tcp (v6)                LIMIT       Anywhere (v6)
+2026-11-16T02:48:43.2138080Z 80/tcp (v6)                ALLOW       Anywhere (v6)
+2026-11-16T02:48:43.2138519Z 443/tcp (v6)               ALLOW       Anywhere (v6)
+2026-11-16T02:48:43.2138815Z
+2026-11-16T02:48:43.2566523Z State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+2026-11-16T02:48:43.2567420Z LISTEN 0      4096       127.0.0.1:2019      0.0.0.0:*    users:(("caddy",pid=10771,fd=3))
+2026-11-16T02:48:43.2568156Z LISTEN 0      1024       127.0.0.1:8080      0.0.0.0:*    users:(("python",pid=10770,fd=6))
+2026-11-16T02:48:43.2569390Z LISTEN 0      4096         0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=7203,fd=3),("systemd",pid=1,fd=70))
+2026-11-16T02:48:43.2570130Z LISTEN 0      4096      127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=686,fd=17))
+2026-11-16T02:48:43.2570906Z LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=686,fd=15))
+2026-11-16T02:48:43.2571484Z LISTEN 0      4096               *:80              *:*    users:(("caddy",pid=10771,fd=9))
+2026-11-16T02:48:43.2576327Z LISTEN 0      4096            [::]:22           [::]:*    users:(("sshd",pid=7203,fd=4),("systemd",pid=1,fd=71))
+2026-11-16T02:48:43.2576802Z LISTEN 0      4096               *:443             *:*    users:(("caddy",pid=10771,fd=6))
+2026-11-16T02:48:43.3494249Z {"ready":true,"paid_dispatch":false}{"checked_at": 1794797322.9666305, "due_batches": 0, "unresolved": [], "ready": true, "scope": "cleanup-only; no billing settlement"}
+2026-11-16T02:48:43.3494885Z HOST_READY_DISARMED; NO_LIVE_JOB_BINDINGS
+2026-11-16T02:48:43.8038087Z {"status": "AUTHENTICATED_POD_READ_PASS", "requests": 1, "method": "GET", "resources_created": 0, "resources_deleted": 0, "deletion_permission_verified": false, "shutdown_verified": false}
+2026-11-16T02:48:44.2110443Z curl: (35) OpenSSL/3.0.13: error:0A000438:SSL routines::tlsv1 alert internal error
+2026-11-16T02:48:44.2152564Z ##[error]Process completed with exit code 35.
+2026-11-16T02:48:44.2265927Z

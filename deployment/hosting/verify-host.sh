@@ -11,7 +11,11 @@ free -m
 df -h /
 ufw status
 ss -lntp
-curl --fail --silent --show-error -H "Host: $wan_hostname" http://127.0.0.1:8080/healthz
+# systemd can report active before Waitress binds its socket after restart.
+# Retry only this read-only probe, within a bounded startup window.
+curl --fail --silent --show-error --connect-timeout 3 --max-time 3 \
+    --retry 10 --retry-delay 2 --retry-max-time 30 --retry-connrefused \
+    -H "Host: $wan_hostname" http://127.0.0.1:8080/healthz
 /opt/wan/venv/bin/python - <<'PY'
 import json, time, sqlite3
 from pathlib import Path

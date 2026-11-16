@@ -1,45 +1,49 @@
 # Wan Video Generation · Master handoff
-Version 1.30 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.31 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
-The Wan worker image is now published privately in GHCR. Actual publication run
-43777990153 succeeded; authenticated registry manifest/config verification binds
-the private digest to the tested image, and anonymous access is denied. Original
-build/publication evidence is retained in deployment/evidence/2026-11-15-private-publication.
-Actual Runpod download remains unverified. No Docker Desktop is required.
+The Wan worker image is published privately in GHCR at the verified digest recorded
+in deployment/evidence/2026-11-15-private-publication. Runpod template lehfc5qf3s
+and private-pull credential wan-ghcr-pull are saved. Actual Runpod image download
+remains unverified. The $10 prepaid balance does not expand the approved trial.
 
-Controller hosting, persistent state and two automatic-cleanup layers are
-implemented and tested with fictional data, but are not installed on a host.
-Runpod funding is complete: after John confirmed with Bank of America and
-explicitly authorized retry, the same $10 credit payment succeeded. The billing
-page now displays $10.00 balance, $0.000/hour current spend, and Auto-Pay Disabled.
-No additional payment or GPU attempt was made. After John's explicit approval,
-both credentials were created and saved: wan-runpod-image-pull (read:packages
-only, expires December 15, 2026) is stored in Runpod as wan-ghcr-pull; wan-cleanup
-(REST Pods Read/Write only) is stored in GitHub Actions as RUNPOD_CLEANUP_TOKEN.
-The private Runpod template lehfc5qf3s binds that registry credential to the exact
-published image digest. Template creation does not verify an actual image pull.
-The manual read-only credential probe passed in GitHub Actions run 43784863537.
-This establishes authenticated Pod read access; deletion and shutdown remain unverified.
-John subsequently approved starting with DigitalOcean Basic Regular bundled:
-1 vCPU, 2 GiB RAM, 50 GiB SSD, $12/month plus weekly backups at $2.40/month,
-total $14.40/month before expected tax. This specific approval replaces the
-free-only controller restriction; the former larger-server proposal remains
-withdrawn. Capacity can be reviewed later, but no priced upgrade is approved.
-John completed DigitalOcean sign-in. The connected browser verified an empty
-global Droplet inventory, an existing payment method and the exact $14.40/month
-checkout. SFO2 is selected; the Basic Regular plan was unavailable in NYC3.
-Tax is not itemized. A dedicated WAN SSH key and its public-key registration
-form are prepared. Administrator-access confirmation is pending before submitting
-the public key and storing its private part as an encrypted private WAN repository
-secret. No external key, server or subscription was created. The amd64 installer
-is prepared; actual 2 GiB host performance and installed cleanup need acceptance.
-See deployment/hosting/HOSTING_DECISION.md and digitalocean-controller-proposal.json.
-The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries
-below are chronological; this checkpoint supersedes earlier hosting directions.
+John confirmed dedicated SSH access with “yes”. One approved DigitalOcean host
+is now active: wan-controller-01, Droplet 619703894, SFO2, 64.225.114.46, Ubuntu
+24.04.5 LTS amd64, Basic Regular 1 vCPU / 2 GiB / 50 GiB. The recurring rate is
+$12/month plus $2.40/month weekly backups, $14.40 before expected tax. Server
+billing has begun; the exact accrued charge is not retrieved. Weekly backups are
+enabled for Wednesday 04:00–08:00 UTC; no completed provider backup exists yet.
+No extra host, volume, managed database or domain purchase was added.
+
+The WAN public SSH key is registered, and its private part is encrypted as
+WAN_HOST_SSH_KEY in the private repository. The unrelated SUMAN key was not used.
+Installed release: 42dbdc127b299b7e11e674630bef8683473f5a7a (PR #55). Controller,
+separate cleanup monitor and Caddy proxy are active and enabled at boot. The
+cleanup credential is installed privately on the host. HTTPS is available at
+https://wan-64-225-114-46.sslip.io without a domain purchase. Verification run
+43795476474 passed: clean source, three active/enabled services, loopback-only app,
+firewall, ready health with paid_dispatch:false, fresh cleanup heartbeat, SQLite
+integrity, zero live-job bindings and authenticated Runpod Pod GET. This proves
+neither Pod deletion nor actual shutdown. The independent deadline guard has not
+been started for an admitted trial.
+
+The live browser blank screen was fixed by compiling the schema validator at
+build time while retaining strict CSP. The sign-in screen now renders, but its
+browser session request is rejected; a separate browser request returned 403.
+Direct unauthenticated same-origin HTTP correctly returns 401 and cross-site
+returns 403. Browser request provenance and owner token delivery remain unresolved;
+do not mark owner access or the full hosted user journey accepted. No token has
+been printed, committed or handed to the owner yet. Baseline memory was 393 MiB
+used / 1,574 MiB available; disk 2.6 GiB used / 45 GiB available, not workload capacity.
+
+The $5 / 1,800-second / one-attempt GPU trial remains unused. Paid dispatch is
+still disabled; installed live authority, worker bootstrap, model weights/checksums,
+actual private image pull, Wan inference, resource closure and bill collection
+remain pending. See deployment/evidence/2026-11-16-controller-hosting/README.md.
+Historical entries below are chronological; this checkpoint supersedes them.
 
 ## Ownership and source of truth
 The Command Center coordinates dependencies, reconciles evidence, and keeps the batch register. John owns spending, scope changes, and production approval. GitHub is the source of truth for code, contracts, issues, PRs, and release evidence. Each chat owns its assigned issues and branch. Chat context does not synchronize automatically. Start each chat with the same handoff and confirmed repository link. Use the companion WAN_01_Workstreams_and_Chat_Prompts.md.
@@ -72,25 +76,25 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Owner: confirm registration of the prepared wan-controller-deploy SSH key in
-DigitalOcean for wan-controller-01 and encrypted storage of its private part as
-WAN_HOST_SSH_KEY in the private hoyosgarciajohn-png/wan-video-generation repository.
-Command Center: after this access confirmation, submit the prepared public key
-and create the dedicated SFO2 controller at the already approved $14.40/month
-before tax with weekly backups. Build Studio off-host; install the reviewed release,
-HTTPS, persistent state and both cleanup layers. Verify fictional workload memory,
-restart/restore, credential access and cleanup freshness before live authority.
-Do not request the same initial hosting approval again. No larger plan or paid
-add-on is included; capacity upgrades require a concrete later decision.
+Command Center: finish owner access to the installed host. Trace the browser's
+403 session rejection without weakening Host/Origin or cross-site protection;
+complete secure delivery of the existing owner token. Then run a fictional hosted
+upload/render/export rehearsal, verify cleanup remains healthy during controller
+failure/load, and verify consistent backup/restore with retained media. Human and
+creative acceptance remain pending in John's live session until observed.
 
-John's GPU approval remains $5 total, 30 minutes from admission, one five-second
-clip and one attempt. The $10 prepaid balance does not expand that cap. Actual
-Runpod private image download, model checksums, CUDA/Wan inference and authoritative
-billing collection remain open. The private image contains no model weights.
-Template lehfc5qf3s is saved but not launch-ready; model/journal mounts, worker
-bootstrap and installed runtime authority remain pending. No GPU, volume, endpoint
-or model-download job was created. Cleanup credentials are still in GitHub Actions,
-not on a controller. Actual shutdown operation remains unverified.
+Complete installed live authority and worker bootstrap, model/journal paths and
+the independent deadline guard for the exact admitted scope before provisioning.
+Use the existing private template and digest; do not rebuild/download by default.
+Only then use the already approved $5 total / 1,800 seconds / one five-second shot /
+one Pod-create and render attempt. Actual image pull, model checksums, CUDA/Wan
+inference, output retention, confirmed shutdown and authoritative bill retrieval
+must be recorded. The $10 prepaid balance is not additional spending approval.
+No Runpod job, volume, endpoint or model download has been created by this step.
+
+Keep exactly one approved $14.40/month-before-tax DigitalOcean host. No repeat
+hosting or SSH approval is required. Do not automatically upgrade, add paid
+storage or rotate the existing credentials. Next recipient: Command Center.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -894,3 +898,47 @@ Validation: JSON scope/price/access state and matching handoff copies, plus
 git diff --check. Existing fictional runtime test evidence is retained without
 repetition. Next recipient: John for dedicated access confirmation, then Command
 Center for the approved host purchase, installation and deployment acceptance.
+
+
+## DigitalOcean controller installed and verified — November 15 local / November 16 UTC, 2026
+
+John approved the concrete key registration and encrypted GitHub storage with
+“yes”. Created only the approved SFO2 server and enabled weekly percentage backups.
+Source/access preparation merged in PR #53; root-owned archive extraction and a
+narrow partial-install recovery merged in PR #54; strict-CSP Studio schema
+precompilation and guarded source upgrade merged in PR #55. Deployed commit:
+42dbdc127b299b7e11e674630bef8683473f5a7a. Contract remains 0.1.0.
+
+Cloud run outcomes are retained, including failures: inspect 43793819679 passed;
+install 43793913368 stopped on source ownership before private application state;
+resume 43794353466 installed all services but its immediate TLS probe failed during
+certificate issuance; upgrade 43794933132 installed the CSP fix and preserved
+private state but its immediate local health probe preceded socket readiness.
+Read-only verification 43795476474 then passed on the installed revision, including
+valid external TLS. A bounded read-only health retry now addresses the observed
+startup race in the verification source; it is not a repeated render or install.
+
+An application-consistent pre-upgrade backup was created on the same host, and
+the old source is retained. This is not off-host recovery acceptance. Database
+integrity passed with zero live-job bindings. Cleanup status was ready with zero
+due batches and no unresolved entries; authenticated Runpod GET passed, zero
+creates/deletes. Actual shutdown and independent guard activation remain open.
+
+Fictional validation performed in this turn: 20 targeted hosting/initialization/
+preflight checks; extraction ownership regression; 17 Studio model/API/CSP checks;
+17 UI checks; production build; one affected source-inventory test after adding
+upgrade-host; formatting, shell syntax and whitespace. Retained previous evidence
+without full-suite repetition. Hosted CPU baseline is not a production load test.
+
+Browser evidence: initial blank UI due to runtime AJV compilation was corrected;
+the sign-in screen now renders. Its session request remains rejected, and a direct
+browser session navigation returned 403. Separate direct same-origin/cross-site
+HTTP checks returned expected 401/403. Owner token exists only in protected host
+configuration; delivery and successful owner login are pending. Security checks
+were not relaxed. No real media or creative acceptance was claimed.
+
+Active cost/resource: one DigitalOcean CPU host at $14.40/month before expected
+tax, with backups enabled and first scheduled backup pending. No additional
+Runpod charge was incurred; the existing $5/1,800-second/one-attempt trial is unused.
+Exact accrued DigitalOcean billing has not been retrieved. Next: owner access,
+fictional hosted workload/recovery, live execution setup, then the approved trial.
