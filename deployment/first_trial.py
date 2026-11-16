@@ -283,6 +283,45 @@ def prepare():
     print(json.dumps({'status':'PREPARED_NO_ADMISSION_NO_GPU', 'project':project, 'quote':pricing, 'build':build['manifest_sha256']}))
 
 
+def refresh_unregistered_validation(c, saved):
+    """Select current locations before registering authority, never after admission."""
+    assert ALLOW_KNOWN_UNKNOWN and not (TRIAL / 'job.json').exists()
+    with c.transaction() as db:
+        prior_history_closed(db)
+        # A registered approval is already immutable, even if submit failed.
+        if db.execute('SELECT 1 FROM live_approvals WHERE id=?', (APPROVAL_ID,)).fetchone():
+            return saved
+        assert db.execute('SELECT count(*) FROM live_job_links WHERE project=?', (saved['project'],)).fetchone()[0] == 0
+    current = checked_quote()
+    regions = list(dict.fromkeys(current['data_center_ids'] + saved['pricing']['data_center_ids']))[:8]
+    current.update(region=regions[0], data_center_ids=regions)
+    approval = read(TRIAL / 'approval.json')
+    host = read(TRIAL / 'host.json')
+    grant = deepcopy(approval['payload'])
+    assert grant['id'] == APPROVAL_ID and grant['owner'] == OWNER and grant['project'] == saved['project']
+    assert (grant['approved_cents'], grant['max_runtime_seconds']) == (400, 1800)
+    # Retain the prior signed preparation as evidence. It never reached the DB.
+    history = TRIAL / 'pre-admission-history'
+    history.mkdir(mode=0o700, exist_ok=True)
+    identity = hashlib.sha256(canonical(approval).encode()).hexdigest()
+    archive = history / (identity + '.json')
+    if not archive.exists():
+        atomic_json(archive, dict(approval=approval, host=host, prepared=saved))
+    grant['profile']['region'] = regions[0]
+    grant['launch_profile']['dataCenterIds'] = regions
+    grant['source_sha256'] = _sources()
+    grant['valid_until'] = stamp(utcnow() + timedelta(hours=6))
+    attestation = deepcopy(host['payload'])
+    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile']),
+                       source_sha256=grant['source_sha256'], valid_until=grant['valid_until'])
+    saved = dict(saved, pricing=current, source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip())
+    atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
+    atomic_json(TRIAL / 'host.json', sign(attestation, 'host', HOST_DOMAIN))
+    atomic_json(TRIAL / 'prepared.json', saved)
+    print(json.dumps({'status':'UNREGISTERED_PREPARATION_REFRESHED', 'project':saved['project'], 'data_center_ids':regions}), flush=True)
+    return saved
+
+
 def admit():
     primary_ready()
     assert not (TRIAL / 'job.json').exists()
@@ -290,10 +329,12 @@ def admit():
     c, a, e = services()
     with c.transaction() as db:
         prior_history_closed(db)
+    if ALLOW_KNOWN_UNKNOWN:
+        saved = refresh_unregistered_validation(c, saved)
+    pricing = checked_quote(saved['pricing'].get('data_center_ids', [saved['pricing']['region']]))
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
-    pricing = checked_quote(saved['pricing'].get('data_center_ids', [saved['pricing']['region']]))
     request = dict(approval_id=APPROVAL_ID, shot_ids=[saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
         reservation_cents=400, runtime_seconds=1800, idempotency_key=IDEMPOTENCY_KEY)
     result = a.submit(OWNER, saved['project'], request)

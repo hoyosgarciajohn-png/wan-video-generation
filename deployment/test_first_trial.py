@@ -7,6 +7,7 @@ import tempfile
 import time
 import unittest
 from unittest.mock import patch
+from contextlib import contextmanager
 
 from deployment import first_trial
 from services.controller.service import canonical
@@ -138,6 +139,44 @@ class FirstTrialGates(unittest.TestCase):
                 for observed in (time.time()-181,time.time()+30):
                     path.write_text(json.dumps({'observed_at':observed,'data':{}}))
                     with self.assertRaises(AssertionError): first_trial.catalog_snapshot()
+
+    def test_unregistered_validation_refreshes_locations_without_expanding_budget(self):
+        first_trial.select_trial('validation')
+        with tempfile.TemporaryDirectory() as t, sqlite3.connect(':memory:') as db, patch.object(first_trial,'TRIAL',Path(t)):
+            db.execute('CREATE TABLE live_approvals(id TEXT)')
+            db.execute('CREATE TABLE live_job_links(project TEXT)')
+            class Control:
+                @contextmanager
+                def transaction(self): yield db
+            saved=dict(project='fictional-project', pricing=dict(region='US-TX-3',data_center_ids=['US-TX-3']))
+            grant=dict(id=first_trial.APPROVAL_ID,owner=first_trial.OWNER,project=saved['project'],approved_cents=400,max_runtime_seconds=1800,
+                       profile=dict(region='US-TX-3',image_ref='fictional/image@sha256:'+'a'*64,gpu_count=1,
+                                    model_profile=first_trial.LOCK['profile'],gpu_type=first_trial.GPU,
+                                    worker_endpoint='https://fictional.example',storage_id='fictional'),
+                       launch_profile=dict(image='fictional/image@sha256:'+'a'*64,cloud='SECURE',mounts={},ports=[],env={},
+                                           dataCenterIds=['US-TX-3'],gpu=dict(id=first_trial.GPU,count=1,minRamPerGpu=64),disk=80))
+            original=dict(payload=grant,signature='fictional-previous-signature')
+            (Path(t)/'approval.json').write_text(json.dumps(original))
+            (Path(t)/'host.json').write_text(json.dumps(dict(payload=dict(project=saved['project']))))
+            quote=dict(region='EU-RO-1',data_center_ids=['EU-RO-1','EUR-IS-1'],usd_per_hour='0.89')
+            with patch.object(first_trial,'prior_history_closed'), patch.object(first_trial,'checked_quote',return_value=quote), \
+                 patch.object(first_trial,'_sources',return_value={'fictional':'current'}), \
+                 patch.object(first_trial,'sign',side_effect=lambda value,*_:dict(payload=value,signature='fictional-refreshed')):
+                changed=first_trial.refresh_unregistered_validation(Control(),saved)
+                updated=json.loads((Path(t)/'approval.json').read_text())['payload']
+                self.assertEqual(updated['launch_profile']['dataCenterIds'],['EU-RO-1','EUR-IS-1','US-TX-3'])
+                self.assertEqual(updated['launch_profile']['gpu'],grant['launch_profile']['gpu'])
+                self.assertEqual((updated['approved_cents'],updated['max_runtime_seconds']),(400,1800))
+                archived=list((Path(t)/'pre-admission-history').glob('*.json'))
+                self.assertEqual(len(archived),1)
+                self.assertEqual(json.loads(archived[0].read_text())['approval'],original)
+                # Registration makes the signature immutable even without a job file.
+                db.execute('INSERT INTO live_approvals VALUES (?)',(first_trial.APPROVAL_ID,))
+                frozen=(Path(t)/'approval.json').read_bytes()
+                first_trial.refresh_unregistered_validation(Control(),changed)
+                self.assertEqual((Path(t)/'approval.json').read_bytes(),frozen)
+                (Path(t)/'job.json').write_text('{}')
+                with self.assertRaises(AssertionError): first_trial.refresh_unregistered_validation(Control(),changed)
 
     def test_quote_freezes_multiple_locations_and_only_rechecks_that_list(self):
         value = {'id':first_trial.GPU,'secure':True,'price':{'secure':0.89},'dataCenters':[
