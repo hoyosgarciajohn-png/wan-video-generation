@@ -66,7 +66,7 @@ class FirstTrialGates(unittest.TestCase):
             db.execute("INSERT INTO live_job_links VALUES ('already-repair')")
             with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
 
-    def test_validation_is_isolated_and_blocked_by_unknown_repair_request(self):
+    def test_validation_is_isolated_and_preserves_only_the_authorized_unknown(self):
         first_trial.select_trial('repair')
         previous=(first_trial.TRIAL,first_trial.AUTH,first_trial.APPROVAL_ID)
         first_trial.select_trial('validation')
@@ -74,17 +74,18 @@ class FirstTrialGates(unittest.TestCase):
         self.assertEqual(first_trial.DURATION_MS,1000)
         self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),3)
         with sqlite3.connect(':memory:') as db:
-            db.execute('CREATE TABLE live_job_links(batch TEXT)')
-            db.execute('CREATE TABLE pod_batches(id TEXT,state TEXT,cleanup TEXT)')
+            from deployment.test_validation_policy import fixture
+            fixture(db)
             for batch in first_trial.EXPECTED_PRIOR_BATCHES:
-                db.execute('INSERT INTO live_job_links VALUES (?)',(batch,))
-                cleanup='failed' if batch=='249c50635ec84ac38cef0eb66232efed' else 'confirmed'
-                db.execute("INSERT INTO pod_batches VALUES (?,'failed',?)",(batch,cleanup))
-            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+                if batch == first_trial.validation_policy.OLD_BATCH: continue
+                db.execute("INSERT INTO live_job_links VALUES (?,'fictional','fictional','attempted')",(batch,))
+                db.execute("INSERT INTO pod_batches VALUES (?,'fictional','failed','confirmed',NULL,1)",(batch,))
+            first_trial.prior_history_closed(db)
+            self.assertEqual(db.execute('SELECT cleanup FROM pod_batches WHERE id=?',(first_trial.validation_policy.OLD_BATCH,)).fetchone()[0],'failed')
             # Only a definitive reconciliation may change this in real state.
             db.execute("UPDATE pod_batches SET cleanup='confirmed'")
             first_trial.prior_history_closed(db)
-            db.execute("INSERT INTO live_job_links VALUES ('already-validation')")
+            db.execute("INSERT INTO live_job_links VALUES ('already-validation','fictional','fictional','disabled')")
             with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
 
     def test_diagnostic_requires_exact_closed_prior_trial(self):

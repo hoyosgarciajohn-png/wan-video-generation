@@ -22,6 +22,7 @@ from urllib.parse import quote
 from urllib.request import Request
 
 from deployment.hosted_app import open_control
+from deployment import validation_policy
 from services.controller.live_admission import LiveAdmission, APPROVAL_DOMAIN, HOST_DOMAIN, configuration_hash
 from services.controller.live_billing import BILLING_DOMAIN
 from services.controller.live_execution import LiveExecution, BOOTSTRAP_CMD, BOOTSTRAP_ENTRYPOINT
@@ -49,12 +50,15 @@ APPROVAL_ID = 'john-first-trial-20261116'
 IDEMPOTENCY_KEY = 'john-first-approved-attempt'
 WORKER_ID = 'john-first-wan-worker'
 EXPECTED_PRIOR_BATCHES = set()
+ALLOW_KNOWN_UNKNOWN = False
 
 
 def select_trial(name):
     """Allowlisted operator scope, never an arbitrary path or mutable retry."""
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
+    global ALLOW_KNOWN_UNKNOWN
+    ALLOW_KNOWN_UNKNOWN = name == 'validation'
     if name == 'first':
         return
     if name == 'repair':
@@ -109,7 +113,7 @@ def select_repair_trial(scope='repair'):
     if scope == 'validation':
         TRIAL = STATE / 'validation-trial-20261116'
         AUTH = Path('/etc/wan/validation-trial-authority-20261116.json')
-        TITLE = 'Wan progressive validation after allocation reconciliation · one second'
+        TITLE = 'Wan isolated progressive validation · one second'
         APPROVAL_ID = 'john-progressive-validation-20261116'
         IDEMPOTENCY_KEY = 'john-progressive-validation-single-attempt'
         WORKER_ID = 'john-progressive-validation-worker'
@@ -120,8 +124,9 @@ def prior_history_closed(db):
     rows = db.execute('SELECT l.batch,p.state,p.cleanup FROM live_job_links AS l '
                       'LEFT JOIN pod_batches AS p ON p.id=l.batch').fetchall()
     assert {row[0] for row in rows} == EXPECTED_PRIOR_BATCHES
-    assert all(row[1] in ('succeeded','failed','canceled') and row[2] == 'confirmed' for row in rows)
-    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
+    assert all(row[1] in ('succeeded','failed','canceled') and
+               (row[2] == 'confirmed' or (ALLOW_KNOWN_UNKNOWN and row[0] == validation_policy.OLD_BATCH)) for row in rows)
+    validation_policy.quiescent(db, allow_unknown=ALLOW_KNOWN_UNKNOWN)
 
 
 def read(path):
@@ -213,7 +218,11 @@ def materialize_build(destination):
 
 def primary_ready():
     status = read(STATE / 'cleanup-status.json')
-    assert status['ready'] and 0 <= time.time() - status['checked_at'] < 45
+    c = control()
+    with c.transaction() as db:
+        validation_policy.monitor_ready(db, status, allow_unknown=ALLOW_KNOWN_UNKNOWN)
+    if ALLOW_KNOWN_UNKNOWN:
+        validation_policy.verify_absent(Path('/etc/wan/runpod-token').read_text().strip(), transport=https_transport())
     for unit in ('wan-controller', 'wan-cleanup', 'wan-proxy'):
         subprocess.run(['systemctl','is-active','--quiet',unit], check=True)
 
@@ -304,6 +313,8 @@ def guard_ready(job):
     assert job['deadline'] - time.time() > 120
     expected = 'wan-' + hashlib.sha256(json.dumps([job['scope'],job['batch'],job['batch']]).encode()).hexdigest()
     assert ready['provider_name'] == expected
+    if ALLOW_KNOWN_UNKNOWN:
+        assert ready.get('additional_cleanup_batch') == validation_policy.OLD_BATCH
     return ready
 
 

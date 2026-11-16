@@ -19,23 +19,27 @@ curl --fail --silent --show-error --connect-timeout 3 --max-time 3 \
 /opt/wan/venv/bin/python - <<'PY'
 import json, time, sqlite3
 from pathlib import Path
+from deployment.validation_policy import quiescent, monitor_ready, verify_absent
+from services.controller.runpod import https_transport
 p=Path('/var/lib/wan/cleanup-status.json')
 for _ in range(20):
-    if p.is_file():
+    try:
         status=json.loads(p.read_text())
-        if status.get('ready') is True and time.time()-status['checked_at'] < 45:
-            print(json.dumps(status)); break
-    time.sleep(1)
+        with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
+            assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
+            retained_unknown=quiescent(db, allow_unknown=True)
+            monitor_ready(db, status, allow_unknown=True)
+            retained=db.execute('SELECT count(*) FROM live_job_links').fetchone()[0]
+        break
+    except (AssertionError, FileNotFoundError):
+        time.sleep(1)
 else:
-    raise SystemExit('Cleanup heartbeat is not ready')
-with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
-    assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
-    # Completed trials remain as audit/billing history. Reject missing, active or
-    # unconfirmed lifecycle rows instead of requiring an unused database.
-    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
-    assert db.execute('SELECT count(*) FROM live_job_links AS l LEFT JOIN pod_batches AS p ON p.id=l.batch WHERE p.id IS NULL').fetchone()[0] == 0
-    retained = db.execute('SELECT count(*) FROM live_job_links').fetchone()[0]
-print('HOST_READY; NO_ACTIVE_PROVIDER_OBLIGATIONS; historical_live_jobs=' + str(retained))
+    raise SystemExit('Cleanup heartbeat or historical state is not acceptable')
+verify_absent(Path('/etc/wan/runpod-token').read_text().strip(), transport=https_transport())
+print(json.dumps(status))
+print(json.dumps({'host_operational':True, 'historical_live_jobs':retained,
+                  'old_request_still_unresolved':retained_unknown,
+                  'billing_reservations_released':False}))
 PY
 # One authenticated Runpod GET. No resource changes; does not verify deletion.
 RUNPOD_CLEANUP_TOKEN=$(cat /etc/wan/runpod-token) /opt/wan/venv/bin/python -m deployment.check_cleanup_credential

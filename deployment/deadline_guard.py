@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 from deployment.cleanup_monitor import CleanupOnlyProvider
 from services.controller.runpod import https_transport
+from deployment.validation_policy import OLD_BATCH, OLD_SCOPE
 
 
 def validate(scope, batch, deadline, now):
@@ -47,6 +48,13 @@ def readiness(provider, scope, batch, deadline, observed):
             'checked_at': time.time(), 'run_id': os.environ.get('GITHUB_RUN_ID')}
 
 
+def watch_previous(provider, observed):
+    # This request's deadline has already expired. Only exact-name GET/DELETE;
+    # absence without ever observing an ID still does not close its liability.
+    confirmed = terminate_matches(provider, OLD_BATCH, observed)
+    return 'ABSENCE_CONFIRMED' if confirmed else 'NO_ALLOCATION_OBSERVED'
+
+
 def save_ready(ready):
     if os.environ.get('WAN_GUARD_READY_FILE'):
         path = Path(os.environ['WAN_GUARD_READY_FILE'])
@@ -62,13 +70,28 @@ def main():
     scope = validate(os.environ['WAN_GUARD_SCOPE'], batch, deadline, start)
     provider = CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=scope, transport=https_transport())
     observed = set()
+    previous = (CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=OLD_SCOPE, transport=https_transport())
+                if os.environ.get('WAN_TRIAL') == 'validation' else None)
+    previous_observed = set()
+    def current_ready():
+        value = readiness(provider, scope, batch, deadline, observed)
+        if previous is not None:
+            watch_previous(previous, previous_observed)
+            value['additional_cleanup_batch'] = OLD_BATCH
+        return value
     # Verify credentials/inventory before announcing readiness. No POST occurs.
-    ready = readiness(provider, scope, batch, deadline, observed)
+    ready = current_ready()
     save_ready(ready)
     print(json.dumps(ready), flush=True)
     confirmed = False
     # Keep reconciling for five minutes after the deadline to catch late creates.
     while time.time() < deadline + 300:
+        if previous is not None:
+            try:
+                old_status = watch_previous(previous, previous_observed)
+            except Exception:
+                old_status = 'CLEANUP_UNRESOLVED'
+            print(json.dumps({'checked_at': time.time(), 'status': old_status, 'batch': OLD_BATCH}), flush=True)
         if time.time() >= deadline:
             try:
                 confirmed = terminate_matches(provider, batch, observed)
@@ -78,7 +101,7 @@ def main():
             print(json.dumps({'checked_at': time.time(), 'status': status, 'batch': batch}), flush=True)
         else:
             try:
-                save_ready(readiness(provider, scope, batch, deadline, observed))
+                save_ready(current_ready())
             except Exception:
                 # Keep the deadline fallback alive, but do not refresh a receipt
                 # when provider access is unavailable.
