@@ -1,0 +1,14 @@
+# Replace with the approved DNS name. No access logging of project URLs/tokens.
+wan.example.invalid {
+    request_body {
+        max_size 33554432
+    }
+    reverse_proxy 127.0.0.1:8080 {
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 60s
+        }
+    }
+}

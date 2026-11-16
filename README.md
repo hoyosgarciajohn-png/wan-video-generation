@@ -26,9 +26,16 @@ Install FFmpeg, including ffprobe, through your operating system package manager
 
 The 0.1.0 schema and complete fictional project live under `contracts/` and `fixtures/`. The previous starter ZIP is an archived draft. Use this repository as the current source for implementations.
 
-The [build/hosting review and first-render proposal](deployment/FIRST_RENDER_PROPOSAL.md) records the remaining host evidence, verified Runpod connection and owner-approved $5 / 30-minute / one-attempt envelope. Build, hosting and runtime authority remain unverified; live execution is not enabled.
+The [build/hosting review and first-render proposal](deployment/FIRST_RENDER_PROPOSAL.md) records the verified cloud builds, remaining host evidence, Runpod connection and owner-approved $5 / 30-minute / one-attempt envelope. Hosting and installed runtime authority remain unverified; live execution is not enabled.
 
 [Manual cloud container builds](deployment/BUILD_VERIFICATION.md) now use GitHub
 Actions within the account's included allowance. Windows Docker Desktop is not
 required. Image verification is separate from registry publication, hosted
 controller acceptance and the approved first GPU trial.
+
+The [hosting and cleanup package](deployment/hosting/README.md) adds a loopback
+Waitress backend behind Caddy TLS, persistent controller service, separate cleanup
+process and an optional second-host deadline guard. These are prepared and tested
+with fictional data, not installed production services. The manual private GHCR
+publication workflow records visibility and digest evidence separately from the
+still-unverified Runpod download.

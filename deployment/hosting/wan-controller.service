@@ -1,0 +1,23 @@
+[Unit]
+Description=WAN Studio HTTPS backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=wan
+Group=wan
+WorkingDirectory=/opt/wan/current
+EnvironmentFile=/etc/wan/controller.env
+ExecStart=/opt/wan/venv/bin/python -m deployment.hosted_app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/wan
+
+[Install]
+WantedBy=multi-user.target

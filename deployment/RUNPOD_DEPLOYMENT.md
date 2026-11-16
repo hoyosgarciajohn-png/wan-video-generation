@@ -1,8 +1,10 @@
 # Runpod deployment preparation
 
-Status: source preparation only. No host, registry image, volume, API credential,
-GPU or public deployment has been provisioned. The worksheet has deliberately
-empty owner values and cannot authorize a launch.
+Status: cloud CPU/GPU builds verified; private publication has a manual workflow.
+See `BUILD_GATE_STATUS.json` for observed registry results and `hosting/README.md`
+for the prepared HTTPS and independent cleanup services. No production controller,
+Runpod GPU/volume or installed application credentials exist. The owner approved
+$5 / 30 minutes / one attempt; the worksheet cannot itself authorize a launch.
 
 ## API migration
 
@@ -29,14 +31,14 @@ Never put secret values into this worksheet, a PR, a command argument or logs.
 
 | Component | Required evidence | Current state |
 |---|---|---|
-| Build host | Linux amd64 Docker/runc; captured build and smoke logs | Unverified |
-| GPU image | Successful pinned build; registry digest bound to built image | Missing |
+| Build host | Linux amd64 Docker/runc; captured build and smoke logs | Verified GitHub-hosted CPU builder |
+| GPU image | Successful pinned build; registry digest bound to built image | Build PASS; registry status in BUILD_GATE_STATUS.json |
 | GPU placement | Catalog ID, data center, capacity and driver compatibility | Unselected |
 | Model cache | Exact locked checkpoint files verified on selected volume | Missing |
 | Worker state | Private writable journal/cache paths; restart recovery | Host unverified |
-| Controller | Durable database/media, HTTPS, authentication, restore acceptance | Local source only |
-| Cleanup monitor | Independent host, bounded polling, failure alert and recovery | Not deployed |
-| Approval | Authenticated project cap, runtime, retry count and cost scope | Unspecified |
+| Controller | Durable database/media, HTTPS, authentication, restore acceptance | WSGI/Caddy/service package prepared; not deployed |
+| Cleanup monitor | Independent host, bounded polling, failure alert and recovery | Separate process and second-host guard prepared; not deployed |
+| Approval | Authenticated project cap, runtime, retry count and cost scope | Owner approved $5 / 1800s / one attempt; runtime authority not installed |
 | Accounting | Observed usage and final bill reconciliation | Not integrated live |
 
 The model mount must contain the locked files, not just a matching directory
