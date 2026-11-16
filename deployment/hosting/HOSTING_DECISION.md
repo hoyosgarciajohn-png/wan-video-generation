@@ -1,114 +1,95 @@
-# Free controller hosting decision — November 15, 2026
+# Approved small DigitalOcean controller — November 15, 2026
 
-Status: **FREE_ONLY_EXISTING_HOSTING_REUSE_ASSESSMENT**.
-John rejected DigitalOcean and new recurring controller-hosting charges. The
-previous $28.80/month proposal and $32/month authorization request are withdrawn.
-No paid host was ordered. The DigitalOcean sign-in tab was closed.
+Status: **APPROVED_AWAITING_ACCOUNT_SIGN_IN**. John selected the lower-cost
+DigitalOcean option and intends to consider capacity upgrades only if needed.
+The approval replaces the earlier free-only controller direction. It does not
+revive the former $24 server or $32 monthly ceiling.
 
-## Cost policy and recommendation
+## Exact approved purchase
 
-First assess reuse of **existing Vercel / ChatGPT Sites and Supabase services**.
-Oracle Always Free remains the candidate requiring fewer backend changes if
-existing hosting cannot meet the requirements at no additional charge. The
-existing Windows computer remains a fallback. Additional recurring controller budget:
-**$0**. Do not upgrade an account, buy a replacement VPS, or treat expiring trial
-credit as permanent free hosting. Do not add a paid database, domain or backup.
-The approved $5 / 1,800-second / one-attempt Runpod trial remains separate and unused.
+One dedicated `wan-controller-01` CPU Droplet: **Basic Regular bundled**, Linux
+amd64, Ubuntu 24.04 LTS preference, 1 vCPU, 2 GiB RAM, 50 GiB SSD, 2,000 GiB
+monthly outbound allowance. Use an available US region after checking the account.
 
-| Candidate | Fit for this implementation | Decision |
-|---|---|---|
-| Existing Vercel / Sites plus durable backend | Existing accounts and projects verified; current SQLite/process model must change | Assess reuse before a new account; incremental cost unverified |
-| Oracle Always Free A1 | Persistent Linux host; requires ARM adaptation | Persistent-server alternative; not provisioned |
-| Existing Windows PC with WSL | Can host controller and CPU export while awake and online | Fallback; local capabilities and secure access unverified |
-| Cloudflare Workers / Durable Objects | Free quotas exist, but current Python services, file storage and FFmpeg require redesign or relocation | Possible later architecture; not a direct deployment |
-| Render Free | Sleeps after 15 minutes idle; filesystem is ephemeral and free persistent disks unavailable | Reject for the unchanged SQLite/media controller |
-| GitHub Actions | Bounded build/deadline jobs within the private account's remaining included allowance | Keep watchdog role; not continuous controller hosting |
+| Item | Monthly published amount |
+|---|---:|
+| Server | $12.00 |
+| Weekly percentage-based backups (20%) | $2.40 |
+| Subtotal before expected tax | **$14.40** |
 
-This recommendation is an implementation-fit inference, not a claim that free
-infrastructure has already been allocated or accepted.
+This is the initial configuration John approved. Do not ask him to approve it
+again. Inspect existing resources first to avoid duplicate allocation. Confirm
+actual regional capacity, plan and checkout price before creating anything.
+No larger plan, v5 configuration, extra volume, managed database, paid builder,
+new domain or other paid add-on is included. Future capacity upgrades have no
+approved price yet. A budget alert is not a provider-enforced account spending cap.
+Powering off a Droplet does not stop billing; its resources remain reserved.
 
-## Existing hosting inventory verified in connected accounts
+The non-executable proposal is [digitalocean-controller-proposal.json](digitalocean-controller-proposal.json).
+It records the approval and unresolved installation inputs; it does not create
+resources, contain credentials or enable Runpod dispatch.
 
-| Service | Existing projects observed |
-|---|---|
-| Vercel | SIMIES, Swing Cubano, Cockpit / Board Autopilot, Wellness Home Visit, Transformational Resonance, OMNIVALE preview, Tu Idea private QA |
-| ChatGPT Sites | Open Tomorrow, Tu Idea es tu Negocio public site, RAP Instituto Tecnico Valle, Dream House Studio; other prototypes |
-| Supabase | Active databases for SIMIES, Swing Cubano (pelota-caliente-dev), Open Tomorrow, OMNIVALE, Transformational Resonance and Cockpit |
+## Observed account state
 
-Vercel custom-domain mappings and Sites live URLs were read. This inventory does
-not establish unused quotas, current billing plans, permission to merge application
-data or the marginal cost of a new Supabase project. No other project was modified.
+No DigitalOcean management integration was returned by current plugin discovery.
+The connected Chrome session opened https://cloud.digitalocean.com/ and reached
+https://cloud.digitalocean.com/login. The email/password fields are blank. The
+page is retained for the owner to sign in. Account resources, region, capacity,
+payment state and checkout are unverified. No server or subscription was created.
 
-The Studio frontend is a plausible reuse candidate. The current controller stores
-SQLite and media on disk, uses process-local sessions and runs background threads
-plus a separate cleanup process. Vercel Functions use ephemeral scratch space and
-bounded execution; Sites runs Worker modules. These are not drop-in systemd hosts.
-A reuse implementation needs durable database/object storage, transactional job
-admission, portable sessions, short request handlers, independent deadline cleanup
-and an explicit execution location for FFmpeg exports. Keep Wan GPU work on Runpod.
-Recheck quotas and isolate Wan from existing project data before choosing storage.
-Do not create an additional billed project merely because the account exists.
+## Installation sequence after sign-in
 
-## Oracle configuration and constraints
+1. Inspect account/project inventory. Select one dedicated host and exact plan;
+   enable weekly percentage-based backups and confirm the final price.
+2. Establish scoped host administration and HTTPS access. Do not put keys into
+   user-data, repository content or screenshots. No domain purchase is included.
+3. Build Studio outside this 2 GiB host. Install the reviewed source, hash-locked
+   Python dependencies, FFmpeg/ffprobe and Caddy on the server. Keep model weights
+   on Runpod; the CPU controller does not need the multi-gigabyte GPU image.
+4. Start the separate controller, cleanup and proxy services using the fresh-host
+   installer. Startup remains disarmed. Measure memory and disk on the actual
+   host, including fictional upload/export and restart. Keep one export job at
+   a time; tune request concurrency and service limits from measured evidence.
+   Verify the cleanup monitor stays healthy during controller failure or load.
+5. Verify HTTPS, authorization, durable media, consistent application backup and
+   restore. Weekly disk backups do not by themselves prove SQLite recovery.
+   Preserve old accepted takes; do not silently delete media to make space.
+6. Install reviewed runtime authority and worker bootstrap. Require the primary
+   cleanup service plus the independent GitHub guard to be ready for the real
+   admitted scope before Runpod provisioning. Check included Actions allowance.
+7. Use only the already approved $5 / 1,800-second / one-attempt Runpod trial for
+   actual private image pull and Wan inference. Verify output retention, cleanup
+   and billing. Do not retry rendering under this authorization.
 
-Current official A1 allowance: 2 OCPUs / 12 GB RAM equivalent; 200 GB combined
-boot/block storage, in the account home region. Proposed dedicated Ubuntu A1:
-2 OCPUs, 12 GB RAM, one 50 GB boot disk, only if existing usage leaves room.
-Capacity shortages and idle-instance reclamation are possible. Free service has
-no SLA. Signup requires card verification and may place a temporary hold.
-Use an existing eligible account if present; no paid upgrade is authorized.
+## Capacity and upgrade decision
 
-The current fresh-host installer is **amd64-only**. Do not bypass its architecture
-check. Review dependency locks and native wheels for ARM, add explicit support,
-and verify the actual ARM host. The Wan GPU container remains linux/amd64 on
-Runpod; changing controller architecture does not require rebuilding that image.
+2 GiB is a starting hypothesis for low-volume controller work, not a verified
+capacity claim for 30-minute production video exports. The current export runner
+serializes jobs and validates a 320x180 fixture profile; production export quality
+and capacity remain separate work. The host also handles media transfer, so
+concurrency and temporary disk use must be measured before broader access.
 
-## Next execution sequence
+Collect baseline/peak RAM, swap/OOM events, CPU saturation, request latency,
+cleanup heartbeat freshness and free disk during the actual fictional rehearsal.
+If those show insufficient capacity, prepare a measured higher-tier proposal.
+First remove avoidable build work and bound concurrency; do not sacrifice cleanup
+reliability. Never automatically resize, add a volume or expand the GPU trial.
 
-1. Compare a concrete Vercel/Sites plus durable-backend adaptation against the
-   existing free Linux/Windows routes. Verify remaining account allowances,
-   independent cleanup scheduling, media retention and additional cost first.
-   If using Oracle, establish account access and confirm quota/capacity. If no
-   free cloud route is available, use Windows; do not substitute a paid plan.
-2. Adapt the installer and validate Python dependencies, FFmpeg/ffprobe, Studio,
-   Caddy and systemd on the actual architecture. Retain disarmed startup.
-3. Use an existing controlled hostname with HTTPS or another verified free access
-   route. Install secrets in protected host storage, not repository/user-data.
-4. Verify fictional upload/export, owner isolation, restart persistence and
-   backup/restore. Set storage retention and quota stops; long-form projects need
-   measured disk/export capacity. Keep recoverable copies outside the controller.
-5. Install live authority and primary cleanup. Start the independent GitHub
-   deadline guard for the actual admitted scope and original deadline; require
-   READY before Pod creation. Recheck included minutes and blocked paid overages.
-6. Only then use the existing single Runpod attempt for private image pull and
-   Wan inference. Verify deletion, retained output and actual billing. Do not
-   retry rendering or resource creation under this authorization.
+## Previous alternatives and evidence boundary
 
-For Windows, first verify WSL support, RAM, free disk and Linux services. Keep the
-PC awake and online during a batch. Establish authenticated HTTPS worker access;
-do not expose the development server directly. Docker Desktop is not required by
-this controller design. This avoids an additional hosting bill but uses the PC's
-power and internet connection. Independent cleanup remains mandatory if it sleeps,
-loses internet or stops. No local installation or network change was made here.
+Existing Vercel / ChatGPT Sites and Supabase accounts were verified in the previous
+inventory. Reuse requires adapting the persistent-file/process backend. Oracle
+Always Free remains an alternate requiring ARM acceptance and available capacity;
+Windows requires reliable power/network access. These routes are not the selected
+installation after John's latest approval.
 
-## Evidence boundary
+This checkpoint records approval and deployment settings only. No runtime source,
+credentials, other project, host, volume or GPU was changed. Documentation and JSON
+consistency were checked; existing tests were not repeated. Actual installation,
+TLS, shutdown, image pull and bill collection remain pending. Contract 0.1.0.
 
-This step changes policy and documents only. No account/signup, server, recurring
-subscription, GPU, storage allocation or new credential was created. No runtime
-or compatibility check was repeated or newly claimed. Actual automatic shutdown,
-Runpod image download, installed live authority and authoritative billing remain
-unverified. Existing credential/build evidence and contract 0.1.0 are preserved.
+Published pricing references, checked November 16 UTC / November 15 owner local:
 
-Official sources checked November 16 UTC / November 15 owner local:
-
-- https://vercel.com/docs/functions/runtimes
-- https://vercel.com/docs/functions/limitations
-- https://supabase.com/docs/guides/functions/limits
-- Connected Vercel project/domain inventory, Sites inventory, and both Supabase account inventories.
-- https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
-- https://www.oracle.com/cloud/free/faq/
-- https://www.oracle.com/cloud/free/
-- https://render.com/docs/free
-- https://developers.cloudflare.com/durable-objects/platform/pricing/
-- https://learn.microsoft.com/en-us/windows/wsl/install
-- https://docs.github.com/en/billing/concepts/product-billing/github-actions
+- https://www.digitalocean.com/pricing/droplets
+- https://docs.digitalocean.com/products/backups/details/pricing/
+- https://docs.digitalocean.com/products/droplets/details/pricing/
