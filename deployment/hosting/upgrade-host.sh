@@ -36,7 +36,9 @@ with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
     assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
 PY
 mkdir -m 0700 "$bootstrap_dir/pre-upgrade"
-/opt/wan/venv/bin/python -m services.controller.backup create --database /var/lib/wan/studio.sqlite --assets /var/lib/wan/assets --output "$bootstrap_dir/pre-upgrade"
+# Use the reviewed backup reader from this release: the installed version cannot
+# preserve completed live trials with a retained, unsettled reservation.
+(cd "$stage" && /opt/wan/venv/bin/python -m services.controller.backup create --database /var/lib/wan/studio.sqlite --assets /var/lib/wan/assets --output "$bootstrap_dir/pre-upgrade")
 systemctl stop wan-controller wan-cleanup
 mv /opt/wan/current "$previous"
 mv "$stage" /opt/wan/current
