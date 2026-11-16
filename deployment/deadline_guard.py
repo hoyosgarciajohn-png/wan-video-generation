@@ -71,7 +71,7 @@ def main():
     provider = CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=scope, transport=https_transport())
     observed = set()
     previous = (CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=OLD_SCOPE, transport=https_transport())
-                if os.environ.get('WAN_TRIAL') == 'validation' else None)
+                if os.environ.get('WAN_TRIAL') in ('validation','fallback') else None)
     previous_observed = set()
     def current_ready():
         value = readiness(provider, scope, batch, deadline, observed)

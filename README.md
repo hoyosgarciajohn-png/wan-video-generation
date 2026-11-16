@@ -64,3 +64,9 @@ as d30fa01. The one-create scope is consumed, its billing reservation is retaine
 and the older ambiguous request remains unresolved. Hourly capacity checks are
 read-only. Five-second generation awaits successful one-second output. See
 [the allocation result](deployment/evidence/2026-11-16-isolated-validation/allocation-result.json).
+
+John approved an L40S fallback and bounded retries after explicit capacity
+rejections. The new isolated scope allows RTX 4090 or L40S at <=$1.10/hour, keeps
+the $5 / 1800-second / one-render envelope, and permits at most three allocation
+requests. [Fallback evidence](deployment/evidence/2026-11-16-fallback-validation/README.md)
+records checks and live status. Earlier consumed scopes remain immutable.

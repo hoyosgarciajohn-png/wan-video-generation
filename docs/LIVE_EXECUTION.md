@@ -64,3 +64,16 @@ Charge events require an observed resource and a reserved/settled reservation. R
 Source implementation is not deployment. John approved the first-trial $5 total / 30-minute / one-attempt envelope on November 15, 2026; see deployment/first-render-proposal.json. The decision is recorded, but a signed runtime grant is not installed. Installed trust roots, authenticated hosted identity/storage, executed build/GPU acceptance, network-model cache verification, scheduler installation, billing reconciliation and release approval remain pending. Budget estimates are not provider-enforced hard spending stops. Provider outage or cleanup failure retains uncertainty and liability.
 
 Focused tests: `python -m unittest discover -s tests -p 'test_live_execution*.py' -v`. The tests use fictional API transport and delegated signatures. Worker media checks, including actual FFmpeg output where exercised, remain synthetic acceptance evidence.
+
+## Opt-in capacity rejection retries
+
+The private signed owner grant may include `capacity_retry` with exactly three
+requests, a 15-second backoff and at least 120 seconds remaining on the unchanged
+admission deadline. Legacy grants remain single-request. The controller stores
+each request start before network I/O and its redacted outcome in the execution
+binding. Only the exact HTTP 400 capacity rejection permits the next POST. Other
+4xx, 5xx, timeouts, malformed successful replies, allocation, cancellation, expiry
+or revocation stop the loop. Restart only reconciles; it never resumes POSTs.
+All requests share one profile/name, one reservation and one render budget.
+Closed backup/restore retains and validates the audit without rearming authority.
+This is an internal optional authority field; bundle contract remains 0.1.0.
