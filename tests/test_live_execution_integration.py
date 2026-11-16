@@ -42,7 +42,7 @@ class LiveExecutionIntegrationTests(unittest.TestCase):
                                     host_keys={'host':(self.owner,self.hostkey)},build_evidence='fictional-mocked-evidence')
         profile=dict(model_profile=LOCK['profile'],image_ref='example/wan@sha256:'+'a'*64,gpu_type='fictional-gpu',gpu_count=1,
                      region='fictional-dc',worker_endpoint='https://worker.example',storage_id='fictional-store')
-        launch=dict(image=profile['image_ref'],gpu={'id':'fictional-gpu','count':1},cloud='SECURE',disk=50,
+        launch=dict(image=profile['image_ref'],gpu={'id':'fictional-gpu','count':1,'minCudaVersion':'12.8','minRamPerGpu':64},cloud='SECURE',disk=50,
                     dataCenterIds=['fictional-dc'],mounts={},ports=[],env={},cmd=WORKER_CMD)
         self.grant=dict(id='fictional-grant',owner=self.owner,project=self.project,currency='USD',approved_cents=100,
                        max_runtime_seconds=180,valid_until=stamp(utcnow()+timedelta(minutes=10)),profile=profile,
@@ -114,7 +114,18 @@ class LiveExecutionIntegrationTests(unittest.TestCase):
         self.fail_delete=True;self.assertEqual(self.execution.watchdog(),[self.batch]);self.assertTrue(self.pods)
         self.assertEqual(self.execution.watchdog(),[])
         self.assertEqual(self.execution.status(self.owner,self.project,self.batch)['budget']['unsettled_count'],1)
-        with self.assertRaises(ValueError):create_backup(self.control.db_path,self.control.asset_root,self.root/'unsettled')
+        # A deleted Pod can still have unsettled billing. Recovery must retain
+        # the reservation and charges, while revoking copied execution authority.
+        create_backup(self.control.db_path,self.control.asset_root,self.root/'unsettled')
+        pending=restore_backup(self.root/'unsettled',self.root/'unsettled-restore')
+        copied_control=ControlService(pending['database'],pending['assets'])
+        copied=LiveAdmission(StudioWorkspace(copied_control))
+        copied_status=copied.status(self.owner,self.project,self.batch)
+        self.assertEqual(copied_status['reservation_state'],'reserved')
+        self.assertEqual(copied_status['batch']['budget'],dict(currency='USD',approved_cents=100,reserved_cents=50,spent_cents=30))
+        with copied_control.transaction() as db:
+            self.assertEqual(db.execute('SELECT revoked FROM live_approvals').fetchone()[0],1)
+            self.assertEqual(db.execute('SELECT revoked FROM worker_credentials').fetchone()[0],1)
         self.bill('final','settlement',60);self.bill('late','charge',50);self.bill('late','charge',50)
         status=self.execution.status(self.owner,self.project,self.batch)
         self.assertEqual(status['budget']['spent_cents'],110);self.assertEqual(status['budget']['reserved_cents'],0)
@@ -145,3 +156,26 @@ class LiveExecutionIntegrationTests(unittest.TestCase):
         self.assertEqual(sum(method=='POST' for method,_ in self.calls),1)
         self.assertFalse(self.pods)
         self.assertEqual(self.execution.status(self.owner,self.project,self.batch)['budget']['unsettled_count'],1)
+
+    def test_failed_attempt_backup_requires_cleanup_and_preserves_reservation(self):
+        from services.controller.backup import create_backup, restore_backup
+        self.control.max_attempts=1
+        self.provision()
+        claim=self.workers.call(self.auth,'claim',{});attempt=claim['attempt']
+        self.workers.call(self.auth,f"attempts/{attempt['id']}/fail",
+                          dict(lease_id=attempt['lease_id'],code='render_failed'))
+        with self.assertRaises(ValueError):
+            create_backup(self.control.db_path,self.control.asset_root,self.root/'before-cleanup')
+        self.assertEqual(self.execution.watchdog(),[])
+        create_backup(self.control.db_path,self.control.asset_root,self.root/'closed')
+        result=restore_backup(self.root/'closed',self.root/'closed-restore')
+        restored=ControlService(result['database'],result['assets'])
+        bundle=restored.bundle(self.owner,self.project)
+        self.assertEqual(bundle['batches'][0]['budget']['reserved_cents'],80)
+        self.assertEqual(bundle['batches'][0]['state'],'failed')
+        self.assertEqual(bundle['batches'][0]['cleanup_state'],'confirmed')
+        self.assertEqual(len(bundle['attempts']),1)
+        with self.control.transaction() as db:
+            db.execute('UPDATE live_reservations SET reserved_cents=79')
+        with self.assertRaises(ValueError):
+            create_backup(self.control.db_path,self.control.asset_root,self.root/'corrupt-reservation')
