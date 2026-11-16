@@ -30,8 +30,12 @@ else:
     raise SystemExit('Cleanup heartbeat is not ready')
 with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
     assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
-    assert db.execute('SELECT count(*) FROM live_job_links').fetchone()[0] == 0
-print('HOST_READY_DISARMED; NO_LIVE_JOB_BINDINGS')
+    # Completed trials remain as audit/billing history. Reject missing, active or
+    # unconfirmed lifecycle rows instead of requiring an unused database.
+    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
+    assert db.execute('SELECT count(*) FROM live_job_links AS l LEFT JOIN pod_batches AS p ON p.id=l.batch WHERE p.id IS NULL').fetchone()[0] == 0
+    retained = db.execute('SELECT count(*) FROM live_job_links').fetchone()[0]
+print('HOST_READY; NO_ACTIVE_PROVIDER_OBLIGATIONS; historical_live_jobs=' + str(retained))
 PY
 # One authenticated Runpod GET. No resource changes; does not verify deletion.
 RUNPOD_CLEANUP_TOKEN=$(cat /etc/wan/runpod-token) /opt/wan/venv/bin/python -m deployment.check_cleanup_credential
