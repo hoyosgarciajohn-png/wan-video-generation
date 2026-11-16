@@ -1,4 +1,10 @@
-# Draft for Runpod support — not sent
+# Runpod support request — sent November 16, 2026
+
+Gmail confirmed this message as SENT to help@runpod.io from the owner's connected account.
+[Open the sent conversation](https://mail.google.com/mail/u/0/#all/1a1e55a2f38c51af). Message/thread ID: `1a1e55a2f38c51af`.
+John explicitly approved sending the prepared request. No provider ticket number or
+resolution has been observed at this send checkpoint. Follow this conversation;
+do not send a duplicate inquiry. The original unknown-allocation block remains.
 
 Subject: Confirm final outcome of one REST v2 Pod-create request
 

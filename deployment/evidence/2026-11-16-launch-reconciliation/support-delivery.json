@@ -1,0 +1,16 @@
+{
+  "status": "SENT",
+  "confirmed_date": "2026-11-16",
+  "channel": "Gmail",
+  "from": "hoyosgarciajohn@gmail.com",
+  "to": "help@runpod.io",
+  "subject": "Confirm final outcome of one REST v2 Pod-create request",
+  "message_id": "1a1e55a2f38c51af",
+  "thread_id": "1a1e55a2f38c51af",
+  "gmail_url": "https://mail.google.com/mail/u/0/#all/1a1e55a2f38c51af",
+  "approved_source_blob": "33b7b9054ed5a0d54c0d88961ca9762d742dd340",
+  "provider_ticket_id": null,
+  "provider_resolution": "AWAITING_REPLY",
+  "credentials_included": false,
+  "new_pod_started": false
+}
