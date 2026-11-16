@@ -6,7 +6,7 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, verify]
+        options: [inspect, install, resume, upgrade, verify]
         default: inspect
         required: true
       host_fingerprint:
@@ -29,7 +29,7 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        if: inputs.operation == 'install'
+        if: inputs.operation == 'install' || inputs.operation == 'upgrade'
         with:
           node-version: '22'
           package-manager-cache: false
