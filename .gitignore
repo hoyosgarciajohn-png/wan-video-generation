@@ -14,3 +14,4 @@ weights/
 outputs/
 *.safetensors
 *.ckpt
+apps/studio/src/generated/*.cjs

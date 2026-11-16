@@ -1,12 +1,6 @@
-import Ajv2020 from "ajv/dist/2020";
-import addFormats from "ajv-formats";
-import schema from "../../../contracts/bundle.schema.json";
+import validBundle from "./generated/bundle-validator.cjs";
 import fixture from "../../../fixtures/project.json";
 import type { Asset, Batch, Bundle, Project, Shot, Take } from "./contract";
-
-const ajv = new Ajv2020({ strict: false });
-addFormats(ajv);
-const validBundle = ajv.compile<Bundle>(schema);
 
 export const OWNER = "fictional-owner";
 export const STORAGE_KEY = "wan-studio.fixture.0.1.0";
