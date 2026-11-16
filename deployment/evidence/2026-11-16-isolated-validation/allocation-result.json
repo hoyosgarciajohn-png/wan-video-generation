@@ -1,0 +1,71 @@
+{
+  "recorded_at": "2026-11-16T18:52:46Z",
+  "installed_commit": "d30fa01aec7dc6bf50be8e5e2a950efb3c04fffc",
+  "contract_version": "0.1.0",
+  "project": "project-bad45576e6c840cfbf3f4c633c8e3f87",
+  "admitted_at": "2026-11-16T18:43:32Z",
+  "create_attempted_at": "2026-11-16T18:52:45Z",
+  "pod_create_attempts": 1,
+  "data_center_ids": [
+    "EU-RO-1",
+    "US-TX-3"
+  ],
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "gpu_count": 1,
+    "gpu_memory_gb": 24,
+    "cloud": "SECURE",
+    "min_cuda": "12.8",
+    "min_host_ram_gb": 64,
+    "ephemeral_disk_gb": 80
+  },
+  "budget": {
+    "total_cents": 500,
+    "pod_reservation_cents": 400,
+    "storage_allowance_cents": 100,
+    "max_hourly_usd": 1,
+    "observed_hourly_usd": 0.89,
+    "max_runtime_seconds": 1800
+  },
+  "worker_image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:fce20324d1ae2f65f163f5550c7719d814f775468ce83475d4705f3f3bebed50",
+  "operator_result": {
+    "checked_at": 1794855166.2399547,
+    "batch": "bee9e55b1d4a4f458771ad4ac69c3318",
+    "state": "failed",
+    "cleanup": "confirmed",
+    "pod": null,
+    "deadline": "2026-11-16T19:13:32Z",
+    "takes": 0,
+    "attempts": 0,
+    "failure_codes": [],
+    "billing": {
+      "status": "NO_POD_ID"
+    },
+    "reservation_state": "reserved",
+    "provider_create": {
+      "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again.",
+      "http_status": 400,
+      "kind": "http_error",
+      "outcome": "rejected",
+      "request_id": "req_c5b30a44-e3c4-4dd2-becf-5ad5c57063c9",
+      "title": "Bad Request"
+    }
+  },
+  "workflow": {
+    "upgrade": 43931628684,
+    "admission": 43931801108,
+    "guard": 43932987270,
+    "launch": 43933406724,
+    "launch_workflow_conclusion": "success",
+    "render_conclusion": "NOT_STARTED",
+    "note": "Workflow success means the operator handled rejection and cleanup; it is not a successful GPU test."
+  },
+  "old_request": {
+    "batch": "249c50635ec84ac38cef0eb66232efed",
+    "cleanup": "unresolved",
+    "reservation_cents": 400,
+    "monitor_active": true
+  },
+  "next_stage": "Five-second generation blocked pending successful one-second output and measured feasibility; current one-create grant consumed.",
+  "billing_note": "No Pod ID; no GPU runtime occurred. Empty inventory and zero billing records are not final billing settlement. Reservations remain retained."
+}
