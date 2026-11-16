@@ -1,5 +1,7 @@
 # First Wan render: host review and proposed limits
 
+**Current status — November 16:** the approved single attempt was consumed. Its render failed without durable output; automatic deadline deletion and zero remaining Pods were confirmed. Hosting, owner sign-in and synthetic recovery are verified. Post-trial controller fixes are installed and a new private worker is published. Billing remains provisional. See [resumed deployment](evidence/2026-11-16-resumed-deployment/README.md) and the [disabled additional diagnostic proposal](diagnostic-trial-proposal.json). The earlier planning record below is historical and does not authorize another attempt.
+
 November 15, 2026. **OWNER APPROVED — infrastructure remains unverified; launch is still blocked.**
 Reviewed source: main `21a5bcab35db6ef047f9190c4185b38415f8882f` (PR #31), tree
 `0af62a393cfa8eb2ea5b3461ac952099de2c7994`. Contract 0.1.0.

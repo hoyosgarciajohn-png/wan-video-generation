@@ -1,0 +1,20 @@
+2026-11-16T05:14:41.6149662Z   ref: 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:14:42.1688238Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:14:42.4611774Z  * branch            45559974d44797e26fb543c6e5ff9e4f75344dcb -> FETCH_HEAD
+2026-11-16T05:14:42.4616851Z [command]/usr/bin/git rev-parse --verify --quiet 45559974d44797e26fb543c6e5ff9e4f75344dcb^{object}
+2026-11-16T05:14:42.4619786Z 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:14:42.4708963Z [command]/usr/bin/git checkout --progress --force 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:14:42.6091003Z Note: switching to '45559974d44797e26fb543c6e5ff9e4f75344dcb'.
+2026-11-16T05:14:42.6169138Z 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:15:01.6692081Z {"complete": true, "files": 4, "recovery": {"uploads_aborted": 0, "attempts_fenced": 0, "worker_credentials_revoked": 1, "live_approvals_revoked": 1}}
+2026-11-16T05:15:01.8599003Z REVIEWED_SOURCE_UPGRADED; PRIVATE_STATE_PRESERVED
+2026-11-16T05:15:02.0772926Z 45559974d44797e26fb543c6e5ff9e4f75344dcb
+2026-11-16T05:15:02.1202025Z active
+2026-11-16T05:15:02.1202503Z active
+2026-11-16T05:15:02.1202879Z active
+2026-11-16T05:15:02.1446637Z enabled
+2026-11-16T05:15:02.1447492Z enabled
+2026-11-16T05:15:02.1447872Z enabled
+2026-11-16T05:15:02.4281891Z Status: active
+2026-11-16T05:15:04.5691481Z AssertionError
+2026-11-16T05:15:04.5692982Z {"ready":true,"paid_dispatch":false}{"checked_at": 1794806102.6094341, "due_batches": 0, "unresolved": [], "ready": true, "scope": "cleanup-only; no billing settlement"}

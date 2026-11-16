@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "as_of": "2026-11-15",
-  "status": "OWNER_APPROVED_INFRASTRUCTURE_PENDING",
+  "as_of": "2026-11-16",
+  "status": "TRIAL_CONSUMED_FAILED_CLEANUP_CONFIRMED",
   "purpose": "owner decision record; not a signed runtime grant or launch configuration",
   "execution_enabled": false,
   "reviewed_source_commit": "f6c8ab126b9c0311f8c4c6a7c3aee53f289af45c",
@@ -16,9 +16,9 @@
     "gpu_run_id": 43774509988,
     "scope": "actual image builds and offline checks only; no hosted runtime or GPU acceptance"
   },
-  "verified_controller_origin": null,
-  "verified_watchdog_host": null,
-  "verified_registry_digest": null,
+  "verified_controller_origin": "https://wan-64-225-114-46.sslip.io",
+  "verified_watchdog_host": "wan-controller-01 plus independent GitHub deadline guard",
+  "verified_registry_digest": "sha256:c1b181cf4fb83f6451c721dc1035d55966a3757bf6567636bcbeff77f740fbe2",
   "runpod_account_state": "CONNECTED_READ_ACCESS_VERIFIED",
   "automatic_bill_retrieval": "CONNECTOR_READ_VERIFIED_APPLICATION_COLLECTOR_PENDING",
   "provider_hard_spending_stop": false,
@@ -49,5 +49,17 @@
     "availability": "NONE",
     "catalog_secure_price_usd_per_hour": "0.89",
     "capacity_reserved": false
+  },
+  "execution_record": {
+    "batch_id": "7c811e6ab21a4392b0e3a80e331fc57a",
+    "provider_resource_id": "xhd7cd3nqsrcca",
+    "pod_create_attempts": 1,
+    "render_attempts": 1,
+    "render_state": "failed",
+    "cleanup_state": "confirmed",
+    "durable_generated_takes": 0,
+    "approval_consumed": true,
+    "provider_billing_final": false,
+    "followup_proposal": "deployment/diagnostic-trial-proposal.json"
   }
 }

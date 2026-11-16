@@ -1,0 +1,80 @@
+{
+  "failed_upgrade": {
+    "run_id": 43808383545,
+    "source": "0f94a1754d03818c04f4376c905a735fd45fa033",
+    "service_replaced": false,
+    "error": "Live launch configuration mismatch"
+  },
+  "installed_upgrade": {
+    "run_id": 43808938735,
+    "source": "45559974d44797e26fb543c6e5ff9e4f75344dcb",
+    "service_replaced": true,
+    "backup_complete": true,
+    "backup_files": 4,
+    "private_state_preserved": true,
+    "postcheck_failed": "Obsolete requirement for zero historical live jobs"
+  },
+  "verification": {
+    "run_id": 43809179887,
+    "verification_source": "19c7d8fc537354a656e6f438d524dd66d5cfb410",
+    "installed_source": "45559974d44797e26fb543c6e5ff9e4f75344dcb",
+    "status": "PASS",
+    "https": true,
+    "paid_dispatch": false,
+    "cleanup_ready": true,
+    "unresolved": [],
+    "historical_live_jobs": 1
+  },
+  "billing": {
+    "run_id": 43808824454,
+    "observed_at": 1794805899.866,
+    "provider": {
+      "metadata": {
+        "query": {
+          "bucketSize": "hour",
+          "endTime": "2026-11-16T05:00:00Z",
+          "podId": "xhd7cd3nqsrcca",
+          "startTime": "2026-11-16T03:00:00Z"
+        },
+        "recordCount": 1,
+        "totals": {
+          "cpuAmount": 0,
+          "diskAmount": 0.0018518518190830946,
+          "gpuAmount": 0.1457330510020256,
+          "totalAmount": 0.1475849028211087
+        },
+        "uniquePodCount": 1
+      },
+      "records": [
+        {
+          "cpuAmount": 0,
+          "diskAmount": 0.0018518518190830946,
+          "endTime": "2026-11-16T05:00:00Z",
+          "gpuAmount": 0.1457330510020256,
+          "podId": "xhd7cd3nqsrcca",
+          "startTime": "2026-11-16T04:00:00Z",
+          "totalAmount": 0.1475849028211087
+        }
+      ]
+    },
+    "recorded_cents": 15,
+    "reserved_remaining_cents": 385,
+    "reservation_state": "reserved",
+    "final": false
+  },
+  "resources": {
+    "observed_at": "2026-11-16T05:19:20.682Z",
+    "active_pods": 0,
+    "additional_pod_creates": 0,
+    "additional_renders": 0,
+    "controller_hosts": 1,
+    "approved_monthly_controller_usd": 14.4
+  },
+  "validation": {
+    "backup_live_integration_pass": 14,
+    "hosting_pass": 8,
+    "shell_syntax": "PASS",
+    "diff_check": "PASS",
+    "contract_version": "0.1.0"
+  }
+}

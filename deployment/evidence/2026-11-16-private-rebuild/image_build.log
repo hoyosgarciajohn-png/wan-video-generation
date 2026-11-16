@@ -1,0 +1,360 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.78kB done
+#1 WARN: FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 2)
+#1 WARN: FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 3)
+#1 DONE 0.0s
+
+#2 [auth] pytorch/pytorch:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [auth] mwader/static-ffmpeg:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+#4 DONE 0.4s
+
+#5 [internal] load metadata for docker.io/mwader/static-ffmpeg:7.1@sha256:a8090df5f5608daef387e1b2e93b98aaacb4d92153ad904e7d715c725724fca4
+#5 DONE 0.5s
+
+#6 [internal] load build context
+#6 transferring context: 430.05kB 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1  1/14] FROM docker.io/pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+#7 resolve docker.io/pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385 done
+#7 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0B / 32B 0.1s
+#7 sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385 1.37kB / 1.37kB done
+#7 sha256:b2078535036f785b93ef4da8138bcbba589ab3a0e66b74d6f3f05dc838b6f059 4.66kB / 4.66kB done
+#7 sha256:66587c81b81a58d07e40c48d900a1517516bbf58c4378c687d89d645824f5e5f 7.34MB / 30.45MB 0.1s
+#7 sha256:653c16bb1f7bbf244aca8a719695abe818c8343614d1706ff249df9dc7e4afe3 7.21MB / 7.21MB 0.1s done
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 5.24MB / 4.25GB 0.1s
+#7 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.1s done
+#7 sha256:fe02679948c8f9694674f682dd9bd2e15105c83da90b1be1affc52549eadf14c 99B / 99B 0.2s done
+#7 sha256:66587c81b81a58d07e40c48d900a1517516bbf58c4378c687d89d645824f5e5f 30.45MB / 30.45MB 0.2s done
+#7 extracting sha256:66587c81b81a58d07e40c48d900a1517516bbf58c4378c687d89d645824f5e5f
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 232.78MB / 4.25GB 0.8s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 477.10MB / 4.25GB 1.5s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 704.64MB / 4.25GB 2.2s
+#7 extracting sha256:66587c81b81a58d07e40c48d900a1517516bbf58c4378c687d89d645824f5e5f 2.3s done
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 919.60MB / 4.25GB 3.3s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 1.15GB / 4.25GB 4.0s
+#7 extracting sha256:653c16bb1f7bbf244aca8a719695abe818c8343614d1706ff249df9dc7e4afe3
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 1.38GB / 4.25GB 4.9s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 1.65GB / 4.25GB 6.2s
+#7 extracting sha256:653c16bb1f7bbf244aca8a719695abe818c8343614d1706ff249df9dc7e4afe3 2.6s done
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 1.91GB / 4.25GB 7.1s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 2.14GB / 4.25GB 7.9s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 2.36GB / 4.25GB 9.5s
+#7 ...
+
+#8 [ffmpeg 1/1] FROM docker.io/mwader/static-ffmpeg:7.1@sha256:a8090df5f5608daef387e1b2e93b98aaacb4d92153ad904e7d715c725724fca4
+#8 resolve docker.io/mwader/static-ffmpeg:7.1@sha256:a8090df5f5608daef387e1b2e93b98aaacb4d92153ad904e7d715c725724fca4 0.0s done
+#8 sha256:a8090df5f5608daef387e1b2e93b98aaacb4d92153ad904e7d715c725724fca4 741B / 741B done
+#8 sha256:32dfd1df302753d47fb4a87344b5ba005c9cae8e58b4d842959fc387fd004a01 529B / 529B done
+#8 sha256:7bc1e81454422cc916e8e74f1554bf9cc72a4bc716ec99817f03ca30fabb328f 826B / 826B done
+#8 sha256:9a0ffa1fcead72810e4591736f8dcdaa1751d32979cbb83292a336a6e4789a89 118.60MB / 118.60MB 1.4s done
+#8 extracting sha256:9a0ffa1fcead72810e4591736f8dcdaa1751d32979cbb83292a336a6e4789a89 5.6s done
+#8 ...
+
+#7 [stage-1  1/14] FROM docker.io/pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 2.58GB / 4.25GB 10.7s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 2.79GB / 4.25GB 11.9s
+#7 ...
+
+#8 [ffmpeg 1/1] FROM docker.io/mwader/static-ffmpeg:7.1@sha256:a8090df5f5608daef387e1b2e93b98aaacb4d92153ad904e7d715c725724fca4
+#8 DONE 12.6s
+
+#7 [stage-1  1/14] FROM docker.io/pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 3.04GB / 4.25GB 13.0s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 3.26GB / 4.25GB 13.9s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 3.49GB / 4.25GB 14.9s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 3.70GB / 4.25GB 15.9s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 3.92GB / 4.25GB 17.1s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 4.16GB / 4.25GB 18.3s
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 4.25GB / 4.25GB 23.3s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b
+#7 sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 4.25GB / 4.25GB 24.3s done
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 5.0s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 10.0s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 15.1s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 20.2s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 25.2s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 30.5s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 35.6s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 40.6s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 45.6s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 51.1s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 56.1s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 61.2s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 66.3s
+#7 extracting sha256:27f025450560594e82b23efaaf1184b1434d3e60c9e712f070e154da0d898f3b 71.0s done
+#7 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
+#7 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#7 extracting sha256:fe02679948c8f9694674f682dd9bd2e15105c83da90b1be1affc52549eadf14c done
+#7 DONE 98.5s
+
+#9 [stage-1  2/14] WORKDIR /app
+#9 DONE 0.0s
+
+#10 [stage-1  3/14] COPY --from=ffmpeg /ffmpeg /usr/local/bin/ffmpeg
+#10 DONE 1.2s
+
+#11 [stage-1  4/14] COPY --from=ffmpeg /ffprobe /usr/local/bin/ffprobe
+#11 DONE 1.3s
+
+#12 [stage-1  5/14] COPY workers/gpu/requirements.lock /app/workers/gpu/requirements.lock
+#12 DONE 0.0s
+
+#13 [stage-1  6/14] RUN python -m pip install --require-hashes --only-binary=:all: -r workers/gpu/requirements.lock
+#13 0.625 Collecting accelerate==1.10.1 (from -r workers/gpu/requirements.lock (line 3))
+#13 0.691   Downloading accelerate-1.10.1-py3-none-any.whl (374 kB)
+#13 0.726 Collecting attrs==26.1.0 (from -r workers/gpu/requirements.lock (line 7))
+#13 0.729   Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+#13 0.755 Collecting certifi==2026.10.23 (from -r workers/gpu/requirements.lock (line 13))
+#13 0.759   Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
+#13 0.879 Collecting charset-normalizer==3.5.2 (from -r workers/gpu/requirements.lock (line 17))
+#13 0.883   Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (269 kB)
+#13 0.907 Collecting diffusers==0.35.1 (from -r workers/gpu/requirements.lock (line 191))
+#13 0.911   Downloading diffusers-0.35.1-py3-none-any.whl (4.1 MB)
+#13 0.944      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.1/4.1 MB 136.6 MB/s eta 0:00:00
+#13 0.969 Collecting easydict==1.13 (from -r workers/gpu/requirements.lock (line 195))
+#13 0.972   Downloading easydict-1.13-py3-none-any.whl (6.8 kB)
+#13 0.984 Collecting einops==0.8.1 (from -r workers/gpu/requirements.lock (line 199))
+#13 0.987   Downloading einops-0.8.1-py3-none-any.whl (64 kB)
+#13 1.009 Collecting filelock==4.2.10 (from -r workers/gpu/requirements.lock (line 203))
+#13 1.013   Downloading filelock-4.2.10-py3-none-any.whl (218 kB)
+#13 1.031 Collecting fsspec==2026.9.0 (from -r workers/gpu/requirements.lock (line 211))
+#13 1.035   Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+#13 1.068 Collecting ftfy==6.3.1 (from -r workers/gpu/requirements.lock (line 217))
+#13 1.072   Downloading ftfy-6.3.1-py3-none-any.whl (44 kB)
+#13 1.116 Collecting hf-xet==1.8.0 (from -r workers/gpu/requirements.lock (line 221))
+#13 1.120   Downloading hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+#13 1.143      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 199.1 MB/s eta 0:00:00
+#13 1.185 Collecting huggingface-hub==0.36.2 (from -r workers/gpu/requirements.lock (line 240))
+#13 1.189   Downloading huggingface_hub-0.36.2-py3-none-any.whl (566 kB)
+#13 1.194      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 112.0 MB/s eta 0:00:00
+#13 1.228 Collecting idna==3.20 (from -r workers/gpu/requirements.lock (line 248))
+#13 1.231   Downloading idna-3.20-py3-none-any.whl (69 kB)
+#13 1.249 Collecting imageio==2.37.0 (from -r workers/gpu/requirements.lock (line 252))
+#13 1.252   Downloading imageio-2.37.0-py3-none-any.whl (315 kB)
+#13 1.277 Collecting imageio-ffmpeg==0.6.0 (from -r workers/gpu/requirements.lock (line 256))
+#13 1.284   Downloading imageio_ffmpeg-0.6.0-py3-none-manylinux2014_x86_64.whl (29.5 MB)
+#13 1.392      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 29.5/29.5 MB 278.6 MB/s eta 0:00:00
+#13 1.434 Collecting importlib-metadata==10.2.0 (from -r workers/gpu/requirements.lock (line 265))
+#13 1.437   Downloading importlib_metadata-10.2.0-py3-none-any.whl (34 kB)
+#13 1.443 Requirement already satisfied: jinja2==3.1.6 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 269)) (3.1.6)
+#13 1.458 Collecting jsonschema==4.26.0 (from -r workers/gpu/requirements.lock (line 273))
+#13 1.462   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#13 1.475 Collecting jsonschema-specifications==2025.9.1 (from -r workers/gpu/requirements.lock (line 277))
+#13 1.479   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+#13 1.487 Collecting lazy-importer==0.1.0 (from -r workers/gpu/requirements.lock (line 281))
+#13 1.491   Downloading lazy_importer-0.1.0-py3-none-any.whl (12 kB)
+#13 1.545 Collecting markupsafe==3.0.4 (from -r workers/gpu/requirements.lock (line 285))
+#13 1.548   Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#13 1.552 Requirement already satisfied: mpmath==1.3.0 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 438)) (1.3.0)
+#13 1.567 Collecting networkx==3.6.1 (from -r workers/gpu/requirements.lock (line 442))
+#13 1.571   Downloading networkx-3.6.1-py3-none-any.whl (2.1 MB)
+#13 1.580      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 303.3 MB/s eta 0:00:00
+#13 1.800 Collecting numpy==1.26.4 (from -r workers/gpu/requirements.lock (line 446))
+#13 1.804   Downloading numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.3 MB)
+#13 1.861      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.3/18.3 MB 329.7 MB/s eta 0:00:00
+#13 1.886 Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 491)) (12.8.4.1)
+#13 1.886 Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 499)) (12.8.90)
+#13 1.887 Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 504)) (12.8.93)
+#13 1.888 Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 509)) (12.8.90)
+#13 1.888 Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 514)) (9.10.2.21)
+#13 1.889 Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 519)) (11.3.3.83)
+#13 1.890 Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 524)) (1.13.1.3)
+#13 1.890 Requirement already satisfied: nvidia-curand-cu12==10.3.9.90 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 528)) (10.3.9.90)
+#13 1.891 Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 533)) (11.7.3.90)
+#13 1.891 Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 538)) (12.5.8.93)
+#13 1.892 Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 545)) (0.7.1)
+#13 1.892 Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 550)) (2.27.3)
+#13 1.893 Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 554)) (12.8.93)
+#13 1.893 Requirement already satisfied: nvidia-nvtx-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 563)) (12.8.90)
+#13 1.940 Collecting opencv-python-headless==4.11.0.86 (from -r workers/gpu/requirements.lock (line 568))
+#13 1.944   Downloading opencv_python_headless-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (50.0 MB)
+#13 2.136      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.0/50.0 MB 262.6 MB/s eta 0:00:00
+#13 2.189 Collecting packaging==26.3 (from -r workers/gpu/requirements.lock (line 577))
+#13 2.193   Downloading packaging-26.3-py3-none-any.whl (129 kB)
+#13 2.380 Collecting pillow==13.0.0 (from -r workers/gpu/requirements.lock (line 584))
+#13 2.385   Downloading pillow-13.0.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.1 MB)
+#13 2.412      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 284.7 MB/s eta 0:00:00
+#13 2.479 Collecting psutil==7.2.2 (from -r workers/gpu/requirements.lock (line 672))
+#13 2.483   Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (155 kB)
+#13 2.520 Collecting pyyaml==6.0.3 (from -r workers/gpu/requirements.lock (line 695))
+#13 2.524   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+#13 2.531      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 130.5 MB/s eta 0:00:00
+#13 2.550 Collecting referencing==0.37.0 (from -r workers/gpu/requirements.lock (line 773))
+#13 2.554   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+#13 2.982 Collecting regex==2026.11.9 (from -r workers/gpu/requirements.lock (line 779))
+#13 2.987   Downloading regex-2026.11.9-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (805 kB)
+#13 2.993      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.0/806.0 kB 164.2 MB/s eta 0:00:00
+#13 3.013 Collecting requests==2.34.2 (from -r workers/gpu/requirements.lock (line 897))
+#13 3.016   Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+#13 3.324 Collecting rpds-py==2026.9.1 (from -r workers/gpu/requirements.lock (line 904))
+#13 3.328   Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (375 kB)
+#13 3.437 Collecting safetensors==0.8.0 (from -r workers/gpu/requirements.lock (line 1036))
+#13 3.441   Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (516 kB)
+#13 3.494 Collecting sentencepiece==0.2.1 (from -r workers/gpu/requirements.lock (line 1058))
+#13 3.502   Downloading sentencepiece-0.2.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (1.4 MB)
+#13 3.509      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 244.8 MB/s eta 0:00:00
+#13 3.582 Collecting setuptools==84.2.1 (from -r workers/gpu/requirements.lock (line 1125))
+#13 3.586   Downloading setuptools-84.2.1-py3-none-any.whl (876 kB)
+#13 3.592      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 876.3/876.3 kB 183.6 MB/s eta 0:00:00
+#13 3.600 Requirement already satisfied: sympy==1.14.0 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 1129)) (1.14.0)
+#13 3.728 Collecting tokenizers==0.21.4 (from -r workers/gpu/requirements.lock (line 1133))
+#13 3.733   Downloading tokenizers-0.21.4-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.1 MB)
+#13 3.747      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 269.8 MB/s eta 0:00:00
+#13 3.751 Requirement already satisfied: torch==2.8.0 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 1152)) (2.8.0+cu128)
+#13 3.751 Requirement already satisfied: torchvision==0.23.0 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 1181)) (0.23.0+cu128)
+#13 3.752 Requirement already satisfied: tqdm==4.67.1 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 1207)) (4.67.1)
+#13 3.838 Collecting transformers==4.51.3 (from -r workers/gpu/requirements.lock (line 1214))
+#13 3.843   Downloading transformers-4.51.3-py3-none-any.whl (10.4 MB)
+#13 3.885      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 261.1 MB/s eta 0:00:00
+#13 3.972 Requirement already satisfied: triton==3.4.0 in /opt/conda/lib/python3.11/site-packages (from -r workers/gpu/requirements.lock (line 1218)) (3.4.0)
+#13 3.984 Collecting typing-extensions==4.16.0 (from -r workers/gpu/requirements.lock (line 1226))
+#13 3.988   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#13 4.007 Collecting urllib3==2.8.0 (from -r workers/gpu/requirements.lock (line 1233))
+#13 4.010   Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+#13 4.031 Collecting wcwidth==0.9.4 (from -r workers/gpu/requirements.lock (line 1237))
+#13 4.034   Downloading wcwidth-0.9.4-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (785 kB)
+#13 4.040      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 785.9/785.9 kB 155.0 MB/s eta 0:00:00
+#13 4.055 Collecting zipp==4.1.2 (from -r workers/gpu/requirements.lock (line 1268))
+#13 4.058   Downloading zipp-4.1.2-py3-none-any.whl (10 kB)
+#13 4.393 Installing collected packages: easydict, zipp, wcwidth, urllib3, typing-extensions, setuptools, sentencepiece, safetensors, rpds-py, regex, pyyaml, psutil, pillow, packaging, numpy, networkx, markupsafe, lazy-importer, imageio-ffmpeg, idna, hf-xet, fsspec, filelock, einops, charset-normalizer, certifi, attrs, requests, referencing, opencv-python-headless, importlib-metadata, imageio, ftfy, jsonschema-specifications, huggingface-hub, tokenizers, jsonschema, diffusers, accelerate, transformers
+#13 4.407   Attempting uninstall: wcwidth
+#13 4.411     Found existing installation: wcwidth 0.2.13
+#13 4.414     Uninstalling wcwidth-0.2.13:
+#13 4.415       Successfully uninstalled wcwidth-0.2.13
+#13 4.591   Attempting uninstall: urllib3
+#13 4.595     Found existing installation: urllib3 2.5.0
+#13 4.600     Uninstalling urllib3-2.5.0:
+#13 4.602       Successfully uninstalled urllib3-2.5.0
+#13 4.668   Attempting uninstall: typing-extensions
+#13 4.671     Found existing installation: typing_extensions 4.14.1
+#13 4.673     Uninstalling typing_extensions-4.14.1:
+#13 4.831       Successfully uninstalled typing_extensions-4.14.1
+#13 4.852   Attempting uninstall: setuptools
+#13 4.855     Found existing installation: setuptools 79.0.1
+#13 4.895     Uninstalling setuptools-79.0.1:
+#13 5.038       Successfully uninstalled setuptools-79.0.1
+#13 5.523   Attempting uninstall: rpds-py
+#13 5.526     Found existing installation: rpds-py 0.26.0
+#13 5.528     Uninstalling rpds-py-0.26.0:
+#13 5.529       Successfully uninstalled rpds-py-0.26.0
+#13 5.615   Attempting uninstall: pyyaml
+#13 5.618     Found existing installation: PyYAML 6.0.2
+#13 5.622     Uninstalling PyYAML-6.0.2:
+#13 5.623       Successfully uninstalled PyYAML-6.0.2
+#13 5.671   Attempting uninstall: psutil
+#13 5.675     Found existing installation: psutil 7.0.0
+#13 5.679     Uninstalling psutil-7.0.0:
+#13 5.681       Successfully uninstalled psutil-7.0.0
+#13 5.730   Attempting uninstall: pillow
+#13 5.734     Found existing installation: pillow 11.0.0
+#13 5.744     Uninstalling pillow-11.0.0:
+#13 5.746       Successfully uninstalled pillow-11.0.0
+#13 6.030   Attempting uninstall: packaging
+#13 6.032     Found existing installation: packaging 25.0
+#13 6.036     Uninstalling packaging-25.0:
+#13 6.037       Successfully uninstalled packaging-25.0
+#13 6.100   Attempting uninstall: numpy
+#13 6.103     Found existing installation: numpy 2.3.2
+#13 6.162     Uninstalling numpy-2.3.2:
+#13 6.174       Successfully uninstalled numpy-2.3.2
+#13 8.163   Attempting uninstall: networkx
+#13 8.167     Found existing installation: networkx 3.5
+#13 8.240     Uninstalling networkx-3.5:
+#13 8.247       Successfully uninstalled networkx-3.5
+#13 9.269   Attempting uninstall: markupsafe
+#13 9.271     Found existing installation: MarkupSafe 3.0.2
+#13 9.273     Uninstalling MarkupSafe-3.0.2:
+#13 9.274       Successfully uninstalled MarkupSafe-3.0.2
+#13 9.618   Attempting uninstall: idna
+#13 9.621     Found existing installation: idna 3.10
+#13 9.624     Uninstalling idna-3.10:
+#13 9.625       Successfully uninstalled idna-3.10
+#13 9.710   Attempting uninstall: fsspec
+#13 9.714     Found existing installation: fsspec 2025.7.0
+#13 9.720     Uninstalling fsspec-2025.7.0:
+#13 9.722       Successfully uninstalled fsspec-2025.7.0
+#13 9.852   Attempting uninstall: filelock
+#13 9.856     Found existing installation: filelock 3.18.0
+#13 9.858     Uninstalling filelock-3.18.0:
+#13 9.860       Successfully uninstalled filelock-3.18.0
+#13 9.979   Attempting uninstall: charset-normalizer
+#13 9.983     Found existing installation: charset-normalizer 3.4.2
+#13 9.987     Uninstalling charset-normalizer-3.4.2:
+#13 9.990       Successfully uninstalled charset-normalizer-3.4.2
+#13 10.02   Attempting uninstall: certifi
+#13 10.03     Found existing installation: certifi 2025.8.3
+#13 10.03     Uninstalling certifi-2025.8.3:
+#13 10.03       Successfully uninstalled certifi-2025.8.3
+#13 10.04   Attempting uninstall: attrs
+#13 10.04     Found existing installation: attrs 25.3.0
+#13 10.05     Uninstalling attrs-25.3.0:
+#13 10.05       Successfully uninstalled attrs-25.3.0
+#13 10.08   Attempting uninstall: requests
+#13 10.09     Found existing installation: requests 2.32.4
+#13 10.09     Uninstalling requests-2.32.4:
+#13 10.09       Successfully uninstalled requests-2.32.4
+#13 10.13   Attempting uninstall: referencing
+#13 10.14     Found existing installation: referencing 0.36.2
+#13 10.14     Uninstalling referencing-0.36.2:
+#13 10.14       Successfully uninstalled referencing-0.36.2
+#13 11.10   Attempting uninstall: jsonschema-specifications
+#13 11.10     Found existing installation: jsonschema-specifications 2025.4.1
+#13 11.11     Uninstalling jsonschema-specifications-2025.4.1:
+#13 11.11       Successfully uninstalled jsonschema-specifications-2025.4.1
+#13 11.41   Attempting uninstall: jsonschema
+#13 11.41     Found existing installation: jsonschema 4.25.0
+#13 11.42     Uninstalling jsonschema-4.25.0:
+#13 11.42       Successfully uninstalled jsonschema-4.25.0
+#13 18.10 
+#13 18.11 Successfully installed accelerate-1.10.1 attrs-26.1.0 certifi-2026.10.23 charset-normalizer-3.5.2 diffusers-0.35.1 easydict-1.13 einops-0.8.1 filelock-4.2.10 fsspec-2026.9.0 ftfy-6.3.1 hf-xet-1.8.0 huggingface-hub-0.36.2 idna-3.20 imageio-2.37.0 imageio-ffmpeg-0.6.0 importlib-metadata-10.2.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 lazy-importer-0.1.0 markupsafe-3.0.4 networkx-3.6.1 numpy-1.26.4 opencv-python-headless-4.11.0.86 packaging-26.3 pillow-13.0.0 psutil-7.2.2 pyyaml-6.0.3 referencing-0.37.0 regex-2026.11.9 requests-2.34.2 rpds-py-2026.9.1 safetensors-0.8.0 sentencepiece-0.2.1 setuptools-84.2.1 tokenizers-0.21.4 transformers-4.51.3 typing-extensions-4.16.0 urllib3-2.8.0 wcwidth-0.9.4 zipp-4.1.2
+#13 18.11 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#13 DONE 20.0s
+
+#14 [stage-1  7/14] COPY workers/gpu/flash-attention.lock /app/workers/gpu/flash-attention.lock
+#14 DONE 0.0s
+
+#15 [stage-1  8/14] RUN python -m pip install --no-deps --require-hashes -r workers/gpu/flash-attention.lock
+#15 0.451 Collecting flash-attn@ https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3%2Bcu12torch2.8cxx11abiTRUE-cp311-cp311-linux_x86_64.whl (from -r workers/gpu/flash-attention.lock (line 1))
+#15 0.662   Downloading https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3%2Bcu12torch2.8cxx11abiTRUE-cp311-cp311-linux_x86_64.whl (256.0 MB)
+#15 3.948      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 256.0/256.0 MB 78.1 MB/s eta 0:00:00
+#15 4.312 Installing collected packages: flash-attn
+#15 8.582 Successfully installed flash-attn-2.8.3
+#15 8.582 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#15 DONE 11.6s
+
+#16 [stage-1  9/14] COPY contracts /app/contracts
+#16 DONE 0.0s
+
+#17 [stage-1 10/14] COPY fixtures /app/fixtures
+#17 DONE 0.0s
+
+#18 [stage-1 11/14] COPY workers/gpu /app/workers/gpu
+#18 DONE 0.0s
+
+#19 [stage-1 12/14] RUN python /app/workers/gpu/install_source.py
+#19 DONE 0.5s
+
+#20 [stage-1 13/14] RUN python -c "import sys, torch; assert sys.version_info[:2] == (3, 11); assert torch.__version__.split('+')[0] == '2.8.0'; assert torch._C._GLIBCXX_USE_CXX11_ABI"
+#20 DONE 2.3s
+
+#21 [stage-1 14/14] RUN python -c "import flash_attn, compileall; assert compileall.compile_dir('/opt/wan/wan', quiet=1)"
+#21 DONE 1.8s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 41.0s done
+#22 writing image sha256:e0b3493001c7fb69c8a5a3fcff71f6bdd9f1ba23a39070751e603805f51ac03b done
+#22 naming to docker.io/library/wan-gpu-verify:0f94a1754d03 done
+#22 DONE 41.0s
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 2)
+ - FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 3)

@@ -42,3 +42,17 @@ still-unverified Runpod download.
 
 [Installed controller evidence](deployment/evidence/2026-11-16-controller-hosting/README.md)
 records the initial hosted release and resource/cost. Later [access and recovery evidence](deployment/evidence/2026-11-16-access-recovery/README.md) supersedes its original sign-in and recovery gaps. See the [first live trial](deployment/evidence/2026-11-16-first-live-trial/README.md) for GPU execution, cleanup, costs and remaining gates.
+
+## Current continuation status
+
+[Resumed deployment](deployment/evidence/2026-11-16-resumed-deployment/README.md)
+installed failure-handling and backup compatibility fixes. Final host verification
+passed, owner browser access works and no Runpod Pods are active. The first trial
+failed without output; automatic deadline deletion passed, and its one-attempt
+approval is consumed. Billing observations are provisional and the remaining
+reservation is retained. [The new private worker](deployment/evidence/2026-11-16-private-rebuild/README.md)
+passed build/runtime/fixture and registry checks; its Runpod pull and CUDA render
+are still unverified. [A one-second diagnostic proposal](deployment/diagnostic-trial-proposal.json)
+is disabled pending new specific owner approval. The public Studio still uses
+synthetic rendering. See the master handoff for exact installed/build/verification
+commits and outstanding operational work.

@@ -1,5 +1,7 @@
 # First live Wan trial — November 16, 2026 UTC
 
+**Later continuation:** browser access resumed, the post-trial controller fixes were deployed, a new private worker was published, and provisional provider charges were imported. See [resumed deployment](../2026-11-16-resumed-deployment/README.md). The observed failed render and consumed allowance below remain unchanged; statements about the disconnected browser, undeployed fixes and zero billing records describe the earlier checkpoint.
+
 Issue [B06 / #7](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/7), contract 0.1.0. This is the single authorized five-second shot, not the six-shot benchmark described in the original issue. Owner creative acceptance remains pending.
 
 ## Scope and immutable launch
