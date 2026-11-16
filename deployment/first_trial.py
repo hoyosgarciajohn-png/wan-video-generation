@@ -1,4 +1,4 @@
-"""Private operator for John's single approved $5 / 1800-second Wan trial.
+"""Private operator for separately approved, isolated one-attempt Wan trials.
 
 The web service receives worker traffic but never receives provider credentials or
 signing keys. No scheduler and no create retry exist here. Preparation is free;
@@ -42,6 +42,49 @@ IMAGE = 'ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:c1b181cf4fb
 GPU = 'NVIDIA GeForce RTX 4090'
 REGISTRY = 'cmwik8xrr008eoog7l16ldqug'
 QUOTE_FILE = Path('/etc/wan/connected-runpod-quote.json')
+BUILD_EVIDENCE = '2026-11-15-private-publication'
+TITLE = 'First Wan GPU trial · one approved five-second shot'
+DURATION_MS = 5000
+APPROVAL_ID = 'john-first-trial-20261116'
+IDEMPOTENCY_KEY = 'john-first-approved-attempt'
+WORKER_ID = 'john-first-wan-worker'
+EXPECTED_PRIOR_BATCHES = set()
+
+
+def select_trial(name):
+    """Allowlisted operator scope, never an arbitrary path or mutable retry."""
+    global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
+    global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
+    if name == 'first':
+        return
+    assert name == 'diagnostic', 'Unknown trial scope'
+    proposal = read(ROOT / 'deployment/diagnostic-trial-proposal.json')
+    assert proposal['status'] == 'OWNER_APPROVED_RUNTIME_PREPARATION'
+    assert proposal['execution_enabled'] is False  # Not a grant by itself.
+    terms = proposal['proposed_additional_terms']
+    assert (terms['overall_cap_cents'],terms['pod_reservation_cents'],terms['storage_allowance_cents'],
+            terms['runtime_seconds_from_admission'],terms['pod_create_attempts'],terms['render_attempts'],
+            terms['target_duration_ms'],terms['frames']) == (500,400,100,1800,1,1,1000,25)
+    assert proposal['approval_reference']
+    TRIAL = STATE / 'diagnostic-trial-20261116'
+    AUTH = Path('/etc/wan/diagnostic-trial-authority-20261116.json')
+    IMAGE = 'ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:f724b9f32ac4ac780702072fd32e9d08254524ca81afd6aadeb87169904f993b'
+    assert proposal['image'] == IMAGE
+    BUILD_EVIDENCE = '2026-11-16-private-rebuild'
+    TITLE = 'Wan diagnostic trial · one approved one-second shot'
+    DURATION_MS = 1000
+    APPROVAL_ID = 'john-diagnostic-trial-20261116'
+    IDEMPOTENCY_KEY = 'john-diagnostic-approved-attempt'
+    WORKER_ID = 'john-diagnostic-wan-worker'
+    EXPECTED_PRIOR_BATCHES = {'7c811e6ab21a4392b0e3a80e331fc57a'}
+
+
+def prior_history_closed(db):
+    rows = db.execute('SELECT l.batch,p.state,p.cleanup FROM live_job_links AS l '
+                      'LEFT JOIN pod_batches AS p ON p.id=l.batch').fetchall()
+    assert {row[0] for row in rows} == EXPECTED_PRIOR_BATCHES
+    assert all(row[1] in ('succeeded','failed','canceled') and row[2] == 'confirmed' for row in rows)
+    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
 
 
 def read(path):
@@ -100,7 +143,7 @@ def checked_quote(region=None):
 
 
 def materialize_build(destination):
-    source = ROOT / 'deployment/evidence/2026-11-15-private-publication'
+    source = ROOT / 'deployment/evidence' / BUILD_EVIDENCE
     destination.mkdir(mode=0o700)
     for file in source.iterdir():
         if file.is_file():
@@ -140,20 +183,20 @@ def prepare():
     assert not TRIAL.exists() and not AUTH.exists()
     c = control()
     with c.transaction() as db:
-        assert db.execute('SELECT COUNT(*) FROM live_job_links').fetchone()[0] == 0
+        prior_history_closed(db)
     pricing = checked_quote()
     TRIAL.mkdir(mode=0o700)
     build = materialize_build(TRIAL / 'build')
     atomic_json(AUTH, {key: secrets.token_hex(32) for key in ('owner','host','billing')})
     studio = StudioWorkspace(c)
     workspace = studio.get(OWNER)
-    title = 'First Wan GPU trial · one approved five-second shot'
+    title = TITLE
     assert not any(x['bundle']['project']['title'] == title for x in workspace['projects'])
     workspace = studio.create(OWNER, title, 'music_video', workspace['revision'])
     p = next(x for x in workspace['projects'] if x['bundle']['project']['title'] == title)
     project = p['bundle']['project']['id']
     shot = deepcopy(read(ROOT / 'fixtures/project.json')['shots'][0])
-    shot.update(project_id=project, scene_id=p['scenes'][0]['id'], target_duration_ms=5000,
+    shot.update(project_id=project, scene_id=p['scenes'][0]['id'], target_duration_ms=DURATION_MS,
                 prompt='A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.')
     shot['settings'].update(width=1280, height=704, steps=50, seed=42)
     p['bundle']['shots'] = [shot]
@@ -164,7 +207,7 @@ def prepare():
         disk=80, dataCenterIds=[pricing['region']], mounts={}, ports=[], env={}, registry=REGISTRY,
         entrypoint=BOOTSTRAP_ENTRYPOINT, cmd=BOOTSTRAP_CMD)
     expires = stamp(utcnow() + timedelta(hours=6))
-    grant = dict(id='john-first-trial-20261116', owner=OWNER, project=project, currency='USD', approved_cents=400,
+    grant = dict(id=APPROVAL_ID, owner=OWNER, project=project, currency='USD', approved_cents=400,
         max_runtime_seconds=1800, valid_until=expires, profile=profile, launch_profile=launch, source_sha256=_sources())
     host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch), source_sha256=grant['source_sha256'],
         build_manifest_sha256=build['manifest_sha256'], valid_until=expires, worker_endpoint=ORIGIN, storage_id=profile['storage_id'])
@@ -176,10 +219,12 @@ def prepare():
     # Only install a receiver in the web process; provider access stays private.
     env = Path('/etc/wan/controller.env')
     current = env.read_text()
-    assert 'WAN_WORKER_EXECUTION' not in current
-    with env.open('a') as out:
-        out.write('\nWAN_WORKER_EXECUTION=1\n')
-    subprocess.run(['systemctl','restart','wan-controller'], check=True)
+    if 'WAN_WORKER_EXECUTION' not in current:
+        with env.open('a') as out:
+            out.write('\nWAN_WORKER_EXECUTION=1\n')
+        subprocess.run(['systemctl','restart','wan-controller'], check=True)
+    else:
+        assert [line for line in current.splitlines() if line.startswith('WAN_WORKER_EXECUTION=')] == ['WAN_WORKER_EXECUTION=1']
     print(json.dumps({'status':'PREPARED_NO_ADMISSION_NO_GPU', 'project':project, 'quote':pricing, 'build':build['manifest_sha256']}))
 
 
@@ -189,18 +234,18 @@ def admit():
     saved = read(TRIAL / 'prepared.json')
     c, a, e = services()
     with c.transaction() as db:
-        assert db.execute('SELECT COUNT(*) FROM live_job_links').fetchone()[0] == 0
+        prior_history_closed(db)
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
     pricing = checked_quote(saved['pricing']['region'])
-    request = dict(approval_id='john-first-trial-20261116', shot_ids=[saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
-        reservation_cents=400, runtime_seconds=1800, idempotency_key='john-first-approved-attempt')
+    request = dict(approval_id=APPROVAL_ID, shot_ids=[saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
+        reservation_cents=400, runtime_seconds=1800, idempotency_key=IDEMPOTENCY_KEY)
     result = a.submit(OWNER, saved['project'], request)
     batch = result['batch']['id']
     atomic_json(TRIAL / 'job.json', dict(project=saved['project'], batch=batch,
         deadline=int(timestamp(result['batch']['deadline_at']).timestamp()), scope=canonical([OWNER,saved['project']]), pricing=pricing))
-    worker = WorkerTransport(c, real_jobs=e).issue(OWNER, saved['project'], batch, 'john-first-wan-worker', ttl_seconds=2100)
+    worker = WorkerTransport(c, real_jobs=e).issue(OWNER, saved['project'], batch, WORKER_ID, ttl_seconds=2100)
     atomic_json(TRIAL / 'worker.json', worker)
     print(json.dumps({'status':'ADMITTED_NOT_LAUNCHED', **read(TRIAL / 'job.json')}))
 
@@ -302,7 +347,9 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
+    parser.add_argument('--trial', choices=['first','diagnostic'], default='first')
     args = parser.parse_args()
+    select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()
 
 

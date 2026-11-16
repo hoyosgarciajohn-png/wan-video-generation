@@ -9,6 +9,12 @@ on:
         options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, trial-prepare, trial-admit, trial-launch, trial-observe]
         default: inspect
         required: true
+      trial:
+        description: Exact approved trial scope (only for trial operations)
+        type: choice
+        options: [first, diagnostic]
+        default: first
+        required: true
       host_fingerprint:
         description: Exact ed25519 SHA256 fingerprint from the inspected host (required for install/verify)
         type: string
@@ -57,6 +63,7 @@ jobs:
           WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
           RUNPOD_CLEANUP_TOKEN: ${{ inputs.operation == 'install' && secrets.RUNPOD_CLEANUP_TOKEN || '' }}
           WAN_HOST_OPERATION: ${{ inputs.operation }}
+          WAN_TRIAL: ${{ inputs.trial }}
           WAN_HOST_FINGERPRINT: ${{ inputs.host_fingerprint }}
           WAN_ACCESS_PUBLIC_KEY: ${{ inputs.access_public_key }}
           WAN_GPU_QUOTE: ${{ inputs.gpu_quote }}

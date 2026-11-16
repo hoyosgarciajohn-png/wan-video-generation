@@ -1,5 +1,7 @@
 """Fictional trial gates and real saved build-evidence consistency; no network."""
 import json
+import importlib
+import sqlite3
 from pathlib import Path
 import tempfile
 import time
@@ -15,11 +17,48 @@ from services.controller.live_admission import HOST_DOMAIN, configuration_hash
 
 
 class FirstTrialGates(unittest.TestCase):
-    def test_materialize_existing_published_image_evidence(self):
+    def setUp(self):
+        importlib.reload(first_trial)
+        self.addCleanup(importlib.reload, first_trial)
+
+    def test_consumed_old_image_cannot_match_changed_worker_source(self):
+        with tempfile.TemporaryDirectory() as t:
+            with self.assertRaises(AssertionError):
+                first_trial.materialize_build(Path(t) / 'build')
+
+    def test_materialize_approved_diagnostic_image_and_isolate_authority(self):
+        old_paths=(first_trial.TRIAL,first_trial.AUTH)
+        first_trial.select_trial('diagnostic')
+        self.assertNotEqual((first_trial.TRIAL,first_trial.AUTH),old_paths)
+        self.assertEqual(first_trial.DURATION_MS,1000)
+        self.assertEqual(first_trial.APPROVAL_ID,'john-diagnostic-trial-20261116')
         with tempfile.TemporaryDirectory() as t:
             result = first_trial.materialize_build(Path(t) / 'build')
             self.assertEqual(result['image_ref'], first_trial.IMAGE)
             self.assertEqual(result['assurance'], 'local_evidence_consistency_only_not_registry_or_gpu_acceptance')
+
+    def test_diagnostic_requires_exact_closed_prior_trial(self):
+        first_trial.select_trial('diagnostic')
+        with sqlite3.connect(':memory:') as db:
+            db.execute('CREATE TABLE live_job_links(batch TEXT)')
+            db.execute('CREATE TABLE pod_batches(id TEXT,state TEXT,cleanup TEXT)')
+            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+            previous=next(iter(first_trial.EXPECTED_PRIOR_BATCHES))
+            db.execute('INSERT INTO live_job_links VALUES (?)',(previous,))
+            db.execute("INSERT INTO pod_batches VALUES (?,'failed','confirmed')",(previous,))
+            first_trial.prior_history_closed(db)
+            db.execute("UPDATE pod_batches SET cleanup='pending'")
+            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+            db.execute("UPDATE pod_batches SET cleanup='confirmed'")
+            db.execute("INSERT INTO live_job_links VALUES ('already-diagnostic')")
+            with self.assertRaises(AssertionError):first_trial.prior_history_closed(db)
+
+    def test_unapproved_or_unknown_trial_refused(self):
+        with self.assertRaises(AssertionError):first_trial.select_trial('third')
+        proposal=first_trial.read(first_trial.ROOT/'deployment/diagnostic-trial-proposal.json')
+        proposal['status']='PENDING_FRESH_OWNER_APPROVAL'
+        with patch.object(first_trial,'read',return_value=proposal):
+            with self.assertRaises(AssertionError):first_trial.select_trial('diagnostic')
 
     def test_quote_requires_available_region_and_ceiling(self):
         value = {'id':first_trial.GPU, 'secure':True, 'price':{'secure':0.89},
