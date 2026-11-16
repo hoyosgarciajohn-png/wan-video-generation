@@ -32,25 +32,32 @@ cmp deployment/hosting/requirements.lock "$stage/deployment/hosting/requirements
 for unit in wan-controller.service wan-cleanup.service wan-proxy.service; do
     cmp "deployment/hosting/$unit" "$stage/deployment/hosting/$unit"
 done
-/opt/wan/venv/bin/python - <<'PY'
-import sqlite3
+# The owner's new instruction permits this one expired unknown request to
+# coexist with an isolated test. Keep the cleanup process running across the
+# source swap; preserve the uncertain database in a non-restorable checkpoint.
+(cd "$stage" && /opt/wan/venv/bin/python - <<'PY_GATE'
+import json, sqlite3
+from pathlib import Path
+from deployment.validation_policy import quiescent, monitor_ready, verify_absent
+from services.controller.runpod import https_transport
 with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
-    # Historical jobs and unsettled bills must survive upgrades. Only an active
-    # job or unresolved cleanup blocks replacing the controller source.
-    assert db.execute("SELECT count(*) FROM pod_batches WHERE cleanup!='confirmed' OR state NOT IN ('succeeded','failed','canceled')").fetchone()[0] == 0
-PY
-mkdir -m 0700 "$bootstrap_dir/pre-upgrade"
-# Use the reviewed backup reader from this release: the installed version cannot
-# preserve completed live trials with a retained, unsettled reservation.
-(cd "$stage" && /opt/wan/venv/bin/python -m services.controller.backup create --database /var/lib/wan/studio.sqlite --assets /var/lib/wan/assets --output "$bootstrap_dir/pre-upgrade")
-systemctl stop wan-controller wan-cleanup
+    quiescent(db, allow_unknown=True)
+    monitor_ready(db, json.loads(Path('/var/lib/wan/cleanup-status.json').read_text()), allow_unknown=True)
+verify_absent(Path('/etc/wan/runpod-token').read_text().strip(), transport=https_transport())
+PY_GATE
+)
+systemctl is-active --quiet wan-cleanup
+systemctl stop wan-controller
+trap 'systemctl start wan-controller' EXIT
+(cd "$stage" && /opt/wan/venv/bin/python -m deployment.validation_policy "$bootstrap_dir/pre-upgrade")
 mv /opt/wan/current "$previous"
 mv "$stage" /opt/wan/current
-if ! systemctl start wan-controller wan-cleanup; then
+if ! systemctl restart wan-controller wan-cleanup; then
     systemctl stop wan-controller wan-cleanup
     mv /opt/wan/current "$stage"
     mv "$previous" /opt/wan/current
     systemctl start wan-controller wan-cleanup
     exit 1
 fi
-printf '%s\n' 'REVIEWED_SOURCE_UPGRADED; PRIVATE_STATE_PRESERVED'
+trap - EXIT
+printf '%s\n' 'REVIEWED_SOURCE_UPGRADED; PRIVATE_STATE_AND_UNRESOLVED_REQUEST_PRESERVED'

@@ -46,20 +46,12 @@ records the initial hosted release and resource/cost. Later [access and recovery
 ## Current continuation status
 
 The 1280x704/24fps exporter and hosted one-minute synthetic rehearsal passed.
-No real Wan clip has been saved: the original trial failed without a retained
-cause, the diagnostic failed with GPU out of memory, and the repaired-worker
-attempt never produced an observed allocation. Its original create response was
-lost; both monitoring workflows finished and cleanup remains unresolved.
+No real Wan clip has been saved yet. PR #76's launch diagnostics and multiple-data-center
+request are merged, and PR #77 records the support inquiry already sent.
 
-[PR #76](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/76)
-adds durable redacted create diagnostics, explicit-rejection handling, signed
-multiple-data-center placement and an isolated next validation scope. The changes
-pass 172 root and 41 deployment fictional checks. They are not deployed over the
-unresolved request. See [reconciliation evidence](deployment/evidence/2026-11-16-launch-reconciliation/README.md)
-and the [master handoff](docs/WAN_00_Master_Handoff.md).
-
-John authorized continuing one second → five seconds → one minute within unchanged
-limits, after reconciling the prior request. No new GPU attempt or larger budget
-was used. Public Studio dispatch remains synthetic. The repaired worker image is
-[verified offline](deployment/evidence/2026-11-16-memory-repair-build/README.md),
-with actual memory fit and successful output still pending.
+John subsequently authorized one isolated one-second test without waiting for the
+old request to be reconciled. The exception retains that exact request's $4 billing
+reservation and cleanup monitoring, checks its expired worker access, and adds it
+to the new independent cleanup guard. All other unresolved historical work blocks
+admission. Hardware, $5 additional total and 1800-second limits stay unchanged.
+See [the current handoff](docs/WAN_00_Master_Handoff.md) for deployment and results.

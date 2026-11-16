@@ -43,3 +43,14 @@ Do not ask for the same approval again. Deployment is authorized after the exist
 cleanup gate passes; do not bypass that gate or rewrite a consumed grant. Subsequent
 stages must use measured costs and separate scopes inside the retained limits.
 A provider-support reconciliation inquiry is drafted but has not been sent.
+
+John subsequently instructed: "we do not need to wait. we can make a new test in
+the mean time". This supersedes the waiting prerequisite above for one isolated
+validation, including its necessary deployment, under the unchanged additional
+$5 / 1800 seconds / one create / one render envelope. Preserve the old repair
+request's failed/unresolved state, expired worker credential and $4 reservation.
+Only that exact historical request may be excepted; all other outstanding work
+blocks admission. Keep persistent cleanup alive, check provider absence, and bind
+the independent new guard to both the new deadline and immediate old-request
+cleanup. A maintenance forensic checkpoint is not an approved restore bundle.
+The support inquiry was sent to help@runpod.io; see PR #77 delivery evidence.

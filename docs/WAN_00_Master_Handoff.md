@@ -1,53 +1,39 @@
 # Wan Video Generation · Master handoff
-Version 1.37 | November 16, 2026 | Owner: John Hoyos
+Version 1.38 | November 16, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
-John approved finishing the launch fix, reconciling the uncertain request before
-another submission, allowing multiple suitable data centers under unchanged GPU
-requirements and spending limits, and resuming one second → five seconds → one
-minute of real Wan footage. This supersedes the earlier statement that no new
-attempt was authorized; it does not waive the reconciliation prerequisite or reset
-any consumed scope.
+John explicitly instructed making a new test without waiting for support. This
+supersedes the prior reconciliation-before-submission prerequisite for one isolated
+`validation` trial, including its necessary deployment. The unchanged envelope is
+$5 additional total, $4 Pod reservation, $1 storage allowance, 1800 seconds from
+admission, one create, one render, one-second 1280x704/24fps output. Keep the same
+Secure RTX 4090, CUDA 12.8+, RAM 64GB+, ephemeral 80GB and $1/hour quote ceiling.
 
-**PR #76 now contains the completed launch-error and multiple-location changes.**
-Documented explicit rejections fail immediately; bounded redacted detail, HTTP
-status and request ID persist privately across restart. Timeouts, 408, 5xx and
-malformed successes remain ambiguous, without automatic create retry. Historical
-missing diagnostics remain null and cannot be promoted to definitive rejection.
-One to eight eligible data centers can be frozen into the signed request. GPU,
-RAM, CUDA, disk, price and runtime limits remain unchanged. The fresh `validation`
-scope is isolated from all three consumed scopes and refuses preparation until
-all three previous requests are definitively closed. No runtime grant is installed.
+The new exception names only expired repair batch
+`249c50635ec84ac38cef0eb66232efed`. It requires failed state, no observed Pod,
+retained $4 reservation, expired/revoked old worker access, fresh cleanup heartbeat
+and a successful provider absence check. Any other unresolved historical request
+blocks the test. It never marks the old request closed or releases its reservation.
+The persistent cleanup continues, and the new independent guard also watches and
+terminates any late old allocation while enforcing the new trial's own deadline.
 
-**The old repair request remains unresolved.** Batch
-`249c50635ec84ac38cef0eb66232efed`, project
-`project-10088bb273fb41d78399957f2dc8cd83`, had one POST at 15:04:38 UTC.
-Launch 43892451814 and guard 43892343231 both finished with failure. The guard
-never observed an allocation through its deadline-plus-five-minute watch ending
-about 15:38:23 UTC. Zero worker attempts and zero takes exist. The controller's
-$4 reservation remains retained and cleanup remains unconfirmed. The original
-HTTP status/detail/request ID cannot be recovered from the installed adapter.
+PR #76 was merged as dc01def and PR #77 recorded support delivery. The request was
+sent from the owner's Gmail to help@runpod.io, message/thread 1a1e55a2f38c51af.
+No provider conclusion has yet been recorded in the project. The original lost
+response remains unknown; empty inventory is not definitive rejection.
 
-Fresh connected inventory and audit reads are empty; trial-window Pod billing has
-zero records but is not final. The console shows $9.35 balance and the enabled
-wan-cleanup key has Pod read/write. These observations do not establish the old
-POST outcome. A complete support inquiry is drafted, not sent, in
-`deployment/evidence/2026-11-16-launch-reconciliation/support-request.md`.
-Provider confirmation is needed before closing this exact unknown request.
-
-Installed operational source remains
-`42b3e993dc8ac3540d1ae450d287c1a90b555338`. No deployment, new GPU allocation,
-permission expansion or billing release occurred in this continuation. The
-existing upgrade/backup gate still blocks replacing source while cleanup is
-unresolved. PR #76 must not be described as deployed. Contract remains 0.1.0.
-
-Verification: 172 root fictional checks and 41 deployment/guard/hosting checks
-passed, along with contract validation, shell syntax and whitespace checks.
-Backup/restore preserves rejection diagnostics, multi-location signatures and
-retained billing reservations. Unchanged Studio tests were not repeated.
+This implementation adds a private maintenance database/assets checkpoint while
+leaving cleanup running across the source swap. It is explicitly not an automatic
+restore bundle; normal backup/restore closure requirements remain unchanged.
+PR #76's redacted launch diagnostics and multiple eligible data centers will ship
+with this deployment. Source remains 42b3e993 until the upgrade is verified.
+No new Pod or runtime grant has been created at this implementation checkpoint.
+Contract remains 0.1.0. Fictional checks: 46 targeted deployment/guard/hosting
+checks passed, plus contract and shell syntax validation. 172 root controller regression checks passed in 34.261 seconds. Live execution
+evidence will be recorded after completion.
 
 **The 1280x704/24fps exporter is already deployed.** Frozen legacy 320x180 jobs
 retain their original profile. Hosted fictional one-minute rehearsal 43890910756

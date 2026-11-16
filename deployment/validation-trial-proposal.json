@@ -3,7 +3,7 @@
   "as_of": "2026-11-16",
   "status": "OWNER_APPROVED_RUNTIME_PREPARATION",
   "execution_enabled": false,
-  "purpose": "Resume the authorized progression with one isolated one-second attempt only after the ambiguous repair request is definitively reconciled",
+  "purpose": "One isolated one-second test while support reconciles the previous expired ambiguous request",
   "controller_origin": "https://wan-64-225-114-46.sslip.io",
   "controller_installed_source": "42b3e993dc8ac3540d1ae450d287c1a90b555338",
   "controller_verification_run": 43891224231,
@@ -38,7 +38,7 @@
     "new_paid_services": false
   },
   "launch_requirements": [
-    "Owner approval recorded above; all three historical requests must first have definitive cleanup closure",
+    "John explicitly authorized a new test without waiting: only the exact expired unknown repair request may remain unresolved, with its $4 reservation and cleanup monitoring retained",
     "Fresh validation identity and source-bound grant; preserve every consumed scope and unsettled liability",
     "Fresh Secure RTX 4090 quote; freeze one to eight eligible data centers in a single request, without automatic POST retries",
     "Verify private digest and exact worker source evidence",
@@ -54,7 +54,7 @@
     "Budget limits are enforced by admission, one-attempt, price and shutdown controls, not a provider hard account cap.",
     "Prior billing remains provisional and automatic collection remains pending."
   ],
-  "approval_reference": "John approved finishing PR #76, reconciling the prior uncertain request before another submission, allowing multiple suitable data centers under unchanged GPU requirements and spending limits, and resuming one second, five seconds, one minute. This fresh one-second scope uses the unchanged $5 / 1800-second / one-create / one-render envelope. Later scopes must be measured and fit the retained limits; this file cannot expand spending or reset historical trials.",
+  "approval_reference": "John approved finishing PR #76, reconciling the prior uncertain request before another submission, allowing multiple suitable data centers under unchanged GPU requirements and spending limits, and resuming one second, five seconds, one minute. This fresh one-second scope uses the unchanged $5 / 1800-second / one-create / one-render envelope. Later scopes must be measured and fit the retained limits; this file cannot expand spending or reset historical trials. Subsequent instruction: \"we do not need to wait. we can make a new test in the mean time\". This supersedes only the waiting prerequisite for this one isolated test and its necessary deployment. The prior unknown request is not declared closed.",
   "previous_trials": [
     {
       "batch_id": "7c811e6ab21a4392b0e3a80e331fc57a",
