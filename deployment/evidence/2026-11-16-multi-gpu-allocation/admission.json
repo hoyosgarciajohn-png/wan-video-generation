@@ -1,0 +1,236 @@
+{
+  "recorded_at": "2026-11-16T23:10:38.691Z",
+  "approval": "John: Ok. I approved. GO ahead",
+  "trial": "allocation",
+  "pr": 84,
+  "installed_source": "84fe9d2d9e2aad680c825069dd5dc5a84f5314f5",
+  "upgrade_run": 43976433823,
+  "upgrade_job": 133681490666,
+  "prepare_run": 43976625623,
+  "prepare_job": 133682156166,
+  "admit_run": 43976761613,
+  "admit_job": 133682624754,
+  "guard_run": 43976858968,
+  "admitted": {
+    "status": "ADMITTED_NOT_LAUNCHED",
+    "project": "project-13ccbd8f41ad4f4c94566f6e9e3aa2ca",
+    "batch": "0a30c22ff1a8493bbe2714ad36cd0321",
+    "deadline": 1794872386,
+    "scope": "[\"john-hoyos\",\"project-13ccbd8f41ad4f4c94566f6e9e3aa2ca\"]",
+    "pricing": {
+      "checked_at": 1794870586.015524,
+      "gpu": "NVIDIA H100 80GB HBM3",
+      "region": "AP-IN-1",
+      "data_center_ids": [
+        "AP-IN-1",
+        "AP-JP-1",
+        "CA-MTL-1",
+        "US-CA-2",
+        "US-GA-2",
+        "US-NE-1"
+      ],
+      "max_hourly_cents": 450,
+      "allocation_plan": {
+        "max_hourly_cents": 450,
+        "candidates": [
+          {
+            "gpu_type": "NVIDIA H100 80GB HBM3",
+            "data_center_ids": [
+              "AP-IN-1",
+              "AP-JP-1",
+              "CA-MTL-1",
+              "US-CA-2",
+              "US-GA-2",
+              "US-NE-1"
+            ]
+          },
+          {
+            "gpu_type": "NVIDIA A100-SXM4-80GB",
+            "data_center_ids": [
+              "EUR-IS-1"
+            ]
+          }
+        ]
+      },
+      "min_cuda": "12.8"
+    }
+  },
+  "admission_quote": {
+    "observed_at": 1794870563.502,
+    "data": {
+      "gpus": [
+        {
+          "availability": "LOW",
+          "community": true,
+          "cudaVersions": [
+            {
+              "available": true,
+              "version": "13.2"
+            }
+          ],
+          "dataCenters": [
+            {
+              "availability": "LOW",
+              "id": "EUR-IS-1",
+              "name": "EUR-IS-1"
+            }
+          ],
+          "id": "NVIDIA A100-SXM4-80GB",
+          "manufacturer": "NVIDIA",
+          "maxCount": {
+            "community": 8,
+            "secure": 8
+          },
+          "memory": 80,
+          "minRam": 125,
+          "minVcpuCount": 32,
+          "name": "A100 SXM",
+          "pool": "AMPERE_80",
+          "price": {
+            "community": 1.39,
+            "secure": 2.19,
+            "serverless": 2.99
+          },
+          "secure": true
+        },
+        {
+          "availability": "NONE",
+          "community": true,
+          "cudaVersions": [
+            {
+              "available": false,
+              "version": "13.2"
+            }
+          ],
+          "id": "NVIDIA GeForce RTX 4090",
+          "manufacturer": "NVIDIA",
+          "maxCount": {
+            "community": 8,
+            "secure": 8
+          },
+          "memory": 24,
+          "name": "RTX 4090",
+          "pool": "ADA_24",
+          "price": {
+            "community": 0.34,
+            "secure": 0.89,
+            "serverless": 1.34
+          },
+          "secure": true
+        },
+        {
+          "availability": "LOW",
+          "community": true,
+          "cudaVersions": [
+            {
+              "available": true,
+              "version": "13.2"
+            }
+          ],
+          "dataCenters": [
+            {
+              "availability": "LOW",
+              "id": "AP-IN-1",
+              "name": "AP-IN-1"
+            },
+            {
+              "availability": "LOW",
+              "id": "AP-JP-1",
+              "name": "AP-JP-1"
+            },
+            {
+              "availability": "LOW",
+              "id": "CA-MTL-1",
+              "name": "CA-MTL-1"
+            },
+            {
+              "availability": "LOW",
+              "id": "US-CA-2",
+              "name": "US-CA-2"
+            },
+            {
+              "availability": "LOW",
+              "id": "US-GA-2",
+              "name": "US-GA-2"
+            },
+            {
+              "availability": "LOW",
+              "id": "US-NE-1",
+              "name": "US-NE-1"
+            }
+          ],
+          "id": "NVIDIA H100 80GB HBM3",
+          "manufacturer": "NVIDIA",
+          "maxCount": {
+            "community": 1,
+            "secure": 8
+          },
+          "memory": 80,
+          "minRam": 251,
+          "minVcpuCount": 16,
+          "name": "H100 SXM",
+          "pool": "ADA_80_PRO",
+          "price": {
+            "community": 2.69,
+            "secure": 4.39,
+            "serverless": 5.89
+          },
+          "secure": true
+        },
+        {
+          "availability": "NONE",
+          "community": true,
+          "cudaVersions": [
+            {
+              "available": false,
+              "version": "13.2"
+            }
+          ],
+          "id": "NVIDIA H100 NVL",
+          "manufacturer": "NVIDIA",
+          "maxCount": {
+            "community": 10,
+            "secure": 8
+          },
+          "memory": 94,
+          "name": "H100 NVL",
+          "pool": "ADA_80_PRO",
+          "price": {
+            "community": 2.59,
+            "secure": 3.19,
+            "serverless": 5.89
+          },
+          "secure": true
+        },
+        {
+          "availability": "NONE",
+          "community": true,
+          "cudaVersions": [
+            {
+              "available": false,
+              "version": "13.2"
+            }
+          ],
+          "id": "NVIDIA L40S",
+          "manufacturer": "NVIDIA",
+          "maxCount": {
+            "community": 8,
+            "secure": 8
+          },
+          "memory": 48,
+          "name": "L40S",
+          "pool": "ADA_48_PRO",
+          "price": {
+            "community": 0.79,
+            "secure": 1.09,
+            "serverless": 1.89
+          },
+          "secure": true
+        }
+      ]
+    }
+  },
+  "previous_unknown": "249c50635ec84ac38cef0eb66232efed",
+  "pod_created": false,
+  "render_result": "PENDING"
+}

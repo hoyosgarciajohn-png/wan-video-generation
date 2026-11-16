@@ -1,0 +1,18 @@
+{
+  "hardware": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"durationMs\": 98,\n  \"exitCode\": 0,\n  \"stderr\": \"\",\n  \"stdout\": \"NVIDIA H100 80GB HBM3, 81559 MiB, 0 MiB, 595.91.07, 0 %\\n\",\n  \"timedOut\": false,\n  \"truncated\": false\n}"
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "metrics_observer": {
+    "purpose": "Read generated metrics and mirror them to container stdout before automatic Pod cleanup",
+    "deadline": 1794872386,
+    "source": "import json,time,pathlib\nroot=pathlib.Path('/worker/projects/project-13ccbd8f41ad4f4c94566f6e9e3aa2ca/attempts')\nwhile time.time()<1794872386:\n for p in root.glob('*/render-*/output.metrics.json'):\n  try: metrics=json.loads(p.read_text())\n  except (OSError,ValueError): continue\n  with open('/proc/1/fd/1','w') as out: print('WAN_BENCHMARK_METRICS:'+json.dumps(metrics,sort_keys=True),file=out,flush=True)\n  print(json.dumps(metrics,sort_keys=True),flush=True)\n  raise SystemExit(0)\n time.sleep(1)\nprint('Metrics observer reached the original deadline',flush=True)",
+    "render_or_source_modified": false
+  }
+}

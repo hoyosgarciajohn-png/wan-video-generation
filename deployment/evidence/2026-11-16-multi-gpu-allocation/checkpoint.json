@@ -1,0 +1,21 @@
+{
+  "implementation_pr": 84,
+  "source_head": "05942b1c7b5b13bff095bf5622b78b348ff65ff8",
+  "installed_commit": "84fe9d2d9e2aad680c825069dd5dc5a84f5314f5",
+  "tree": "f5ae9ebac703b39c3ebc8c76f5d38ee77c601d35",
+  "upgrade_run": 43976433823,
+  "upgrade_job": 133681490666,
+  "prepare_run": 43976625623,
+  "prepare_job": 133682156166,
+  "admit_run": 43976761613,
+  "contract_version": "0.1.0",
+  "tests": {
+    "root": 197,
+    "deployment_guard_hosting": 50
+  },
+  "gpu_validation": "PASSED_ONE_SECOND_H100",
+  "launch_run": 43977423400,
+  "launch_job": 133684894142,
+  "final_bill_pending": true,
+  "exact_peak_vram_not_retained": true
+}
