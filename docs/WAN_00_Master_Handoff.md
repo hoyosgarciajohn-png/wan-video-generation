@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.22 | November 16, 2026 UTC (November 15 owner local) | Owner: John Hoyos
+Version 1.23 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -13,10 +13,10 @@ Actual Runpod download remains unverified. No Docker Desktop is required.
 
 Controller hosting, persistent state and two automatic-cleanup layers are
 implemented and tested with fictional data, but are not installed on a host.
-The Runpod account still displays $0 and has no registry credential. After John's
-instruction to proceed, one $10 credit purchase was attempted through the existing
-checkout payment method; it was declined. No other card was tried. The funding
-checkout remains open for John to select a working method. GitHub requires email
+Runpod funding is complete: after John confirmed with Bank of America and
+explicitly authorized retry, the same $10 credit payment succeeded. The billing
+page now displays $10.00 balance, $0.000/hour current spend, and Auto-Pay Disabled.
+No additional payment or GPU attempt was made. GitHub requires email
 verification before preparing a classic private-image pull token; its code-entry
 page is open. The cleanup-key form is prepared but not submitted. No suitable
 existing controller host or approved recurring hosting budget is established.
@@ -54,22 +54,22 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Command Center: finish the account/host inputs, deploy and verify the reviewed
-controller and both cleanup layers, then verify the exact private image on Runpod
-within the already-approved trial. John approved $5 total, 30 minutes from
-admission, one five-second clip and one attempt on November 15, 2026. Do not
-request the same numeric approval again. A $10 credit top-up and any new recurring
-hosting expense are separate from that consumption envelope and have not occurred.
+Command Center: finish GitHub verification and scoped private-image/cleanup
+credentials; select and deploy the approved controller host; verify both cleanup
+layers and live authority; then verify the exact private image on Runpod within
+the already-approved trial. John approved $5 total, 30 minutes from admission,
+one five-second clip and one attempt on November 15, 2026. Do not request the same
+numeric approval again. Runpod now has $10 of prepaid credit; that does not expand
+the $5 consumption cap. No new recurring hosting expense is approved or incurred.
 
-Required inputs: scoped GHCR pull credential saved directly in Runpod; an
-application/cleanup Runpod credential in trusted service secret storage; funded
-Runpod credit; an available Linux amd64 controller host and owned HTTPS hostname.
-Install real live authority, persistent storage/restore evidence and primary plus
-second-host cleanup before GPU creation. Recheck compatible RTX 4090 capacity and
-price only when those prerequisites are ready. The published image has no model
-weights. Wan CUDA import, model checksum verification and inference remain open.
-Automated authoritative application billing collection remains pending. A draft
-Runpod template is saved but no template or paid resource was created.
+Remaining inputs: scoped GHCR pull credential saved directly in Runpod; an
+application/cleanup Runpod credential in trusted service secret storage; an
+available Linux amd64 controller host and owned HTTPS hostname. Install actual
+live authority, persistent storage/restore evidence and primary plus second-host
+cleanup before GPU creation. Recheck compatible RTX 4090 capacity and price only
+when these prerequisites are ready. Model checksums, Wan CUDA import, inference
+and authoritative application billing collection remain open. The private image
+contains no model weights; no template or GPU resource has been created.
 
 ## References
 - AI Project Development Master Guide v1.0, supplied project guide.
@@ -627,3 +627,27 @@ credential, trusted cleanup secret and concrete hosting selection afterward.
 The existing private image and 36-test evidence are unchanged; no code was changed
 and no tests were repeated. Hosting, actual Runpod image download and installed
 automatic shutdown remain unverified. No new recurring service was purchased.
+
+
+## Runpod funding confirmed — November 15, 2026 (America/New_York)
+
+John stated he confirmed the prior decline with Bank of America and explicitly
+authorized a retry of the $10 Runpod payment. The same previously selected
+checkout payment method was selected and Pay was submitted exactly once for the
+retry. The observed post-payment Runpod billing page showed:
+
+- Account balance: $10.00.
+- Current spend rate: $0.000/hour.
+- Auto-Pay: Disabled.
+
+Funding is therefore complete. The prior decline and credential/hosting records
+above remain historical. Do not make another top-up unless separately requested.
+The existing checkout also resulted in the payment method being listed in the
+Runpod account; no separate Add payment method action or Auto-Pay change was made.
+No payment screenshot or card details are retained in project documents.
+
+The $10 is prepaid service credit, not observed GPU consumption. The trial remains
+$5 maximum total, 1,800 seconds from admission and one attempt; it has not started.
+No GPU, volume or recurring hosting resource was created. GitHub email verification,
+private pull credentials, hosting and installed shutdown remain pending. The
+billing result is left open, and the credential/verification tabs remain available.
