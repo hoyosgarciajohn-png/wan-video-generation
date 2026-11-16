@@ -4,14 +4,17 @@ set -euo pipefail
 umask 0077
 release_sha=${1:?}
 wan_hostname=${2:?}
+bootstrap_mode=${3:-fresh}
 [[ $EUID == 0 && $release_sha =~ ^[a-f0-9]{40}$ ]]
 [[ $wan_hostname == wan-64-225-114-46.sslip.io ]]
 [[ $(hostname) == wan-controller-01 && $(uname -m) == x86_64 ]]
 . /etc/os-release
 [[ $ID == ubuntu && $VERSION_ID == 24.04 ]]
-[[ ! -e /opt/wan/current && ! -e /var/lib/wan && ! -e /etc/wan/controller.env ]]
+[[ ! -e /var/lib/wan && ! -e /etc/wan/controller.env ]]
 bootstrap_dir=/root/wan-bootstrap-$release_sha
 [[ -s $bootstrap_dir/runpod-token ]]
+if [[ $bootstrap_mode == fresh ]]; then
+[[ ! -e /opt/wan/current ]]
 cloud-init status --wait >/dev/null
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
@@ -24,12 +27,26 @@ apt-get install -y --no-install-recommends caddy
 systemctl disable --now caddy
 id wan >/dev/null 2>&1 || useradd --system --home-dir /var/lib/wan --shell /usr/sbin/nologin wan
 install -d -m 0755 /opt/wan/current
-tar -xzf "$bootstrap_dir/source.tar.gz" -C /opt/wan/current
-tar -xzf "$bootstrap_dir/git.tar.gz" -C /opt/wan/current
-tar -xzf "$bootstrap_dir/studio.tar.gz" -C /opt/wan/current/apps/studio
+tar --no-same-owner -xzf "$bootstrap_dir/source.tar.gz" -C /opt/wan/current
+tar --no-same-owner -xzf "$bootstrap_dir/git.tar.gz" -C /opt/wan/current
+tar --no-same-owner -xzf "$bootstrap_dir/studio.tar.gz" -C /opt/wan/current/apps/studio
+elif [[ $bootstrap_mode == resume ]]; then
+    [[ $release_sha == e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6 ]]
+    [[ -d /opt/wan/current/.git && ! -e /opt/wan/venv && ! -e /etc/wan/studio-tokens.json ]]
+    [[ ! -L /opt/wan/current && ! -L /opt/wan/current/.git ]]
+    command -v caddy >/dev/null
+    command -v ffmpeg >/dev/null
+    id wan >/dev/null
+    ! systemctl is-active --quiet caddy
+else
+    exit 1
+fi
+# Keep source root-owned; never weaken Git ownership checks with a global exception.
+chown -R root:root /opt/wan/current
 cd /opt/wan/current
-git remote remove origin
 [[ $(git rev-parse HEAD) == "$release_sha" ]]
+git diff --quiet && git diff --cached --quiet
+if git remote | grep -qx origin; then git remote remove origin; fi
 python3 -m venv /opt/wan/venv
 /opt/wan/venv/bin/python -m pip install --require-hashes --only-binary=:all: -r deployment/hosting/requirements.lock
 chmod -R a+rX /opt/wan/current /opt/wan/venv

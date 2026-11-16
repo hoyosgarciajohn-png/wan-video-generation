@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|verify) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|verify) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -44,6 +44,11 @@ if [[ "$operation" == install ]]; then
     printf '%s' "$RUNPOD_CLEANUP_TOKEN" | ssh "${ssh_options[@]}" "root@$host" "umask 077; cat > /root/wan-bootstrap-$GITHUB_SHA/runpod-token"
     unset RUNPOD_CLEANUP_TOKEN
     ssh "${ssh_options[@]}" "root@$host" "bash -s -- '$GITHUB_SHA' '$hostname'" < deployment/hosting/bootstrap-host.sh
+fi
+if [[ "$operation" == resume ]]; then
+    # Only the observed pre-venv ownership failure from run 43793913368.
+    # The already uploaded source/build remain bound to that exact reviewed SHA.
+    ssh "${ssh_options[@]}" "root@$host" "bash -s -- 'e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6' '$hostname' resume" < deployment/hosting/bootstrap-host.sh
 fi
 ssh "${ssh_options[@]}" "root@$host" "bash -s -- '$hostname'" < deployment/hosting/verify-host.sh
 curl --fail --silent --show-error --retry 10 --retry-delay 6 --retry-connrefused "https://$hostname/healthz"

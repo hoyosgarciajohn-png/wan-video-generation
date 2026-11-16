@@ -6,7 +6,7 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, verify]
+        options: [inspect, install, resume, verify]
         default: inspect
         required: true
       host_fingerprint:
