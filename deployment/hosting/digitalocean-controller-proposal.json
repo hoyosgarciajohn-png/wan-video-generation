@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "HOST_CREATED_INSTALLATION_PENDING",
+  "status": "HOST_INSTALLED_DISARMED",
   "executable": false,
   "owner": "John Hoyos",
   "approval_date_local": "2026-11-15",
@@ -23,7 +23,9 @@
     "plan": "weekly_percentage",
     "percentage": 20,
     "monthly_usd_cents": 240,
-    "enabled_verified": true
+    "enabled_verified": true,
+    "first_backup_completed": false,
+    "schedule_utc": "Wednesday 04:00-08:00"
   },
   "monthly_subtotal_before_tax_usd_cents": 1440,
   "expected_tax_additional": true,
@@ -33,7 +35,6 @@
   "account_access_verified": true,
   "project_name": "first-project",
   "project_id": "9bf0133f-d248-4eef-a8c8-229efe4170f6",
-  "observed_existing_droplets": 0,
   "payment_method_present": true,
   "checkout_monthly_before_tax_usd_cents": 1440,
   "checkout_tax_itemized": false,
@@ -44,10 +45,12 @@
     "private_key_secret_installed": true,
     "proposed_secret_destination": "hoyosgarciajohn-png/wan-video-generation:WAN_HOST_SSH_KEY",
     "action_time_confirmation_pending": false,
-    "approval_text": "yes"
+    "approval_text": "yes",
+    "server_ed25519_fingerprint": "SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4",
+    "host_identity_method": "TOFU at provider-console IP; subsequent operations pin recorded key"
   },
   "droplet_id": 619703894,
-  "public_origin": null,
+  "public_origin": "https://wan-64-225-114-46.sslip.io",
   "created": true,
   "installed_runtime_authority": false,
   "paid_gpu_dispatch_enabled": false,
@@ -58,12 +61,10 @@
     "No extra volume, managed database, domain purchase or paid builder"
   ],
   "acceptance_pending": [
-    "Cloud runner SSH access and host identity recording",
-    "Scoped host administration and HTTPS hostname",
-    "Controller installation with disarmed startup",
-    "2 GiB host memory/disk behavior under fictional workload",
-    "Restart persistence and consistent off-host restore",
-    "Primary cleanup and independent deadline guard",
+    "Owner token handoff and browser session access (browser session request returned 403)",
+    "2 GiB host memory/disk behavior under fictional upload/export workload",
+    "Restart persistence with media and consistent off-host restore",
+    "Primary cleanup under controller failure/load and scoped independent deadline guard",
     "Installed live authority and worker bootstrap",
     "Actual Runpod private image pull, Wan inference and shutdown",
     "Authoritative billing collection"
@@ -76,5 +77,12 @@
     "unused": true
   },
   "ipv4": "64.225.114.46",
-  "temporary_hostname": "wan-64-225-114-46.sslip.io"
+  "temporary_hostname": "wan-64-225-114-46.sslip.io",
+  "installed_release": "42dbdc127b299b7e11e674630bef8683473f5a7a",
+  "verified_run_id": 43795476474,
+  "controller_installed": true,
+  "cleanup_monitor_installed": true,
+  "https_verified": true,
+  "owner_browser_sign_in_verified": false,
+  "observed_existing_droplets_before_creation": 0
 }

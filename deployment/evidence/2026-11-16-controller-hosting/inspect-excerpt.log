@@ -1,0 +1,156 @@
+30f5c6
+2026-11-16T02:42:56.9233586Z   persist-credentials: false
+2026-11-16T02:42:56.9233996Z   repository: hoyosgarciajohn-png/wan-video-generation
+2026-11-16T02:42:56.9236268Z   token: ***
+2026-11-16T02:42:56.9236548Z   ssh-strict: true
+2026-11-16T02:42:56.9236835Z   ssh-user: git
+2026-11-16T02:42:56.9237136Z   clean: true
+2026-11-16T02:42:56.9237461Z   sparse-checkout-cone-mode: true
+2026-11-16T02:42:56.9237801Z   fetch-depth: 1
+2026-11-16T02:42:56.9238085Z   fetch-tags: false
+2026-11-16T02:42:56.9238376Z   show-progress: true
+2026-11-16T02:42:56.9238663Z   lfs: false
+2026-11-16T02:42:56.9238968Z   submodules: false
+2026-11-16T02:42:56.9239295Z   set-safe-directory: true
+2026-11-16T02:42:56.9239619Z   allow-unsafe-pr-checkout: false
+2026-11-16T02:42:56.9240024Z ##[endgroup]
+2026-11-16T02:42:57.2031592Z Syncing repository: hoyosgarciajohn-png/wan-video-generation
+2026-11-16T02:42:57.2034343Z ##[group]Getting Git version info
+2026-11-16T02:42:57.2035392Z Working directory is '/home/runner/work/wan-video-generation/wan-video-generation'
+2026-11-16T02:42:57.2036889Z [command]/usr/bin/git version
+2026-11-16T02:42:57.2037485Z git version 2.56.1
+2026-11-16T02:42:57.2039010Z ##[endgroup]
+2026-11-16T02:42:57.2087429Z Temporarily overriding HOME='/home/runner/work/_temp/e41165bf-ddc1-4dfc-b2db-ab12a941b779' before making global git config changes
+2026-11-16T02:42:57.2102465Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T02:42:57.2105175Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/wan-video-generation/wan-video-generation
+2026-11-16T02:42:57.2146577Z Deleting the contents of '/home/runner/work/wan-video-generation/wan-video-generation'
+2026-11-16T02:42:57.2148291Z ##[group]Determining repository object format
+2026-11-16T02:42:57.2149959Z ##[endgroup]
+2026-11-16T02:42:57.2151016Z ##[group]Initializing the repository
+2026-11-16T02:42:57.2156991Z [command]/usr/bin/git init /home/runner/work/wan-video-generation/wan-video-generation
+2026-11-16T02:42:57.2362716Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-16T02:42:57.2373257Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-16T02:42:57.2470405Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-16T02:42:57.2491867Z hint: call:
+2026-11-16T02:42:57.2501500Z hint:
+2026-11-16T02:42:57.2502126Z hint: 	git config --global init.defaultBranch <name>
+2026-11-16T02:42:57.2502860Z hint:
+2026-11-16T02:42:57.2503416Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-16T02:42:57.2504298Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-16T02:42:57.2505000Z hint:
+2026-11-16T02:42:57.2505411Z hint: 	git branch -m <name>
+2026-11-16T02:42:57.2505946Z hint:
+2026-11-16T02:42:57.2506532Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-16T02:42:57.2507551Z Initialized empty Git repository in /home/runner/work/wan-video-generation/wan-video-generation/.git/
+2026-11-16T02:42:57.2578669Z [command]/usr/bin/git remote add origin https://github.com/hoyosgarciajohn-png/wan-video-generation
+2026-11-16T02:42:57.2585567Z ##[endgroup]
+2026-11-16T02:42:57.2586345Z ##[group]Disabling automatic garbage collection
+2026-11-16T02:42:57.2587033Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-16T02:42:57.2588423Z ##[endgroup]
+2026-11-16T02:42:57.2589128Z ##[group]Setting up auth
+2026-11-16T02:42:57.2589878Z Removing SSH command configuration
+2026-11-16T02:42:57.2590630Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T02:42:57.2593224Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T02:42:57.3003615Z Removing HTTP extra header
+2026-11-16T02:42:57.3004500Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T02:42:57.3030379Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T02:42:57.3246607Z Removing includeIf entries pointing to credentials config files
+2026-11-16T02:42:57.3251217Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T02:42:57.3292813Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T02:42:57.3633977Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-16T02:42:57.3642668Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:57.3647487Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:57.3687468Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:57.3730980Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:57.3773159Z ##[endgroup]
+2026-11-16T02:42:57.3774132Z ##[group]Fetching the repository
+2026-11-16T02:42:57.3775970Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6
+2026-11-16T02:42:57.9532365Z From https://github.com/hoyosgarciajohn-png/wan-video-generation
+2026-11-16T02:42:57.9592301Z  * branch            e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6 -> FETCH_HEAD
+2026-11-16T02:42:57.9595875Z [command]/usr/bin/git rev-parse --verify --quiet e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6^{object}
+2026-11-16T02:42:57.9597013Z e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6
+2026-11-16T02:42:57.9599268Z ##[endgroup]
+2026-11-16T02:42:57.9600267Z ##[group]Determining the checkout info
+2026-11-16T02:42:57.9601936Z ##[endgroup]
+2026-11-16T02:42:57.9602641Z [command]/usr/bin/git sparse-checkout disable
+2026-11-16T02:42:57.9632494Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-16T02:42:57.9671500Z ##[group]Checking out the ref
+2026-11-16T02:42:57.9673885Z [command]/usr/bin/git checkout --progress --force e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6
+2026-11-16T02:42:57.9848283Z Note: switching to 'e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6'.
+2026-11-16T02:42:57.9849405Z
+2026-11-16T02:42:57.9850238Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-16T02:42:57.9851640Z changes and commit them, and you can discard any commits you make in this
+2026-11-16T02:42:57.9852751Z state without impacting any branches by switching back to a branch.
+2026-11-16T02:42:57.9853435Z
+2026-11-16T02:42:57.9854035Z If you want to create a new branch to retain commits you create, you may
+2026-11-16T02:42:57.9855060Z do so (now or later) by using -c with the switch command. Example:
+2026-11-16T02:42:57.9855723Z
+2026-11-16T02:42:57.9856109Z   git switch -c <new-branch-name>
+2026-11-16T02:42:57.9856906Z
+2026-11-16T02:42:57.9857368Z Or undo this operation with:
+2026-11-16T02:42:57.9857858Z
+2026-11-16T02:42:57.9858217Z   git switch -
+2026-11-16T02:42:57.9858626Z
+2026-11-16T02:42:57.9859506Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-16T02:42:57.9860259Z
+2026-11-16T02:42:57.9861162Z HEAD is now at e5cdd4f Merge pull request #53 from hoyosgarciajohn-png/integration/b06-cloud-host-install
+2026-11-16T02:42:57.9864182Z ##[endgroup]
+2026-11-16T02:42:57.9912396Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T02:42:57.9948018Z e5cdd4fb0a138d44f53b40e62ee39b215c30f5c6
+2026-11-16T02:42:57.9955847Z ##[group]Removing auth
+2026-11-16T02:42:57.9956704Z Removing SSH command configuration
+2026-11-16T02:42:57.9959314Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T02:42:57.9997288Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T02:42:58.0207166Z Removing HTTP extra header
+2026-11-16T02:42:58.0209055Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T02:42:58.0252797Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T02:42:58.0470446Z Removing includeIf entries pointing to credentials config files
+2026-11-16T02:42:58.0472303Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T02:42:58.0510569Z includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path
+2026-11-16T02:42:58.0512812Z includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path
+2026-11-16T02:42:58.0514114Z includeif.gitdir:/github/workspace/.git.path
+2026-11-16T02:42:58.0515127Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-16T02:42:58.0531566Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path
+2026-11-16T02:42:58.0563650Z /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0577685Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git.path /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0620405Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path
+2026-11-16T02:42:58.0652474Z /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0663879Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/wan-video-generation/wan-video-generation/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0707863Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-16T02:42:58.0752285Z /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0756221Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0847513Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-16T02:42:58.0886526Z /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0934340Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config
+2026-11-16T02:42:58.0962950Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T02:42:58.1168433Z Removing credentials config '/home/runner/work/_temp/git-credentials-4d426dce-7555-4a78-a599-313a4720d94f.config'
+2026-11-16T02:42:58.1175999Z ##[endgroup]
+2026-11-16T02:42:58.1462821Z ##[group]Run bash deployment/hosting/cloud-install.sh
+2026-11-16T02:42:58.1463402Z bash deployment/hosting/cloud-install.sh
+2026-11-16T02:42:58.1482971Z shell: /usr/bin/bash -e {0}
+2026-11-16T02:42:58.1483325Z env:
+2026-11-16T02:42:58.1485349Z   WAN_HOST_SSH_KEY: ***
+
+2026-11-16T02:42:58.1485696Z   RUNPOD_CLEANUP_TOKEN:
+2026-11-16T02:42:58.1486039Z   WAN_HOST_OPERATION: inspect
+2026-11-16T02:42:58.1486388Z   WAN_HOST_FINGERPRINT:
+2026-11-16T02:42:58.1486723Z ##[endgroup]
+2026-11-16T02:42:58.4264113Z Host ed25519 fingerprint: SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4
+2026-11-16T02:43:00.0488458Z wan-controller-01
+2026-11-16T02:43:00.0501269Z x86_64
+2026-11-16T02:43:00.0514667Z Ubuntu 24.04.5 LTS
+2026-11-16T02:43:00.0580014Z                total        used        free      shared  buff/cache   available
+2026-11-16T02:43:00.0580846Z Mem:            1967         327        1124           4         675        1640
+2026-11-16T02:43:00.0581467Z Swap:              0           0           0
+2026-11-16T02:43:00.0634849Z Filesystem      Size  Used Avail Use% Mounted on
+2026-11-16T02:43:01.0170961Z /dev/vda1        48G  1.9G   46G   4% /
+2026-11-16T02:43:01.0171354Z status: done
+2026-11-16T02:43:01.0172105Z extended_status: done
+2026-11-16T02:43:01.0172629Z boot_status_code: enabled-by-generator
+2026-11-16T02:43:01.0173095Z last_update: Thu, 01 Jan 1970 00:01:30 +0000
+2026-11-16T02:43:01.0174503Z detail: DataSourceConfigDrive [net,ver=2][source=/dev/vdb]
+2026-11-16T02:43:01.0175135Z errors: []
+2026-11-16T02:43:01.0175610Z recoverable_errors: {}
+2026-11-16T02:43:01.2186476Z 256 SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4 root@wan-controller-01 (ED25519)
+2026-11-16T02:43:01.2187105Z FRESH_HOST_ACCESS_PASS
+2026-11-16T02:43:01.2780067Z

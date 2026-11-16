@@ -1,19 +1,25 @@
 # Hosting and automatic cleanup
 
-Updated November 15, 2026 (owner local date). **Host created; installation pending.** Runpod has $10
-prepaid credit, zero observed Pods, saved private registry credential wan-ghcr-pull,
-and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions;
-its Pod read access passed run 43784863537. No credential is installed on a
-controller. John approved one DigitalOcean Basic Regular bundled server: 1 vCPU,
-2 GiB RAM, 50 GiB SSD, $12/month plus $2.40/month weekly backups, before tax.
-This replaces the earlier free-only direction. Account access, empty Droplet
-inventory and the exact checkout price are verified. The configured region is
-SFO2; Basic Regular was unavailable in NYC3. John confirmed the dedicated SSH
-access. The public key is registered and WAN_HOST_SSH_KEY is saved in the private
-repository. Droplet 619703894 (64.225.114.46) is active with weekly backups enabled.
-The controller and cleanup services are not installed yet.
-See [the approved hosting decision](HOSTING_DECISION.md) and
-[non-executable configuration](digitalocean-controller-proposal.json).
+Updated November 15 local / November 16 UTC, 2026. **Controller installed;
+paid dispatch disabled.** One approved DigitalOcean Basic Regular CPU host is
+active: wan-controller-01, Droplet619703894, SFO2, 64.225.114.46, 1 vCPU / 2 GiB /
+50 GiB, $12/month plus $2.40/month weekly backups before expected tax. Weekly
+backups are enabled; first backup is pending. No extra paid resource was added.
+
+Installed release: 42dbdc127b299b7e11e674630bef8683473f5a7a. Controller, separate
+cleanup and proxy are active/enabled; cleanup credentials are private on the host.
+[Host verification run](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43795476474)
+passed clean source, services, firewall, SQLite, fresh cleanup heartbeat,
+authenticated Pod GET and valid external HTTPS at
+https://wan-64-225-114-46.sslip.io. No GPU was created or deleted. The independent
+trial deadline guard is not yet running; actual shutdown remains unverified.
+
+The strict-CSP Studio build now loads. Owner login remains unaccepted: browser
+session access returned 403, while direct same-origin unauthenticated HTTP returns
+401. Owner token delivery, fictional workload/recovery, live authority, worker
+bootstrap and the actual $5/1,800-second/one-attempt trial remain pending.
+See [hosting decision](HOSTING_DECISION.md), [configuration](digitalocean-controller-proposal.json)
+and [deployment evidence](../evidence/2026-11-16-controller-hosting/README.md).
 
 ## Approved starting deployment shape
 
@@ -138,7 +144,7 @@ web app remains fixture-only, and no provider creation route is enabled.
   configuration and dedicated SSH access are approved; do not repeat either.
 - Temporary hostname wan-64-225-114-46.sslip.io resolves through the public
   IP-based DNS service without a domain purchase; DNS/TLS acceptance is pending.
-- Host-side operator and cleanup credentials and installed live authority.
+- Owner-token handoff and installed live spending authority (cleanup credential is installed).
 - Off-host recovery arrangement, monitor acceptance, exact image pull and model setup.
 
 Funding, private-pull credential, and GitHub cleanup-secret creation are complete.
@@ -177,4 +183,17 @@ trust/configuration, model checksums and the approved one-attempt envelope.
 Two new fictional initialization checks pass: empty-schema cleanup without network
 or authority, repeat initialization with retained data, and restored-path refusal.
 The new installer and proxy/initializer bytes are part of the source-bound planning
-inventory. These checks do not establish a running service or shutdown acceptance.
+inventory. These fictional checks do not prove shutdown; running-service evidence is recorded separately above.
+
+## Upgrade and verification notes
+
+The guarded upgrade script was used once from initial release e5cdd4f to 42dbdc1;
+it preserves private state, takes an application-consistent local backup and
+retains previous source. It is deliberately bound to that initial release and
+will refuse a second upgrade from the current host; prepare the next reviewed
+upgrade explicitly. Do not repeat install/resume on the populated host.
+
+The read-only verify operation can be used independently. Its bounded health
+retry now accommodates the observed gap between systemd active state and Waitress
+socket readiness. Main may contain later operational records; installed source
+remains the exact release stated above until an explicit reviewed upgrade.

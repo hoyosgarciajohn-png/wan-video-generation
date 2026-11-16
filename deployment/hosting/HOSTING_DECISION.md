@@ -1,6 +1,6 @@
 # Approved small DigitalOcean controller — November 15, 2026
 
-Status: **APPROVED_AWAITING_SSH_ACCESS_CONFIRMATION**. John selected the lower-cost
+Status: **HOST_INSTALLED_DISARMED**. John selected the lower-cost
 DigitalOcean option and intends to consider capacity upgrades only if needed.
 The approval replaces the earlier free-only controller direction. It does not
 revive the former $24 server or $32 monthly ceiling.
@@ -30,49 +30,52 @@ The non-executable proposal is [digitalocean-controller-proposal.json](digitaloc
 It records the approval and unresolved installation inputs; it does not create
 resources, contain credentials or enable Runpod dispatch.
 
-## Observed account state
+## Observed installed state
 
-No DigitalOcean management integration was returned by current plugin discovery.
-John completed sign-in. The connected Chrome session verified the My Team account,
-the first-project project and an empty global Droplet inventory. A primary payment
-method exists. No payment was attempted. The prepared form selects Ubuntu 24.04
-LTS x64, SFO2, Basic Regular s-1vcpu-2gb, quantity one, and weekly percentage
-backups. Its displayed total is $14.40/month; tax is not itemized. Extra storage
-and the managed database remain unchecked. Free monitoring is selected.
+John confirmed the concrete dedicated SSH access with “yes”. One host was created
+in My Team / first-project (9bf0133f-d248-4eef-a8c8-229efe4170f6): Droplet 619703894,
+wan-controller-01, SFO2, 64.225.114.46, Ubuntu 24.04.5 LTS amd64. Weekly backups
+are enabled for Wednesday 04:00–08:00 UTC; the first scheduled backup is pending.
+Server billing is active at the approved recurring rate; accrued billing is not
+retrieved. No extra host, volume, database or domain purchase was added.
 
-A dedicated ed25519 key named wan-controller-deploy was generated locally with
-private-file mode 0600. Its fingerprint is
-SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA. The public-key form is prepared
-but unsubmitted. Confirmation is pending before registering this new administrator
-access and storing the private part as encrypted WAN_HOST_SSH_KEY in the private
-hoyosgarciajohn-png/wan-video-generation repository. Use the key only for the WAN
-controller; do not select the unrelated existing SUMAN staging key. No private
-key is in source, documents or screenshots. No host or subscription was created.
+The WAN public key is registered. Its private part is stored as encrypted
+WAN_HOST_SSH_KEY in the private hoyosgarciajohn-png/wan-video-generation repository.
+The unrelated SUMAN key was not selected. SSH is key-only, port 22 is rate limited,
+HTTP/HTTPS are public, and application port 8080 is loopback-only. The client-key
+fingerprint is SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA. The host-key
+fingerprint is SHA256:aU+cxUkky0P7tyOuS7JQjevb7gLGxeN/kjMVfQIDTr4 (TOFU at the
+provider-console IP, then pinned strictly on all later cloud operations).
 
-## Remaining installation sequence
+Controller, cleanup and Caddy services are active and enabled. Installed source
+is 42dbdc127b299b7e11e674630bef8683473f5a7a. Studio was built off-host using Node22.
+Private owner token and cleanup credential are installed under /etc/wan with
+restricted permissions; neither is in source or logs. The owner token has not yet
+been delivered. Live spending authority is absent and paid dispatch is disabled.
 
-1. Obtain the concrete administrator-access confirmation, register the prepared
-   public key, and retain the private part in the approved encrypted secret store.
-   Recheck the existing prepared checkout before creating exactly one host.
-2. Establish scoped host administration and HTTPS access. Do not put private keys into
-   user-data, repository content or screenshots. No domain purchase is included.
-3. Build Studio outside this 2 GiB host. Install the reviewed source, hash-locked
-   Python dependencies, FFmpeg/ffprobe and Caddy on the server. Keep model weights
-   on Runpod; the CPU controller does not need the multi-gigabyte GPU image.
-4. Start the separate controller, cleanup and proxy services using the fresh-host
-   installer. Startup remains disarmed. Measure memory and disk on the actual
-   host, including fictional upload/export and restart. Keep one export job at
-   a time; tune request concurrency and service limits from measured evidence.
-   Verify the cleanup monitor stays healthy during controller failure or load.
-5. Verify HTTPS, authorization, durable media, consistent application backup and
-   restore. Weekly disk backups do not by themselves prove SQLite recovery.
-   Preserve old accepted takes; do not silently delete media to make space.
-6. Install reviewed runtime authority and worker bootstrap. Require the primary
-   cleanup service plus the independent GitHub guard to be ready for the real
-   admitted scope before Runpod provisioning. Check included Actions allowance.
-7. Use only the already approved $5 / 1,800-second / one-attempt Runpod trial for
-   actual private image pull and Wan inference. Verify output retention, cleanup
-   and billing. Do not retry rendering under this authorization.
+https://wan-64-225-114-46.sslip.io serves valid HTTPS without a domain purchase.
+Cloud verification 43795476474 passed service, firewall, SQLite, fresh cleanup,
+Runpod GET and external HTTPS checks. Studio now loads after the strict-CSP schema
+fix, but owner access is not accepted: the browser session route returned 403.
+Direct same-origin unauthenticated HTTP returns 401, and cross-site returns 403.
+Investigate browser request provenance; preserve authentication/origin protections.
+
+See ../evidence/2026-11-16-controller-hosting/README.md for actual run outcomes,
+including failed partial checks. There are zero live-job bindings. Runpod GET
+success does not prove deletion. No GPU has been launched.
+
+## Remaining sequence
+
+1. Resolve the browser session rejection and securely hand off the existing owner
+   token. Do not implicitly rotate credentials or publish secrets in artifacts.
+2. Measure fictional upload/export load and cleanup freshness on this actual
+   2 GiB host. Keep one export at a time. Verify retained media across restart.
+3. Verify consistent restore and off-host recovery. The pre-upgrade backup on the
+   same host and scheduled provider backups do not establish recovery acceptance.
+4. Install reviewed live authority and worker bootstrap/model paths. Require both
+   primary cleanup and a ready independent deadline guard for the admitted scope.
+5. Use only the already approved $5 / 1,800-second / one-attempt trial to verify
+   actual image pull, Wan inference, output retention, shutdown and billing.
 
 ## Capacity and upgrade decision
 
@@ -96,11 +99,10 @@ Always Free remains an alternate requiring ARM acceptance and available capacity
 Windows requires reliable power/network access. These routes are not the selected
 installation after John's latest approval.
 
-This checkpoint records account inspection and prepared deployment settings. A new
-local key pair exists but no external access was granted. No runtime source,
-other project, host, volume or GPU was changed. Documentation and JSON
-consistency were checked; existing tests were not repeated. Actual installation,
-TLS, shutdown, image pull and bill collection remain pending. Contract 0.1.0.
+This checkpoint records an installed CPU host with verified HTTPS and cleanup
+heartbeat. It does not establish owner login, workload capacity, off-host restore,
+real image pull, GPU shutdown or billing collection. Contract 0.1.0 is unchanged.
+The $5 GPU trial remains unused. No larger plan or add-on is authorized.
 
 Published pricing references, checked November 16 UTC / November 15 owner local:
 
