@@ -6,8 +6,11 @@ and private template lehfc5qf3s. RUNPOD_CLEANUP_TOKEN is saved in GitHub Actions
 its Pod read access passed run 43784863537. No credential is installed on a
 controller. John approved one DigitalOcean Basic Regular bundled server: 1 vCPU,
 2 GiB RAM, 50 GiB SSD, $12/month plus $2.40/month weekly backups, before tax.
-This replaces the earlier free-only direction. Account access is currently blocked
-at the DigitalOcean sign-in page; no server was created or installed.
+This replaces the earlier free-only direction. Account access, empty Droplet
+inventory and the exact checkout price are verified. The configured region is
+SFO2; Basic Regular was unavailable in NYC3. The dedicated SSH key is prepared
+but awaits confirmation before registration and encrypted private-repository
+secret storage. No server was created or installed.
 See [the approved hosting decision](HOSTING_DECISION.md) and
 [non-executable configuration](digitalocean-controller-proposal.json).
 
@@ -130,9 +133,10 @@ web app remains fixture-only, and no provider creation route is enabled.
 
 ## Inputs still required
 
-- DigitalOcean account sign-in; the $14.40/month pre-tax configuration is already
-  approved. Inspect existing resources and verify actual capacity/checkout price
-  and expected tax before creation. Do not repeat the initial approval request.
+- Confirmation to register the dedicated WAN administrator SSH key and retain
+  its private part as encrypted WAN_HOST_SSH_KEY in the private WAN repository.
+  The $14.40/month pre-tax configuration is approved and checkout verified;
+  actual tax was not itemized. Do not repeat the initial hosting approval.
 - Approved hostname and DNS control; no domain purchase is included.
 - Host-side operator and cleanup credentials and installed live authority.
 - Off-host recovery arrangement, monitor acceptance, exact image pull and model setup.

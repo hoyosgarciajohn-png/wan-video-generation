@@ -1,5 +1,5 @@
 # Wan Video Generation · Master handoff
-Version 1.29 | November 15, 2026 (America/New_York) | Owner: John Hoyos
+Version 1.30 | November 15, 2026 (America/New_York) | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope is approved; hosted storage and release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
@@ -29,9 +29,13 @@ John subsequently approved starting with DigitalOcean Basic Regular bundled:
 total $14.40/month before expected tax. This specific approval replaces the
 free-only controller restriction; the former larger-server proposal remains
 withdrawn. Capacity can be reviewed later, but no priced upgrade is approved.
-The connected browser is at https://cloud.digitalocean.com/login and is retained
-for owner sign-in. Account inventory, regional capacity and checkout remain
-unverified. No server or subscription was created. The existing amd64 installer
+John completed DigitalOcean sign-in. The connected browser verified an empty
+global Droplet inventory, an existing payment method and the exact $14.40/month
+checkout. SFO2 is selected; the Basic Regular plan was unavailable in NYC3.
+Tax is not itemized. A dedicated WAN SSH key and its public-key registration
+form are prepared. Administrator-access confirmation is pending before submitting
+the public key and storing its private part as an encrypted private WAN repository
+secret. No external key, server or subscription was created. The amd64 installer
 is prepared; actual 2 GiB host performance and installed cleanup need acceptance.
 See deployment/hosting/HOSTING_DECISION.md and digitalocean-controller-proposal.json.
 The $5 / 1,800-second / one-attempt GPU trial remains unused. Historical entries
@@ -68,10 +72,12 @@ Known gaps, cost incurred, and resources still active
 Next eligible batch, recipient, and exact input they need
 
 ## Next action
-Owner: sign in to DigitalOcean in the retained browser page. Command Center:
-inspect existing resources, confirm the exact approved $14.40/month before tax
-configuration and available region, then create the dedicated controller with
-weekly backups. Build Studio off-host; install the reviewed amd64 release,
+Owner: confirm registration of the prepared wan-controller-deploy SSH key in
+DigitalOcean for wan-controller-01 and encrypted storage of its private part as
+WAN_HOST_SSH_KEY in the private hoyosgarciajohn-png/wan-video-generation repository.
+Command Center: after this access confirmation, submit the prepared public key
+and create the dedicated SFO2 controller at the already approved $14.40/month
+before tax with weekly backups. Build Studio off-host; install the reviewed release,
 HTTPS, persistent state and both cleanup layers. Verify fictional workload memory,
 restart/restore, credential access and cleanup freshness before live authority.
 Do not request the same initial hosting approval again. No larger plan or paid
@@ -851,3 +857,40 @@ Existing runtime tests were retained without repetition. The $5 / 1,800-second /
 one-attempt trial remains unused. No DigitalOcean charge was initiated here.
 Next recipient: owner for sign-in, then Command Center for actual host provisioning,
 installation and acceptance. No repeat numeric hosting approval is required.
+
+
+## DigitalOcean account verified; dedicated access prepared — November 15, 2026
+
+John confirmed sign-in. The current account is My Team; first-project has no
+resources and the global Droplet inventory is empty. An existing primary payment
+method is present. No billing change or payment attempt was made. The exact
+approved checkout is configured: one wan-controller-01, Ubuntu 24.04 LTS x64,
+SFO2, Basic Regular s-1vcpu-2gb, 1 vCPU, 2 GiB RAM, 50 GiB SSD, $12/month plus
+weekly percentage backups $2.40/month. Tax is not itemized. NYC3 did not offer
+Basic Regular, so the form retains SFO2 rather than a higher-priced substitute.
+No extra volume or managed database is selected. Free monitoring is selected.
+
+The existing SUMAN staging key is unrelated and remains unselected. A dedicated
+ed25519 key named wan-controller-deploy was generated locally, with private-file
+mode 0600. Its public fingerprint is
+SHA256:GGPDVk0v1xgocnC0P1OCvmSM/h9VggrKxAUDIbF1iKA. The public-key registration
+dialog is filled but unsubmitted. Confirmation is needed at this action because
+it grants administrator access. The concrete request covers registering the
+public key for this WAN host and keeping its private part as encrypted
+WAN_HOST_SSH_KEY in the private WAN GitHub repository for installation/maintenance.
+The private key has not been printed, committed, uploaded or registered externally.
+The form is retained for continuation after that access confirmation.
+
+The hosting purchase itself is already authorized; do not ask again for its
+$14.40/month pre-tax price. No server has been created, so installation, hostname,
+HTTPS, persistent restore, live authority, image pull, shutdown and billing
+collection remain pending. The separate $5 / 1,800-second / one-attempt GPU trial
+remains unused. No new paid resource or Runpod job was started in this step.
+
+Issue: #7 (B06), with the one-shot owner envelope superseding its original six-shot
+proposal. Baseline main: 5dae41d3d7e7811aa761f42f7c30a332406cf9a7 / PR #51.
+Contract 0.1.0 is unchanged. This update changes documentation/configuration only.
+Validation: JSON scope/price/access state and matching handoff copies, plus
+git diff --check. Existing fictional runtime test evidence is retained without
+repetition. Next recipient: John for dedicated access confirmation, then Command
+Center for the approved host purchase, installation and deployment acceptance.
