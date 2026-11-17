@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg
-          python3 -m pip install -r requirements-dev.txt
+          python3 -m pip install -r requirements-dev.txt Pillow==11.3.0
           ffmpeg -version >/dev/null
           npm ci --ignore-scripts --no-audit --no-fund --prefix apps/studio
       - name: Contract, controller, queue and full-duration export checks
