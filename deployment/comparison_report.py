@@ -51,8 +51,10 @@ def make_report(directory):
             m=result['metrics']
             result['attributed_compute_estimate_usd']=(m['render_and_verify_seconds']+m['upload_seconds'])/3600*float(rate)
     atomic_json(directory/'comparison-report.json',report)
+    completed=', '.join(f"{result['seconds']}-second" for result in results)
+    outcome=(f"Retained output: {completed}." if results else 'No committed video was retained.')
     lines=['# WAN duration comparison','',
-           'Two independently generated continuous clips of the same sailboat scene. Fixed model, H100, prompt, seed 42, 1280×704, 24 fps and 50 steps.','',
+           outcome+' The planned comparison uses independently generated continuous clips of the same sailboat scene, with fixed model, H100, prompt, seed 42, 1280×704, 24 fps and 50 steps.','',
            '| Test | Model load | Generation | Decode / encode | Peak allocated VRAM | Peak reserved VRAM | Attributed compute estimate |',
            '|---|---:|---:|---:|---:|---:|---:|']
     for result in results:
@@ -60,10 +62,10 @@ def make_report(directory):
         cost_label=f'${cost:.4f}' if cost is not None else 'Unavailable'
         lines.append(f"| {result['seconds']} seconds | {m['model_load_seconds']:.1f}s | {m['generation_seconds']:.1f}s | {m['decode_encode_seconds']:.1f}s | {m['gpu_peak_allocated_bytes']/1024**3:.2f} GiB | {m['gpu_peak_reserved_bytes']/1024**3:.2f} GiB | {cost_label} |")
     lines += ['', 'Generation includes text encoding and sampling; decode/encode is reported separately. Each render loads the model in an isolated process; the model download is shared.',
-              '', 'Successful 5-second and 15-second originals contain 121 and 361 frames respectively. Each comparison copy trims only the final frame to the exact requested duration; playback speed is unchanged.',
+              '', 'Each retained comparison copy trims only the original’s final frame to the exact requested duration; playback speed is unchanged. Originals have one extra frame because Wan requires a 4n+1 frame count.',
               '', 'Technical checks passed for each listed clip: resolution, frame rate, frame count, checksum and full video decoding after confirmed Pod cleanup.',
               '', 'The provider invoice covers the entire Pod. Per-clip and elapsed-time amounts are estimates; shared startup is excluded from each clip’s attributed cost. Final billing: '+str(report['billing']),
-              '', 'Owner visual acceptance is pending. Review boat and sail consistency, natural motion, flicker, stable background, and the final ten seconds of the longer clip. One pair is an exploratory comparison.',
+              '', 'Owner visual acceptance is pending. Review boat and sail consistency, natural motion, flicker, and stable background. A comparison between durations requires both clips.',
               '', 'Cleanup: '+report['cleanup']+'.']
     if report.get('shared_startup_seconds') is not None:
         lines += ['', f"Shared startup: {report['shared_startup_seconds']:.1f} seconds; estimated compute ${report['shared_startup_compute_estimate_usd']:.4f}."]

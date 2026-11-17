@@ -1,0 +1,76 @@
+{
+  "results": [
+    {
+      "seconds": 5,
+      "original": "wan-05s-original.mp4",
+      "comparison": "wan-05s.mp4",
+      "sha256": "d5b03a8c6a84678b284548c882dc924a817fe0f3d0e4ef35aad9258d0d5228f2",
+      "bytes": 5155278,
+      "technical_validation": "PASS",
+      "media": {
+        "duration_ms": 5000,
+        "width": 1280,
+        "height": 704,
+        "frame_rate": {
+          "numerator": 24,
+          "denominator": 1
+        }
+      },
+      "metrics": {
+        "asset_bytes": 14014322,
+        "asset_sha256": "d1ca8eb36f151c8ca18fd29a692b531e2476ecdb53f36f1ad29967d84964650d",
+        "attempt_id": "141641dc8c374fad93fc0b56db5a383e",
+        "batch_id": "1226612319814a0d85c2d0d62a9c4357",
+        "cuda_version": "12.8",
+        "decode_encode_seconds": 11.948471100535244,
+        "driver_version": "595.91.07",
+        "fps": 24,
+        "frames": 121,
+        "generation_seconds": 177.81337797734886,
+        "gpu_model_loaded_reserved_bytes": 2929721344,
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "gpu_peak_allocated_bytes": 20341129216,
+        "gpu_peak_reserved_bytes": 26891780096,
+        "gpu_total_bytes": 85019590656,
+        "height": 704,
+        "image_ref": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367",
+        "memory_policy": "sequential-gpu-text-bf16-vae-v1",
+        "model_load_seconds": 55.32946374081075,
+        "model_profile": {
+          "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+          "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+          "id": "wan22-ti2v-5b",
+          "revision": "1"
+        },
+        "protocol": "wan-duration-comparison-v1",
+        "render_and_verify_seconds": 273.0603376151994,
+        "target_duration_ms": 5000,
+        "torch_version": "2.8.0+cu128",
+        "upload_seconds": 0.9029587558470666,
+        "width": 1280
+      },
+      "attributed_compute_estimate_usd": 0.33408301974135945
+    }
+  ],
+  "batch": "1226612319814a0d85c2d0d62a9c4357",
+  "cleanup": "confirmed",
+  "billing": {
+    "status": "AWAITING_CONNECTED_BILLING_RECORD",
+    "reservation_retained": true
+  },
+  "continuation_gate": {
+    "allowed": false,
+    "memory_limit_bytes": 76517631590,
+    "projected_reserved_bytes": 74815897600,
+    "reason": "insufficient_time_or_memory_headroom",
+    "remaining_seconds": 1084.399361,
+    "required_seconds": 1812.3982375944033
+  },
+  "quality_acceptance": "PENDING_OWNER_LIVE_REVIEW",
+  "provider_bill_is_batch_level": true,
+  "quoted_hourly_usd": "4.39",
+  "shared_startup_seconds": 1112.5532710552216,
+  "shared_startup_compute_estimate_usd": 1.356696905536784,
+  "total_elapsed_compute_estimate_usd": 1.7035581927458443,
+  "elapsed_estimate_basis": "Allocation request through first observed confirmed cleanup; upper estimate, not invoice"
+}

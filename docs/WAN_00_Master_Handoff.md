@@ -1,10 +1,54 @@
 # Wan Video Generation · Master handoff
-Version 1.44 | November 16, 2026 | Owner: John Hoyos
+Version 1.46 | November 17, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 5 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
+**Five-second H100 rendering passed; the continuous 15-second render was skipped by the approved remaining-time gate. One real video and durable telemetry survived confirmed Pod deletion. The two-duration comparison remains incomplete.**
+
+PR #87 is deployed as `af3b013a1d485cc5278c6a2101ed62a673ef8032`. Upgrade 44025983221, preparation 44026124821 and admission 44026224208 passed. Project `project-0ebe9e6ddab243cf8e91924211593c27`, batch `1226612319814a0d85c2d0d62a9c4357`, was admitted at 05:44:51 UTC November 17. The immutable deadline is 06:29:51 UTC (1:29:51 a.m. Eastern). Independent guard 44026572576 was verified running before launch 44026660382. The first allocation created H100 Pod `5kolyuk9n1ete3` in US-MO-1 at $4.39/hour. No additional Pod or inference retry was submitted.
+
+The approved $5 / 2700-second / one-Pod comparison scope is consumed. Preserve all seven consumed scopes, every prior reservation and the exact old unresolved repair exception. Never reset/replay this grant or extend its deadline. Future paid work requires a fresh isolated scoped approval; implementation, deployment and this bounded execution already had John's approval and must not be described as still awaiting it.
+
+The private image `ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367` pulled successfully. Download integrity failed at 06:02:53 UTC on the text encoder; the same container restarted, retained the other model files and downloaded that file again. Generic logs do not distinguish byte-count from checksum failure. All pinned files verified at 06:07:09 UTC. Rendering was attempted only once.
+
+The five-second attempt succeeded and was committed at 06:11:46.314 UTC. Original take `b3a4e02752574bd09d0392c14dcec3b6`: 121 frames, 1280×704, 24fps, 14,014,322 bytes; SHA256 `d1ca8eb36f151c8ca18fd29a692b531e2476ecdb53f36f1ad29967d84964650d`. Exact 120-frame / 5.000-second viewing copy: 5,155,278 bytes; SHA256 `d5b03a8c6a84678b284548c882dc924a817fe0f3d0e4ef35aad9258d0d5228f2`. Fixed model/prompt/seed 42/50 steps were preserved. No 15-second or side-by-side output exists.
+
+Measured load 55.329s, generation 177.813s, decode/encode 11.948s, render/verify 273.060s, upload 0.903s. Peak allocated VRAM 18.94 GiB; reserved 25.04 GiB. Startup before first claim 1112.553s (18m33s), including the failed download. The longer-render gate needed 1812.398s but only 1084.399s remained. Memory projection passed (74,815,897,600 bytes projected versus 76,517,631,590 permitted). Time alone blocked the second claim; these projections do not prove actual 15s runtime or memory fit.
+
+Batch state is `failed` because the second planned shot is absent; its sole worker attempt is `succeeded`, with one committed take and no attempt failure code. Cleanup was confirmed at 06:11:53.879 UTC; complete Runpod inventory was empty. Total elapsed compute estimate $1.7036, of which $0.3341 is attributed to the render/upload and $1.3567 to startup. This is not an invoice. The connected billing query returned no records, so the $4 reservation remains retained. The prior successful one-second Pod now has a posted $1.3606901543 charge including disk; it is recorded separately and does not settle older unresolved liabilities automatically.
+
+Export 44029555013 / job 133857911204 passed after deletion, validating checksums, full decoding, frame count, rate and dimensions. Artifact 14304462063 ZIP SHA256 `5a98ea02452be2f28ecae5abac70a683e0390aa3b8b281e0f4e0f267f195f533` was downloaded and hashes matched. User deliverables are `wan-05s.mp4`, `WAN_Duration_Comparison.md`, and `WAN_Duration_Comparison_Evidence.zip` (includes original and exact-duration copy). Evidence is `deployment/evidence/2026-11-17-duration-comparison/`. The report generator's wording now accurately describes partial output; syntax/whitespace checks passed. Existing fictional suites were not repeated for this prose-only change. This report correction is prepared in source; installed host remains the PR #87 commit above.
+
+Sampled-frame review: coherent blue boat and broadly stable mountains/shoreline; two visible sails despite the prompt specifying one. This prompt-adherence miss is recorded. Full playback/owner creative acceptance remains pending. B06 remains open; there is no duration-quality comparison without the longer clip. H100 success does not prove 24 GB GPU fit.
+
+Independent guard continues through 06:34:51 UTC (1:34:51 a.m. Eastern), including the exact historical unknown allocation. Do not cancel it early. No new GPU is running. Persistent host cleanup remains active. Next recipient: B01/B06 — retain/review this video, reconcile posted billing when available, and prepare a separately scoped continuous 15-second run using these measurements and sufficient startup allowance. No fresh paid run is authorized by this consumed scope.
+
+Links: [Launch](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44026660382) · [Export](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44029555013) · [Guard](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44026572576) · [B06 issue #7](https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/7).
+
+## Previous checkpoint — comparison built, deployment blocked
+**The approved 5-second / 15-second comparison is implemented, merged and built. Deployment and both real renders remain pending because the connected browser became unavailable; alternate GitHub sign-in did not complete.**
+
+Owner approval: John replied “yes I approve” to the concrete PR #86 proposal. The additional envelope is $5 total ($4 Pod + $1 storage), maximum $4.50/hour, 45 minutes from admission, one H100 80GB, two ordered renders (5s then 15s), one attempt per render and up to three allocation requests only after explicit capacity rejection. Do not ask for this approval again. No comparison project/grant/batch has been prepared or admitted, no comparison Pod requested, and no new deadline started.
+
+Implementation PR #86 merged as 294c3680c443e41a2d032ac24a835ba0c4a506aa. It adds the privately versioned signed comparison scope, durable per-render time and VRAM telemetry acknowledged before completion, ordered claiming on one Pod, and a resource/time check before 15s. Settings are identical: blue sailboat prompt, seed 42, Wan2.2 TI2V-5B, 1280×704, 24fps, 50 steps. The 15s take must be independently generated, never stitched/looped from 5s. Ordinary 0.1.0 bundle behavior and historical duration limits are preserved.
+
+PR #87 merged as af3b013a1d485cc5278c6a2101ed62a673ef8032. It binds the new private image and adds read-only post-cleanup `trial-export` retrieval. Original 121/361-frame takes are checksum/full-decode validated, then comparison copies trim the final frame to exact 5s/15s. A labeled first-five-seconds side-by-side copy and JSON/Markdown measurement report are produced. Per-clip compute and shared startup are estimates, not provider invoices. Owner visual acceptance remains pending.
+
+Validation: 202 application + 41 CPU worker + 79 deployment checks, plus one scope regression (323 total) passed before image publication. The subsequent extended integration check verifies actual retained-file retrieval, checksum/full decoding, exact 5s/15s copies, side-by-side output, cost attribution and backup restore. Seven targeted deployment checks, compile, shell syntax and whitespace checks passed. No fictional result is being represented as a real Wan render.
+
+Private build/publication run 43984610965 / job 133709440946 completed successfully. Artifact 14284837533 ZIP SHA256: 5a0e1a66e7292b2c217adb56bade21d8e303ad99893af9c787f8c58542142c2b. Downloaded source inventory, four logs, registry/config identity, fixture checksum and full decoding passed the existing strict offline verifier. Published image:
+`ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367`.
+Evidence: `deployment/evidence/2026-11-16-duration-comparison-build/`. This image's real Runpod pull and GPU inference remain unverified.
+
+At 8:12 p.m. Eastern November 16 (01:12 UTC November 17), the complete Runpod inventory is empty. GitHub's newest workflow is the successful private build; no new controller upgrade, comparison admission, guard or launch was dispatched. Installed controller remains last confirmed 84fe9d2d9e2aad680c825069dd5dc5a84f5314f5. All six earlier grants, exact old unknown allocation exception and reservations remain preserved. Prior one-second final billing still needs reconciliation.
+
+**Resume at deployment, not another build or approval:** restore the connected authenticated GitHub browser, run `upgrade` on main using the existing pinned host fingerprint, verify health, then `trial-prepare` and `trial-admit` with `trial=comparison` and fresh H100 Secure CUDA>=12.8 availability quotes. Start the independent `deadline-guard` with the exact admitted scope/batch/deadline and verify READY/in-progress before `trial-launch`. Do not extend the deadline. Monitor both ordered renders and cleanup; if the measured continuation gate declines 15s, report that result without manufacturing a second video. After confirmed teardown run `trial-export`, download its artifact and persist both successful clips/report. Any future fresh comparison trial beyond the authorized one must be separately scoped; never reset a consumed grant.
+
+Links: [Implementation PR #86](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/86) · [Release PR #87](https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/87) · [Worker build](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/43984610965).
+
+## Previous checkpoint — successful one-second H100 validation
 **The approved multi-GPU allocation and repaired one-second GPU render passed.**
 PR #84 is merged and installed as 84fe9d2d9e2aad680c825069dd5dc5a84f5314f5.
 Upgrade 43976433823 passed with all three services active, HTTPS healthy and
@@ -1264,20 +1308,3 @@ decode passed. The actual image reference and manifest hashes are in the current
 checkpoint and deployment/evidence/2026-11-16-memory-repair-build/. This continuation
 created no Runpod Pod, no new runtime grant and no controller deployment. Both paid
 attempts remain consumed; actual GPU validation of the repair is still pending.
-
-## November 16, 2026 — approved duration comparison implementation
-
-John approved the PR #86 proposal: $5 additional total for one H100 and two
-ordered independent renders (5s then 15s), <=$4.50/hour, 2700 seconds from
-admission, three explicit-capacity-only allocation requests, one Pod. All six
-historical consumed grants and the exact unresolved repair exception remain.
-Private comparison protocol v1 adds signed scope, ordered claims, durable metrics
-acknowledgement, first-output retention and measured continuation gating. Ordinary
-five-second worker limits and canonical contract 0.1.0 remain compatible.
-
-Checks: 202 application tests, 41 GPU-worker CPU-only tests, 79 deployment checks,
-one additional comparison scope regression, contract validator and whitespace
-checks passed (323 automated tests). These are fictional checks, not GPU evidence.
-New image publication, installed release, admission and paid outputs remain pending.
-No new Pod or rental was started during implementation. Next: publish reviewed
-worker, record immutable build evidence, deploy, then run within approved limits.

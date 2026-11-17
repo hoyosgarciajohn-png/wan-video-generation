@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "filename": "wan-05s.mp4",
+      "library_file_id": "libfile_fde3_f-d18c4a34ef788191bd67504c895f79ae_eea2ba6c535c8191b29d94a651cc633c",
+      "version": 0
+    },
+    {
+      "filename": "WAN_Duration_Comparison.md",
+      "library_file_id": "libfile_fde3_f-5884460223c88191a8e57c7fffdd97b7_eea2ba6c535c8191b29d94a651cc633c",
+      "version": 0
+    },
+    {
+      "filename": "WAN_Duration_Comparison_Evidence.zip",
+      "library_file_id": "libfile_fde3_f-6c5759b5e05c8191b737d34bb0ba11d0_eea2ba6c535c8191b29d94a651cc633c",
+      "version": 0
+    },
+    {
+      "filename": "WAN_00_Master_Handoff.md",
+      "library_file_id": "libfile_fde3_f-fe262cbf986c81919633a6df3936baaf_eea2ba6c535c8191b29d94a651cc633c",
+      "version": 41
+    }
+  ],
+  "evidence_zip_sha256": "89304e1a64dc0d67bbd3e3182bb1bfa86515e1d300752fb5364c587689e4a04b"
+}

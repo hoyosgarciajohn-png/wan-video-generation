@@ -123,3 +123,18 @@ settings. Implementation, image publication, deployment and execution are
 authorized. Preserve all six consumed scopes and the exact old unknown exception.
 Save first video and durable telemetry before the second claim; gate remaining
 time and memory. No automatic regeneration or additional rental.
+
+The comparison scope is now consumed: project
+project-0ebe9e6ddab243cf8e91924211593c27, batch 1226612319814a0d85c2d0d62a9c4357.
+Installed release af3b013 (PR #87), launch 44026660382, H100 Pod 5kolyuk9n1ete3.
+One five-second attempt succeeded and its video/telemetry were saved; the 15s
+claim was refused for insufficient remaining time (1084.399s available versus
+1812.398s required). Memory projection passed. Batch state failed/incomplete;
+sole attempt succeeded. Cleanup confirmed and provider inventory empty. Export
+44029555013 recovered the original and exact five-second copy after deletion.
+Estimated compute $1.7036, current billing pending, reservation retained.
+Never replay/reset this grant or extend its 06:29:51 UTC November 17 deadline.
+Independent guard 44026572576 continues through 06:34:51 UTC; preserve the old
+unknown exception and all seven consumed scopes. No additional rental or render
+is authorized. Owner creative acceptance and continuous 15s remain pending.
+Read deployment/evidence/2026-11-17-duration-comparison/ for measured results.
