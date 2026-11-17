@@ -1,0 +1,33 @@
+name: LongCat full queue fictional checks
+on:
+  pull_request:
+    paths:
+      - 'workers/gpu/longcat_*.py'
+      - 'workers/gpu/tests/test_longcat_batch.py'
+      - 'contracts/runtime-policy.json'
+      - 'workers/media/test_export.py'
+      - '.github/workflows/longcat-full-queue-checks.yml'
+permissions:
+  contents: read
+jobs:
+  fictional:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Install CPU check dependencies
+        run: |
+          python3 -m pip install -r requirements-dev.txt
+          ffmpeg -version >/dev/null
+          npm ci --ignore-scripts --no-audit --no-fund --prefix apps/studio
+      - name: Contract, controller, queue and full-duration export checks
+        run: |
+          python3 scripts/validate_contract.py --media-root fixtures
+          python3 -m unittest discover -s tests -v
+          python3 -m unittest workers.gpu.tests.test_longcat_batch workers.media.test_export -v
+      - name: Studio shared policy checks
+        working-directory: apps/studio
+        env:
+          WAN_PYTHON: python3
+        run: npm test

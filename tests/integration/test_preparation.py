@@ -115,13 +115,15 @@ class IntegrationPreparationTests(unittest.TestCase):
                 validate_bundle(self.first, Path(directory))
 
     def test_music_film_and_cartoon_timeline_boundaries(self):
-        for kind, cap in (("music_video", 360000), ("short_film", 1800000), ("cartoon", 1800000)):
+        for kind, cap in (("music_video", 363000), ("short_film", 1800000), ("cartoon", 1800000)):
             with self.subTest(kind=kind):
                 bundle = deepcopy(self.first)
                 bundle["project"].update(kind=kind, runtime_limit_ms=cap)
                 timeline = bundle["timelines"][0]
                 item = timeline["items"][0]
                 timeline["items"] = [deepcopy(item) for _ in range(cap // 2000)]
+                if cap % 2000:
+                    timeline["items"].append({**item, "source_out_ms": cap % 2000})
                 timeline["duration_ms"] = cap
                 validate_bundle(bundle)
                 timeline["items"].append({**item, "source_out_ms": 1})

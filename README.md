@@ -1,6 +1,6 @@
 # Wan Video Generation
 
-A private foundation for self-hosted Wan production using temporary Runpod GPU Pods. Target projects are music videos up to 6 minutes and short films and cartoons up to 30 minutes. See the [full-song production acceptance plan](docs/B07_FULL_SONG_PRODUCTION.md) for the current 5:40.126 music-video goal and remaining GPU capabilities.
+A private foundation for self-hosted Wan production using temporary Runpod GPU Pods. Target projects are music videos up to 6 minutes 3 seconds and short films and cartoons up to 30 minutes. See the [full-song production acceptance plan](docs/B07_FULL_SONG_PRODUCTION.md) for the current 5:40.126 music-video goal and remaining GPU capabilities.
 
 The local integration checkpoint includes the storyboard fixture UI, durable fixture controller, Wan worker source, CPU exporter and QA checks. See [integration evidence and remaining gates](docs/B05_INTEGRATION_CHECKPOINT.md). The [connected Studio checkpoint](docs/STUDIO_API_V1.md) adds local authenticated project persistence and protected media reads. [Connected fixture render commands](docs/RENDER_COMMANDS_V1.md) now submit, cancel and review actual synthetic worker outputs. [Protected uploads and timeline/export controls](docs/MEDIA_COMMANDS_V1.md) complete the local synthetic workflow through MP4 download. Durable chunk uploads support WAV/MP3 tracks up to 128 MiB; see [upload protocol](docs/UPLOADS_V1.md). [Checked local recovery](docs/BACKUP_RESTORE.md) and [staging preparation](docs/DEPLOYMENT_READINESS.md) are available. [Budget/lifecycle rehearsals](docs/BUDGET_ORCHESTRATION.md) use only the built-in fake provider; they cannot dispatch Runpod. [Scoped remote worker transfer](docs/WORKER_TRANSPORT.md) now supports separate controller/worker storage roots for fixture batches, with expiring credentials and replay-safe completion. The CPU controller is hosted with HTTPS and durable disk. Owner browser sign-in and the synthetic hosted workflow with independent recovery are verified. The first bounded live trial is recorded separately from synthetic acceptance.
 
@@ -44,6 +44,16 @@ still-unverified Runpod download.
 records the initial hosted release and resource/cost. Later [access and recovery evidence](deployment/evidence/2026-11-16-access-recovery/README.md) supersedes its original sign-in and recovery gaps. See the [first live trial](deployment/evidence/2026-11-16-first-live-trial/README.md) for GPU execution, cleanup, costs and remaining gates.
 
 ## Current continuation status
+
+The current owner-selected model is LongCat-Video-Avatar 1.6 after review of its
+three-shot benchmark. The complete approximately 6:03 song is approved, with
+110 planned shots, eleven locations, John as singer/athlete and head covering
+in every scene. See [LongCat full-queue preparation](docs/B07_LONGCAT_FULL_QUEUE.md)
+for the new duration policy, resident worker and remaining live integration.
+The earlier Wan production history below remains evidence, not the current
+song/model scope. No new GPU grant or deployed LongCat queue is implied here.
+
+### Previous Wan full-song continuation
 
 John has directed the full 5:40.126 concert video as the production acceptance
 goal, including corrective retries. Six-minute project/export support is prepared
