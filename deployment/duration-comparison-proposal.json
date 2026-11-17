@@ -77,7 +77,7 @@
       "expected_raw_duration_ms": 15042,
       "comparison_export_frames": 360,
       "comparison_export_duration_ms": 15000,
-      "current_worker_duration_support": false,
+      "current_worker_duration_support": true,
       "goal": "Measure longer-shot continuity, temporal drift and resource growth",
       "classification": "EXPERIMENTAL_CONTINUOUS_GENERATION"
     }
@@ -131,12 +131,12 @@
     "Cleanup and final-billing record"
   ],
   "limitations": [
-    "15-second support is not currently enabled or GPU-validated",
+    "15-second support is implemented only for the signed comparison scope; real GPU execution remains unverified",
     "Longer duration can require more than proportionally greater compute or memory; no guaranteed 3x cost estimate",
     "One pair is an exploratory comparison, not a statistical benchmark",
     "Final one-second billing remains pending; do not equate empty billing records with zero cost",
     "The proposed application limits are not a provider-side hard account cap"
   ],
-  "image": null,
+  "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367",
   "approval_reference": "John: yes I approve, in direct response to PR #86 proposal: $5 additional total / $4.50 hourly / 45 minutes / one H100 / two ordered renders. Implementation, deployment and bounded execution authorized."
 }

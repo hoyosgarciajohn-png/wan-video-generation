@@ -6,7 +6,7 @@ on:
       operation:
         description: Inspect access or install once on the approved fresh host
         type: choice
-        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, scale-rehearsal, trial-prepare, trial-admit, trial-launch, trial-observe]
+        options: [inspect, install, resume, upgrade, verify, diagnose, owner-access, recovery, recovery-copy, scale-rehearsal, trial-prepare, trial-admit, trial-launch, trial-observe, trial-export]
         default: inspect
         required: true
       trial:
@@ -53,7 +53,7 @@ jobs:
           node-version: '22'
           package-manager-cache: false
       - name: Install media decoder for independent recovery
-        if: inputs.operation == 'recovery' || inputs.operation == 'recovery-copy'
+        if: inputs.operation == 'recovery' || inputs.operation == 'recovery-copy' || inputs.operation == 'trial-export'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends ffmpeg
@@ -69,3 +69,11 @@ jobs:
           WAN_GPU_QUOTE: ${{ inputs.gpu_quote }}
           WAN_BILLING_RECORD: ${{ inputs.billing_record }}
         run: bash deployment/hosting/cloud-install.sh
+      - name: Preserve retained comparison outputs
+        if: inputs.operation == 'trial-export'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: wan-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/wan-comparison
+          if-no-files-found: error
+          retention-days: 7

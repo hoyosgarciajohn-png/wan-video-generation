@@ -4,7 +4,7 @@ set -euo pipefail
 umask 0077
 fail() { printf '%s\n' "$1" >&2; exit 1; }
 operation=${WAN_HOST_OPERATION:?}
-case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy|scale-rehearsal|trial-prepare|trial-admit|trial-launch|trial-observe) ;; *) fail 'Invalid operation';; esac
+case "$operation" in inspect|install|resume|upgrade|verify|diagnose|owner-access|recovery|recovery-copy|scale-rehearsal|trial-prepare|trial-admit|trial-launch|trial-observe|trial-export) ;; *) fail 'Invalid operation';; esac
 [[ ${GITHUB_REF:-} == refs/heads/main ]] || fail 'Main branch required'
 [[ ${GITHUB_SHA:-} =~ ^[a-f0-9]{40}$ ]] || fail 'Exact source commit required'
 [[ -n ${WAN_HOST_SSH_KEY:-} ]] || fail 'Missing approved SSH secret'
@@ -87,7 +87,7 @@ if [[ "$operation" == trial-* ]]; then
         printf '%s' "$WAN_BILLING_RECORD" > "$temp_dir/billing.json"
         scp "${ssh_options[@]}" "$temp_dir/billing.json" "root@$host:$trial_dir/connected-billing.json"
     fi
-    [[ "$operation" == trial-observe ]] || ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
+    [[ "$operation" == trial-observe || "$operation" == trial-export ]] || ssh "${ssh_options[@]}" "root@$host" "test \"\$(git -C /opt/wan/current rev-parse HEAD)\" = '$GITHUB_SHA'"
     guard_run=''
     if [[ "$operation" == trial-launch ]]; then
         ssh "${ssh_options[@]}" "root@$host" "cat '$trial_dir/guard-ready.json'" > "$temp_dir/guard.json"
@@ -105,6 +105,14 @@ print('INDEPENDENT_GUARD_RUNNING_VERIFIED')
 PY
     fi
     ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}' --trial '$trial'"
+    if [[ "$operation" == trial-export ]]; then
+        [[ "$trial" == comparison ]] || fail 'Comparison export scope required'
+        mkdir -p "$RUNNER_TEMP/wan-comparison"
+        scp -r "${ssh_options[@]}" "root@$host:$trial_dir/comparison-output/." "$RUNNER_TEMP/wan-comparison/"
+        python3 -m venv "$temp_dir/report-venv"
+        "$temp_dir/report-venv/bin/pip" install --require-hashes --only-binary=:all: -r deployment/hosting/requirements.lock
+        "$temp_dir/report-venv/bin/python" -m deployment.comparison_report "$RUNNER_TEMP/wan-comparison"
+    fi
     exit
 fi
 if [[ "$operation" == inspect ]]; then
