@@ -1,0 +1,198 @@
+{
+  "checked_at": 1794896026.3100057,
+  "pricing": {
+    "checked_at": 1794894291.0435336,
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "region": "AP-IN-1",
+    "data_center_ids": [
+      "AP-IN-1",
+      "AP-JP-1",
+      "CA-MTL-1",
+      "EU-FR-1",
+      "US-CA-2",
+      "US-GA-2",
+      "US-MO-1",
+      "US-NE-1"
+    ],
+    "usd_per_hour": "4.39",
+    "min_cuda": "12.8"
+  },
+  "batch": {
+    "approved_at": "2026-11-17T05:44:51.143345Z",
+    "budget": {
+      "approved_cents": 400,
+      "currency": "USD",
+      "reserved_cents": 400,
+      "spent_cents": 0
+    },
+    "cleanup_state": "confirmed",
+    "deadline_at": "2026-11-17T06:29:51Z",
+    "execution_mode": "runpod",
+    "id": "1226612319814a0d85c2d0d62a9c4357",
+    "idempotency_key": "john-duration-comparison-pair",
+    "model_profile": {
+      "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+      "id": "wan22-ti2v-5b",
+      "revision": "1"
+    },
+    "project_id": "project-0ebe9e6ddab243cf8e91924211593c27",
+    "provider_resource_id": "5kolyuk9n1ete3",
+    "shot_snapshots": [
+      {
+        "prompt": "One small blue sailboat with a single white sail moves slowly from left to right across a calm lake at sunrise. A fixed wide camera keeps the entire boat visible. Keep the boat's shape, sail, colors, shoreline and mountains consistent. Gentle continuous ripples, natural light, one uninterrupted shot, no cuts, no text.",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "settings": {
+          "frame_rate": {
+            "denominator": 1,
+            "numerator": 24
+          },
+          "height": 704,
+          "seed": 42,
+          "steps": 50,
+          "width": 1280
+        },
+        "shot_id": "duration-05",
+        "target_duration_ms": 5000
+      },
+      {
+        "prompt": "One small blue sailboat with a single white sail moves slowly from left to right across a calm lake at sunrise. A fixed wide camera keeps the entire boat visible. Keep the boat's shape, sail, colors, shoreline and mountains consistent. Gentle continuous ripples, natural light, one uninterrupted shot, no cuts, no text.",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "settings": {
+          "frame_rate": {
+            "denominator": 1,
+            "numerator": 24
+          },
+          "height": 704,
+          "seed": 42,
+          "steps": 50,
+          "width": 1280
+        },
+        "shot_id": "duration-15",
+        "target_duration_ms": 15000
+      }
+    ],
+    "state": "failed"
+  },
+  "budget": {
+    "spent_cents": 0,
+    "reserved_cents": 400,
+    "unsettled_count": 1
+  },
+  "reservation_state": "reserved",
+  "provider": {},
+  "billing": {
+    "status": "AWAITING_CONNECTED_BILLING_RECORD",
+    "reservation_retained": true
+  },
+  "unresolved": [
+    "249c50635ec84ac38cef0eb66232efed"
+  ],
+  "takes": [
+    {
+      "asset_id": "output-141641dc8c374fad93fc0b56db5a383e",
+      "attempt_id": "141641dc8c374fad93fc0b56db5a383e",
+      "committed_at": "2026-11-17T06:11:46.314288Z",
+      "duration_ms": 5042,
+      "frame_rate": {
+        "denominator": 1,
+        "numerator": 24
+      },
+      "height": 704,
+      "id": "b3a4e02752574bd09d0392c14dcec3b6",
+      "project_id": "project-0ebe9e6ddab243cf8e91924211593c27",
+      "shot_id": "duration-05",
+      "width": 1280
+    }
+  ],
+  "attempts": [
+    {
+      "batch_id": "1226612319814a0d85c2d0d62a9c4357",
+      "completed_at": "2026-11-17T06:11:46.314288Z",
+      "failure_reason": null,
+      "id": "141641dc8c374fad93fc0b56db5a383e",
+      "lease_expires_at": "2026-11-17T06:12:10.375377Z",
+      "lease_id": "248fbd98f0da4dce9c686085b1f527a2",
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "project_id": "project-0ebe9e6ddab243cf8e91924211593c27",
+      "settings": {
+        "frame_rate": {
+          "denominator": 1,
+          "numerator": 24
+        },
+        "height": 704,
+        "seed": 42,
+        "steps": 50,
+        "width": 1280
+      },
+      "shot_id": "duration-05",
+      "shot_revision": 1,
+      "started_at": "2026-11-17T06:07:09.437185Z",
+      "state": "succeeded",
+      "worker_id": "john-duration-comparison-worker"
+    }
+  ],
+  "provider_create": null,
+  "allocation_attempts": [
+    {
+      "attempt": 1,
+      "finished_at": "2026-11-17T05:48:38.065637Z",
+      "result": {
+        "outcome": "allocated",
+        "pod_id": "5kolyuk9n1ete3"
+      },
+      "started_at": "2026-11-17T05:48:36.883914Z"
+    }
+  ],
+  "telemetry": [
+    {
+      "asset_bytes": 14014322,
+      "asset_sha256": "d1ca8eb36f151c8ca18fd29a692b531e2476ecdb53f36f1ad29967d84964650d",
+      "attempt_id": "141641dc8c374fad93fc0b56db5a383e",
+      "batch_id": "1226612319814a0d85c2d0d62a9c4357",
+      "cuda_version": "12.8",
+      "decode_encode_seconds": 11.948471100535244,
+      "driver_version": "595.91.07",
+      "fps": 24,
+      "frames": 121,
+      "generation_seconds": 177.81337797734886,
+      "gpu_model_loaded_reserved_bytes": 2929721344,
+      "gpu_name": "NVIDIA H100 80GB HBM3",
+      "gpu_peak_allocated_bytes": 20341129216,
+      "gpu_peak_reserved_bytes": 26891780096,
+      "gpu_total_bytes": 85019590656,
+      "height": 704,
+      "image_ref": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367",
+      "memory_policy": "sequential-gpu-text-bf16-vae-v1",
+      "model_load_seconds": 55.32946374081075,
+      "model_profile": {
+        "checkpoint_ref": "Wan-AI/Wan2.2-TI2V-5B@921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+        "code_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5",
+        "id": "wan22-ti2v-5b",
+        "revision": "1"
+      },
+      "protocol": "wan-duration-comparison-v1",
+      "render_and_verify_seconds": 273.0603376151994,
+      "target_duration_ms": 5000,
+      "torch_version": "2.8.0+cu128",
+      "upload_seconds": 0.9029587558470666,
+      "width": 1280
+    }
+  ],
+  "comparison_gate": {
+    "allowed": false,
+    "memory_limit_bytes": 76517631590,
+    "projected_reserved_bytes": 74815897600,
+    "reason": "insufficient_time_or_memory_headroom",
+    "remaining_seconds": 1084.399361,
+    "required_seconds": 1812.3982375944033
+  },
+  "cleanup_confirmed_observed_at": 1794895913.879243
+}

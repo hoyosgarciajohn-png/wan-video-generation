@@ -1,0 +1,124 @@
+{
+  "issue": 7,
+  "contract_version": "0.1.0",
+  "deployed_commit": "af3b013a1d485cc5278c6a2101ed62a673ef8032",
+  "private_protocol": "wan-duration-comparison-v1",
+  "image": "ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a3bbb9a2aba572de26609c5a4411dd3f705625fa33a9a97ae81193deb1719367",
+  "workflow_runs": {
+    "upgrade": 44025983221,
+    "prepare": 44026124821,
+    "admit": 44026224208,
+    "guard": 44026572576,
+    "launch": 44026660382,
+    "export": 44029555013
+  },
+  "admission": {
+    "status": "ADMITTED_NOT_LAUNCHED",
+    "project": "project-0ebe9e6ddab243cf8e91924211593c27",
+    "batch": "1226612319814a0d85c2d0d62a9c4357",
+    "deadline": 1794896991,
+    "scope": "[\"john-hoyos\",\"project-0ebe9e6ddab243cf8e91924211593c27\"]",
+    "pricing": {
+      "checked_at": 1794894291.0435336,
+      "gpu": "NVIDIA H100 80GB HBM3",
+      "region": "AP-IN-1",
+      "data_center_ids": [
+        "AP-IN-1",
+        "AP-JP-1",
+        "CA-MTL-1",
+        "EU-FR-1",
+        "US-CA-2",
+        "US-GA-2",
+        "US-MO-1",
+        "US-NE-1"
+      ],
+      "usd_per_hour": "4.39",
+      "min_cuda": "12.8"
+    }
+  },
+  "pod": {
+    "id": "5kolyuk9n1ete3",
+    "created_at": "2026-11-17T05:48:37.583Z",
+    "data_center": "US-MO-1",
+    "quote_usd_per_hour": 4.39,
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "gpu_total_mib": 81559,
+    "driver": "595.91.07"
+  },
+  "launch_quote": {
+    "observed_at": 1794894470.032,
+    "data": {
+      "availability": "LOW",
+      "community": true,
+      "cudaVersions": [
+        {
+          "available": true,
+          "version": "13.2"
+        }
+      ],
+      "dataCenters": [
+        {
+          "availability": "LOW",
+          "id": "AP-IN-1",
+          "name": "AP-IN-1"
+        },
+        {
+          "availability": "LOW",
+          "id": "AP-JP-1",
+          "name": "AP-JP-1"
+        },
+        {
+          "availability": "LOW",
+          "id": "CA-MTL-1",
+          "name": "CA-MTL-1"
+        },
+        {
+          "availability": "LOW",
+          "id": "EU-FR-1",
+          "name": "EU-FR-1"
+        },
+        {
+          "availability": "LOW",
+          "id": "US-CA-2",
+          "name": "US-CA-2"
+        },
+        {
+          "availability": "LOW",
+          "id": "US-GA-2",
+          "name": "US-GA-2"
+        },
+        {
+          "availability": "LOW",
+          "id": "US-MO-1",
+          "name": "US-MO-1"
+        },
+        {
+          "availability": "LOW",
+          "id": "US-NE-1",
+          "name": "US-NE-1"
+        }
+      ],
+      "id": "NVIDIA H100 80GB HBM3",
+      "manufacturer": "NVIDIA",
+      "maxCount": {
+        "community": 1,
+        "secure": 8
+      },
+      "memory": 80,
+      "minRam": 125,
+      "minVcpuCount": 16,
+      "name": "H100 SXM",
+      "pool": "ADA_80_PRO",
+      "price": {
+        "community": 2.69,
+        "secure": 4.39,
+        "serverless": 5.89
+      },
+      "secure": true
+    }
+  },
+  "export_artifact": {
+    "id": 14304462063,
+    "sha256": "5a98ea02452be2f28ecae5abac70a683e0390aa3b8b281e0f4e0f267f195f533"
+  }
+}

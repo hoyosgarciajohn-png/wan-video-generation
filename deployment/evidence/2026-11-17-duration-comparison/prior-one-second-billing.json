@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-11-17T05:53:13.220Z",
+  "data": {
+    "metadata": {
+      "query": {
+        "bucketSize": "hour",
+        "endTime": "2026-11-17T00:00:00Z",
+        "podId": "ymhk7srf23nend",
+        "startTime": "2026-11-16T23:00:00Z"
+      },
+      "recordCount": 1,
+      "totals": {
+        "cpuAmount": 0,
+        "diskAmount": 0.002777777728624642,
+        "gpuAmount": 1.3579123765230179,
+        "totalAmount": 1.3606901542516425
+      },
+      "uniquePodCount": 1
+    },
+    "records": [
+      {
+        "cpuAmount": 0,
+        "diskAmount": 0.002777777728624642,
+        "endTime": "2026-11-17T00:00:00Z",
+        "gpuAmount": 1.3579123765230179,
+        "podId": "ymhk7srf23nend",
+        "startTime": "2026-11-16T23:00:00Z",
+        "totalAmount": 1.3606901542516425
+      }
+    ]
+  }
+}

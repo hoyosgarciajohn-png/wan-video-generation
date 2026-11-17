@@ -1,0 +1,67 @@
+{
+  "observed_at": "2026-11-17T06:03:49.068Z",
+  "logs": {
+    "items": [
+      {
+        "source": "container",
+        "line": "Traceback (most recent call last):",
+        "ts": "2026-11-17T06:02:53.511448428Z"
+      },
+      {
+        "source": "container",
+        "line": "  File \"<frozen runpy>\", line 198, in _run_module_as_main",
+        "ts": "2026-11-17T06:02:53.514911563Z"
+      },
+      {
+        "source": "container",
+        "line": "  File \"<frozen runpy>\", line 88, in _run_code",
+        "ts": "2026-11-17T06:02:53.514966017Z"
+      },
+      {
+        "source": "container",
+        "line": "  File \"/app/workers/gpu/weights.py\", line 48, in <module>",
+        "ts": "2026-11-17T06:02:53.514979616Z"
+      },
+      {
+        "source": "container",
+        "line": "    (download if args.action == 'download' else verify)(args.directory)",
+        "ts": "2026-11-17T06:02:53.514988831Z"
+      },
+      {
+        "source": "container",
+        "line": "  File \"/app/workers/gpu/weights.py\", line 36, in download",
+        "ts": "2026-11-17T06:02:53.515051135Z"
+      },
+      {
+        "source": "container",
+        "line": "    require(count == item['bytes'] and digest(temp) == item['sha256'], 'Download mismatch')",
+        "ts": "2026-11-17T06:02:53.515060450Z"
+      },
+      {
+        "source": "container",
+        "line": "  File \"/app/workers/gpu/common.py\", line 23, in require",
+        "ts": "2026-11-17T06:02:53.515072624Z"
+      },
+      {
+        "source": "container",
+        "line": "    raise ValueError(message)",
+        "ts": "2026-11-17T06:02:53.515081219Z"
+      },
+      {
+        "source": "container",
+        "line": "ValueError: Download mismatch",
+        "ts": "2026-11-17T06:02:53.515093440Z"
+      }
+    ],
+    "count": 10,
+    "truncated": false
+  },
+  "inventory": {
+    "durationMs": 138,
+    "exitCode": 0,
+    "stderr": "",
+    "stdout": "{\"observed_at\": 1794895410.2630262, \"files\": [{\"path\": \"README.md\", \"bytes\": 15935}, {\"path\": \"Wan2.2_VAE.pth\", \"bytes\": 2818839170}, {\"path\": \"config.json\", \"bytes\": 251}, {\"path\": \"configuration.json\", \"bytes\": 43}, {\"path\": \"diffusion_pytorch_model-00001-of-00003.safetensors\", \"bytes\": 9825014472}, {\"path\": \"diffusion_pytorch_model-00002-of-00003.safetensors\", \"bytes\": 9995661736}, {\"path\": \"diffusion_pytorch_model-00003-of-00003.safetensors\", \"bytes\": 178558176}, {\"path\": \"diffusion_pytorch_model.safetensors.index.json\", \"bytes\": 72865}, {\"path\": \"tmpyyqstbgg\", \"bytes\": 0}, {\"path\": \"google/umt5-xxl/special_tokens_map.json\", \"bytes\": 6623}, {\"path\": \"google/umt5-xxl/spiece.model\", \"bytes\": 4548313}, {\"path\": \"google/umt5-xxl/tokenizer.json\", \"bytes\": 16837417}, {\"path\": \"google/umt5-xxl/tokenizer_config.json\", \"bytes\": 61728}], \"required_files\": [{\"path\": \"README.md\", \"bytes\": 15935}, {\"path\": \"Wan2.2_VAE.pth\", \"bytes\": 2818839170}, {\"path\": \"config.json\", \"bytes\": 251}, {\"path\": \"configuration.json\", \"bytes\": 43}, {\"path\": \"diffusion_pytorch_model-00001-of-00003.safetensors\", \"bytes\": 9825014472}, {\"path\": \"diffusion_pytorch_model-00002-of-00003.safetensors\", \"bytes\": 9995661736}, {\"path\": \"diffusion_pytorch_model-00003-of-00003.safetensors\", \"bytes\": 178558176}, {\"path\": \"diffusion_pytorch_model.safetensors.index.json\", \"bytes\": 72865}, {\"path\": \"google/umt5-xxl/special_tokens_map.json\", \"bytes\": 6623}, {\"path\": \"google/umt5-xxl/spiece.model\", \"bytes\": 4548313}, {\"path\": \"google/umt5-xxl/tokenizer.json\", \"bytes\": 16837417}, {\"path\": \"google/umt5-xxl/tokenizer_config.json\", \"bytes\": 61728}, {\"path\": \"models_t5_umt5-xxl-enc-bf16.pth\", \"bytes\": 11361920418}]}\n",
+    "timedOut": false,
+    "truncated": false
+  }
+}
