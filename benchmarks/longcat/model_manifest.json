@@ -1,0 +1,214 @@
+{
+  "status": "metadata_prepared_not_downloaded",
+  "source_repository": "https://github.com/meituan-longcat/LongCat-Video",
+  "source_revision": "58eb336edc5c8c63389838727e40b8c18434e54e",
+  "entrypoint": "run_demo_avatar_single_audio_to_video.py",
+  "entrypoint_sha256": "4a8abbf73385af5369399b18046325b8d322ba8a7998df34e92095d2dad21fa8",
+  "models": [
+    {
+      "repository": "meituan-longcat/LongCat-Video",
+      "revision": "03b55529b1d1d4045f5fbe14d65c8c6e8116b278",
+      "files": [
+        {
+          "path": "text_encoder/config.json",
+          "bytes": 854,
+          "sha256": null
+        },
+        {
+          "path": "text_encoder/model-00001-of-00005.safetensors",
+          "bytes": 4972389712,
+          "sha256": "c0ef3a140898e228a3520c9adec60743d2e8e5b3d229651bb37f1a3921919f99"
+        },
+        {
+          "path": "text_encoder/model-00002-of-00005.safetensors",
+          "bytes": 4899225672,
+          "sha256": "481c7b2b39771c44df6dd8d13ee12ed072d731b4a650bd092885d4d52db229ad"
+        },
+        {
+          "path": "text_encoder/model-00003-of-00005.safetensors",
+          "bytes": 4966309504,
+          "sha256": "f93148bcc04052a169e1e49bfcf6125df6cf9bf243cb9c627da75266cf8e35c3"
+        },
+        {
+          "path": "text_encoder/model-00004-of-00005.safetensors",
+          "bytes": 4999880704,
+          "sha256": "a451792c739c05bca4606190cc2dd16731411bac03b4cf6aacc5767321f857c9"
+        },
+        {
+          "path": "text_encoder/model-00005-of-00005.safetensors",
+          "bytes": 2885866152,
+          "sha256": "7e76e18d224531b8197a46231cb53daf7f2f6ca707130252becf933026ac4eea"
+        },
+        {
+          "path": "text_encoder/model.safetensors.index.json",
+          "bytes": 22476,
+          "sha256": null
+        },
+        {
+          "path": "tokenizer/special_tokens_map.json",
+          "bytes": 7079,
+          "sha256": null
+        },
+        {
+          "path": "tokenizer/spiece.model",
+          "bytes": 4548313,
+          "sha256": "e3909a67b780650b35cf529ac782ad2b6b26e6d1f849d3fbb6a872905f452458"
+        },
+        {
+          "path": "tokenizer/tokenizer.json",
+          "bytes": 16837459,
+          "sha256": "20a46ac256746594ed7e1e3ef733b83fbc5a6f0922aa7480eda961743de080ef"
+        },
+        {
+          "path": "tokenizer/tokenizer_config.json",
+          "bytes": 61758,
+          "sha256": null
+        },
+        {
+          "path": "vae/config.json",
+          "bytes": 724,
+          "sha256": null
+        },
+        {
+          "path": "vae/diffusion_pytorch_model.safetensors",
+          "bytes": 507591892,
+          "sha256": "d6e524b3fffede1787a74e81b30976dce5400c4439ba64222168e607ed19e793"
+        }
+      ],
+      "total_bytes": 23252742299
+    },
+    {
+      "repository": "meituan-longcat/LongCat-Video-Avatar-1.6",
+      "revision": "acfc628244201fc53fb6fe8a8903c5bac9bdf68f",
+      "files": [
+        {
+          "path": "base_model_int8/config.json",
+          "bytes": 854,
+          "sha256": null
+        },
+        {
+          "path": "base_model_int8/quantization_config.json",
+          "bytes": 193,
+          "sha256": null
+        },
+        {
+          "path": "base_model_int8/quantized_model-00001-of-00004.safetensors",
+          "bytes": 4264635792,
+          "sha256": "59bc93c0100bbeb2f1cd4fcb274e556270248beadbcd5ce3386a1b35070ed2b5"
+        },
+        {
+          "path": "base_model_int8/quantized_model-00002-of-00004.safetensors",
+          "bytes": 4275232472,
+          "sha256": "2e132eb2b8277a8c34ed6ac1ff823af35e7105219e18f7f619b943d8144b06f4"
+        },
+        {
+          "path": "base_model_int8/quantized_model-00003-of-00004.safetensors",
+          "bytes": 4275232472,
+          "sha256": "e382678dea3e8da14b9c0947381005b39268accba26df3aef0cb1b5e91852c2f"
+        },
+        {
+          "path": "base_model_int8/quantized_model-00004-of-00004.safetensors",
+          "bytes": 3065282200,
+          "sha256": "69d819629f55e5a06c295dc03c55ba94b3557c885879802237ce593b74fb4df6"
+        },
+        {
+          "path": "base_model_int8/quantized_model.safetensors.index.json",
+          "bytes": 201884,
+          "sha256": null
+        },
+        {
+          "path": "loraA/lora.safetensors",
+          "bytes": 2523077984,
+          "sha256": "6e0d1ce0d8b3fdfd63fbdae4c25e1bbbb286b1cb198a2ec07d4c945e883c188c"
+        },
+        {
+          "path": "loraB/lora.safetensors",
+          "bytes": 2523077984,
+          "sha256": "5efc11d8eaa298cfa60fa20ce8f57e894df07deff61c922166aed8f4503e660b"
+        },
+        {
+          "path": "scheduler/scheduler_config.json",
+          "bytes": 213,
+          "sha256": null
+        },
+        {
+          "path": "vocal_separator/Kim_Vocal_2.onnx",
+          "bytes": 66759214,
+          "sha256": "ce74ef3b6a6024ce44211a07be9cf8bc6d87728cc852a68ab34eb8e58cde9c8b"
+        },
+        {
+          "path": "vocal_separator/download_checks.json",
+          "bytes": 17194,
+          "sha256": null
+        },
+        {
+          "path": "vocal_separator/mdx_model_data.json",
+          "bytes": 11975,
+          "sha256": null
+        },
+        {
+          "path": "vocal_separator/vr_model_data.json",
+          "bytes": 4380,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/added_tokens.json",
+          "bytes": 34648,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/config.json",
+          "bytes": 1272,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/generation_config.json",
+          "bytes": 3903,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/merges.txt",
+          "bytes": 493869,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/model.safetensors",
+          "bytes": 3087130976,
+          "sha256": "a8e94b85976e5864ba3e9525c7e6c83b2a1eca42d4b797a0c7c24d778e40fd95"
+        },
+        {
+          "path": "whisper-large-v3/normalizer.json",
+          "bytes": 52666,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/preprocessor_config.json",
+          "bytes": 340,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/special_tokens_map.json",
+          "bytes": 2072,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/tokenizer.json",
+          "bytes": 2480617,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/tokenizer_config.json",
+          "bytes": 282843,
+          "sha256": null
+        },
+        {
+          "path": "whisper-large-v3/vocab.json",
+          "bytes": 1036558,
+          "sha256": null
+        }
+      ],
+      "total_bytes": 24085054575
+    }
+  ],
+  "total_model_bytes": 47337796874
+}
