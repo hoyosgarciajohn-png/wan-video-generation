@@ -46,6 +46,17 @@ Reserve estimated remaining cost before launch and before a retry. Move settled 
 
 ## Compatibility
 
+### Runtime policy 1.1.0
+
+`contracts/runtime-policy.json` is the shared operational duration policy. Version
+1.1.0 increases new music-video projects to 360000 milliseconds; short films and
+cartoons retain 1800000 milliseconds. The Studio client, project creator, bundle
+validator and media exporter consume the same values. A stored project's smaller
+`runtime_limit_ms` remains binding; no existing records or accepted takes are
+rewritten. B07 issue #8 coordinates B01–B05 consumers. Canonical wire records and
+bundle schema remain 0.1.0; this separate version replaces the former hard-coded
+five-minute operational policy. The change does not authorize GPU spending.
+
 The earlier starter ZIP used a compact draft with singular record keys. Keep it as archived planning evidence. Use the versioned bundle for new work. This is a new repository, with no production data to migrate. An additive or breaking change must increment contract version and provide an updated fixture and consumer handoff.
 
 ## Private duration experiment protocol v1

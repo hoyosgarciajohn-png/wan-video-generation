@@ -1,14 +1,11 @@
 import validBundle from "./generated/bundle-validator.cjs";
 import fixture from "../../../fixtures/project.json";
+import runtimePolicy from "../../../contracts/runtime-policy.json";
 import type { Asset, Batch, Bundle, Project, Shot, Take } from "./contract";
 
 export const OWNER = "fictional-owner";
 export const STORAGE_KEY = "wan-studio.fixture.0.1.0";
-export const caps = {
-  music_video: 300000,
-  short_film: 1800000,
-  cartoon: 1800000,
-};
+export const caps = runtimePolicy.runtime_caps_ms;
 const copy = <T>(value: T): T => structuredClone(value);
 const id = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 const now = () => new Date().toISOString();
@@ -391,7 +388,7 @@ function validProject(p: StudioProject): boolean {
   if (
     !validBundle(p.bundle) ||
     p.bundle.project.owner_id !== OWNER ||
-    p.bundle.project.runtime_limit_ms !== caps[p.bundle.project.kind] ||
+    p.bundle.project.runtime_limit_ms > caps[p.bundle.project.kind] ||
     !Array.isArray(p.scenes) ||
     !p.scenes.length ||
     p.scenes.some(

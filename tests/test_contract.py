@@ -19,6 +19,24 @@ class ContractTests(unittest.TestCase):
     def test_complete_fixture_and_media(self):
         validate_bundle(self.bundle, ROOT / "fixtures")
 
+    def test_six_minute_policy_preserves_smaller_project_limits(self):
+        bundle = self.bundle
+        bundle["project"]["runtime_limit_ms"] = 360000
+        validate_bundle(bundle)
+        bundle["project"]["runtime_limit_ms"] = 360001
+        with self.assertRaisesRegex(ValueError, "supported runtime cap"):
+            validate_bundle(bundle)
+        bundle["project"]["runtime_limit_ms"] = 300000
+        timeline = bundle["timelines"][0]
+        item = timeline["items"][0]
+        timeline["items"] = [deepcopy(item) for _ in range(170)] + [dict(item, source_out_ms=126)]
+        timeline["duration_ms"] = 340126
+        bundle["exports"] = []
+        with self.assertRaisesRegex(ValueError, "exceeds project runtime limit"):
+            validate_bundle(bundle)
+        bundle["project"]["runtime_limit_ms"] = 360000
+        validate_bundle(bundle)
+
     def test_cross_project_and_owner_references_are_rejected(self):
         for record, key in (("takes", "project_id"), ("assets", "owner_id")):
             with self.subTest(record=record, key=key):

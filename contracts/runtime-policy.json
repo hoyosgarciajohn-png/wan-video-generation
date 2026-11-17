@@ -1,0 +1,8 @@
+{
+  "policy_version": "1.1.0",
+  "runtime_caps_ms": {
+    "music_video": 360000,
+    "short_film": 1800000,
+    "cartoon": 1800000
+  }
+}

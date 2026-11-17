@@ -48,6 +48,7 @@ class StudioServiceTests(unittest.TestCase):
             restarted.get('')
         self.assertEqual(state['projects'][0]['bundle']['assets'], [])
         self.assertEqual(state['projects'][0]['bundle']['takes'], [])
+        self.assertEqual(state['projects'][0]['bundle']['project']['runtime_limit_ms'], 360000)
 
     def test_creator_fields_history_and_canonical_project_shared(self):
         state = self.add_shot(self.create())
@@ -63,6 +64,19 @@ class StudioServiceTests(unittest.TestCase):
         self.assertEqual(bundle['shots'][0]['revision'], 2)
         self.assertEqual(bundle['project']['title'], 'Renamed')
         self.assertEqual(StudioWorkspace(self.control).get(self.owner), state)
+
+    def test_edit_does_not_expand_existing_limit_or_accept_client_override(self):
+        state = self.create()
+        project_id = state['projects'][0]['bundle']['project']['id']
+        with self.control.transaction() as db:
+            bundle = self.control._load(db, self.owner, project_id)
+            bundle['project']['runtime_limit_ms'] = 300000
+            self.control._save(db, bundle)
+        state = self.studio.get(self.owner)
+        state['projects'][0]['bundle']['project'].update(title='Renamed legacy project', runtime_limit_ms=360000)
+        saved = self.studio.save(self.owner, state, state['revision'])
+        self.assertEqual(saved['projects'][0]['bundle']['project']['runtime_limit_ms'], 300000)
+        self.assertEqual(saved['projects'][0]['bundle']['project']['title'], 'Renamed legacy project')
 
     def test_optimistic_concurrency_and_whole_save_rollback(self):
         state = self.create()

@@ -9,11 +9,11 @@ import json
 from uuid import uuid4
 from urllib.parse import quote
 
-from scripts.validate_contract import COLLECTIONS, validate_bundle
+from scripts.validate_contract import COLLECTIONS, RUNTIME_CAPS, validate_bundle
 from services.controller.service import canonical
 from workers.gpu.common import record
 
-CAPS = {'music_video': 300000, 'short_film': 1800000, 'cartoon': 1800000}
+CAPS = RUNTIME_CAPS
 
 
 class StudioConflict(ValueError):
@@ -142,7 +142,9 @@ class StudioWorkspace:
         title, kind = project.get('title'), project.get('kind')
         require(isinstance(title, str) and 0 < len(title.strip()) <= 500, 'Project title must contain 1 to 500 characters')
         require(isinstance(kind, str) and kind in CAPS, 'Unknown project kind')
-        bundle['project'].update(title=title.strip(), kind=kind, runtime_limit_ms=CAPS[kind])
+        runtime_limit = (bundle['project']['runtime_limit_ms']
+                         if kind == bundle['project']['kind'] else CAPS[kind])
+        bundle['project'].update(title=title.strip(), kind=kind, runtime_limit_ms=runtime_limit)
         scenes = incoming.get('scenes')
         require(isinstance(scenes, list) and 0 < len(scenes) <= 1000, 'At least one scene required')
         scene_ids = set()

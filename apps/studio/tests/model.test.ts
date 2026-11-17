@@ -125,7 +125,7 @@ test("all project kinds enforce runtime caps and isolate project records", () =>
   for (const kind of ["music_video", "short_film", "cartoon"] as const) {
     const pid = createProject(state, "Fictional " + kind, kind);
     const p = projectFor(state, pid);
-    const limit = kind === "music_video" ? 300000 : 1800000;
+    const limit = kind === "music_video" ? 360000 : 1800000;
     assert.equal(p.bundle.project.runtime_limit_ms, limit);
     const shot = {
       ...state.projects[0].bundle.shots[0],

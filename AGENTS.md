@@ -138,3 +138,13 @@ Independent guard 44026572576 continues through 06:34:51 UTC; preserve the old
 unknown exception and all seven consumed scopes. No additional rental or render
 is authorized. Owner creative acceptance and continuous 15s remain pending.
 Read deployment/evidence/2026-11-17-duration-comparison/ for measured results.
+
+John subsequently directed completing the whole 5:40.126 music video as the real
+capability test, learning from failures, fixing problems and retrying until done.
+This authorizes preparation and corrective retries for the new B07 production;
+a short sample alone does not meet the goal. Preserve successful takes and retry
+affected work. See docs/B07_FULL_SONG_PRODUCTION.md and issue #8. No new numeric
+production budget or rental runtime envelope was supplied. Prepare the full
+workflow, but obtain that missing financial scope before paid admission. Never
+reset/replay any of the seven consumed grants. The older one-attempt rules remain
+historical facts for those scopes; they do not negate the new retry direction.
