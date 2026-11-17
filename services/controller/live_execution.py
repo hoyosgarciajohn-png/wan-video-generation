@@ -153,7 +153,7 @@ class LiveExecution:
         reservation=db.execute('SELECT state,reserved_cents FROM live_reservations WHERE batch=?',(batch_id,)).fetchone()
         spent=db.execute('SELECT COALESCE(SUM(amount_cents),0) FROM live_billing_events WHERE batch=?',(batch_id,)).fetchone()[0]
         batch['budget'].update(spent_cents=spent,reserved_cents=max(0,reservation[1]-spent) if reservation[0]=='reserved' else 0)
-        self.control._reconcile(bundle,batch,self.control.clock())
+        self.control._reconcile(bundle,batch,self.control.clock(), db)
         self.synchronize(db,bundle,batch)
         self.control._save(db,bundle)
         return dict(batch=deepcopy(batch),budget=totals(db,owner,project),dispatch_state=link[2],reservation_state=reservation[0])

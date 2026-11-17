@@ -152,7 +152,10 @@ class ControlService:
         if queue is not None: envelope['continuous_queue'] = deepcopy(queue)
         return envelope
 
-    def _reconcile(self, bundle, batch, now):
+    def _reconcile(self, bundle, batch, now, db=None):
+        from .production import policy
+        queue=policy(db,batch) if db is not None else None
+        limit=queue['max_attempts_per_shot'] if queue else self.max_attempts
         for attempt in bundle['attempts']:
             if attempt['batch_id'] != batch['id'] or attempt['state'] not in ('claimed','running'):
                 continue
@@ -167,7 +170,7 @@ class ControlService:
             for snapshot in batch['shot_snapshots']:
                 attempts = [a for a in bundle['attempts'] if a['batch_id'] == batch['id']
                             and a['shot_id'] == snapshot['shot_id']]
-                if len(attempts) >= self.max_attempts and all(a['state'] == 'failed' for a in attempts):
+                if len(attempts) >= limit and all(a['state'] == 'failed' for a in attempts):
                     batch['state'] = 'failed'
                     # An exhausted shot closes the batch without requiring a new
                     # worker claim. Fence any other in-flight shots immediately.
@@ -182,7 +185,7 @@ class ControlService:
             bundle = self._load(db, client.owner, client.project)
             batch = self._batch(bundle, client.batch)
             now = self.clock()
-            self._reconcile(bundle, batch, now)
+            self._reconcile(bundle, batch, now, db)
             experiment = comparison.experiment(db,batch)
             from .production import policy as production_policy
             queue = production_policy(db,batch)
@@ -206,7 +209,7 @@ class ControlService:
                         attempts = [a for a in bundle['attempts'] if a['batch_id'] == batch['id'] and a['shot_id'] == snapshot['shot_id']]
                         if any(a['state'] in ('claimed','running','succeeded') for a in attempts):
                             continue
-                        if len(attempts) >= self.max_attempts:
+                        if len(attempts) >= (queue['max_attempts_per_shot'] if queue else self.max_attempts):
                             batch['state'] = 'failed'
                             break
                         if not comparison.claim_gate(db,bundle,batch,snapshot,now):
@@ -252,7 +255,7 @@ class ControlService:
                 attempt.update(state='failed', completed_at=stamp(now), failure_reason=payload)
                 if queue and payload in ('gpu_out_of_memory','model_load_failed'):
                     batch['state'] = 'failed'
-                self._reconcile(bundle, batch, now)
+                self._reconcile(bundle, batch, now, db)
                 result = None
             elif action == 'complete':
                 result = self._complete(db, bundle, batch, attempt, payload, now)
@@ -306,7 +309,7 @@ class ControlService:
             batch = self._batch(bundle, batch_id)
             if batch['state'] == 'rendering':
                 batch['state'] = 'canceled'
-            self._reconcile(bundle, batch, self.clock())
+            self._reconcile(bundle, batch, self.clock(), db)
             self._save(db, bundle)
             return deepcopy(batch)
 

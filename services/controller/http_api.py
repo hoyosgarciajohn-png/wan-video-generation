@@ -270,7 +270,7 @@ class StudioAPI:
                     size = file.stat().st_size
                 except (KeyError, StopIteration, OSError, ValueError):
                     raise HTTPError(404)
-                allowed = {'video/mp4', 'audio/wav', 'audio/mpeg', 'image/png', 'image/jpeg', 'image/webp'}
+                allowed = {'video/mp4', 'audio/wav', 'audio/mpeg', 'audio/mp4', 'image/png', 'image/jpeg', 'image/webp'}
                 if asset['mime_type'] not in allowed or size != asset['bytes']:
                     raise HTTPError(404)
                 start, end, status = 0, size - 1, 200

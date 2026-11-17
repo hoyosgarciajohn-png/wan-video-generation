@@ -56,6 +56,8 @@ ALLOW_KNOWN_UNKNOWN = False
 CAPACITY_RETRY = False
 MULTI_GPU = False
 COMPARISON = False
+SINGING = False
+POD_CAP_CENTS = 400
 RUNTIME_SECONDS = 1800
 HOURLY_CEILING = Decimal('1.00')
 
@@ -64,14 +66,28 @@ def select_trial(name):
     """Allowlisted operator scope, never an arbitrary path or mutable retry."""
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
-    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU, MULTI_GPU, COMPARISON, RUNTIME_SECONDS
+    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU, MULTI_GPU, COMPARISON, RUNTIME_SECONDS, SINGING, POD_CAP_CENTS
+    SINGING = name == 'singing'
+    POD_CAP_CENTS = 1800 if SINGING else 400
     COMPARISON = name == 'comparison'
-    RUNTIME_SECONDS = 2700 if COMPARISON else 1800
+    RUNTIME_SECONDS = 14400 if SINGING else 2700 if COMPARISON else 1800
     MULTI_GPU = name == 'allocation'
-    CAPACITY_RETRY = name in ('fallback', 'allocation','comparison')
-    HOURLY_CEILING = Decimal('4.50') if MULTI_GPU or COMPARISON else Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
+    CAPACITY_RETRY = name in ('fallback', 'allocation','comparison','singing')
+    HOURLY_CEILING = Decimal('4.50') if MULTI_GPU or COMPARISON or SINGING else Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
     GPU = 'NVIDIA GeForce RTX 4090'
-    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback','allocation','comparison')
+    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback','allocation','comparison','singing')
+    if SINGING:
+        select_repair_trial('validation')
+        proposal=read(ROOT/'deployment/song-production.json')
+        assert proposal['approved_caps'] == dict(total_cents=2000,gpu_cents=1800,storage_cents=200,runtime_seconds=14400,hourly_cents=450)
+        TRIAL=STATE/'singing-trial-20261117'
+        AUTH=Path('/etc/wan/singing-trial-authority-20261117.json')
+        TITLE=proposal['title'];GPU='NVIDIA H100 80GB HBM3'
+        IMAGE=proposal['image'];assert isinstance(IMAGE,str) and '@sha256:' in IMAGE
+        BUILD_EVIDENCE='2026-11-17-singing-build'
+        APPROVAL_ID='john-full-song-20261117';IDEMPOTENCY_KEY='john-full-song-continuous-v1';WORKER_ID='john-singing-worker'
+        EXPECTED_PRIOR_BATCHES.update({'bee9e55b1d4a4f458771ad4ac69c3318','4e87af47cce0477b8750b2e4681b722d','0a30c22ff1a8493bbe2714ad36cd0321','1226612319814a0d85c2d0d62a9c4357'})
+        return
     if COMPARISON:
         select_repair_trial('validation')
         proposal=read(ROOT/'deployment/duration-comparison-proposal.json')
@@ -210,7 +226,7 @@ def services():
         host_keys={'host': (OWNER, bytes.fromhex(keys['host']))}, build_evidence=TRIAL / 'build')
     e = LiveExecution(a, runpod_token=Path('/etc/wan/runpod-token').read_text().strip(),
         transport=https_transport(), billing_keys={'billing': (OWNER, bytes.fromhex(keys['billing']))},
-        candidate_check=candidate_available if MULTI_GPU else comparison_available if COMPARISON else None)
+        candidate_check=candidate_available if MULTI_GPU else comparison_available if COMPARISON or SINGING else None)
     return c, a, e
 
 
@@ -247,7 +263,7 @@ def candidate_available(candidate, ceiling):
 
 
 def comparison_available(candidate, ceiling):
-    assert COMPARISON and ceiling==450 and candidate['gpu_type']==GPU
+    assert (COMPARISON or SINGING) and ceiling==450 and candidate['gpu_type']==GPU
     checked_quote(candidate['data_center_ids'])
     return True
 
@@ -287,7 +303,7 @@ def checked_quote(region=None):
     if MULTI_GPU:
         return allocation_quote(region)
     value = catalog_snapshot()
-    if CAPACITY_RETRY and not COMPARISON and region is None:
+    if CAPACITY_RETRY and not (COMPARISON or SINGING) and region is None:
         assert value['id'] in ('NVIDIA GeForce RTX 4090','NVIDIA L40S')
         GPU = value['id']
     price = Decimal(str(value['price']['secure']))
@@ -343,6 +359,10 @@ def primary_ready():
 
 
 def prepare():
+    if SINGING:
+        import sys
+        from deployment.song_trial import prepare as prepare_song
+        return prepare_song(sys.modules[__name__])
     primary_ready()
     previous = read(STATE / 'acceptance-20261116/result.json')
     assert previous['http_workflow'] == previous['restart_persistence'] == previous['cleanup_during_controller_stop'] == 'PASS'
@@ -390,7 +410,7 @@ def prepare():
         grant['allocation_plan'] = pricing['allocation_plan']
     if COMPARISON:
         grant['duration_comparison']=comparison.policy(['duration-05','duration-15'],IMAGE)
-    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison')), source_sha256=grant['source_sha256'],
+    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison'), grant.get('continuous_queue')), source_sha256=grant['source_sha256'],
         build_manifest_sha256=build['manifest_sha256'], valid_until=expires, worker_endpoint=ORIGIN, storage_id=profile['storage_id'])
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
     atomic_json(TRIAL / 'host.json', sign(host, 'host', HOST_DOMAIN))
@@ -425,7 +445,7 @@ def refresh_unregistered_validation(c, saved):
     host = read(TRIAL / 'host.json')
     grant = deepcopy(approval['payload'])
     assert grant['id'] == APPROVAL_ID and grant['owner'] == OWNER and grant['project'] == saved['project']
-    assert (grant['approved_cents'], grant['max_runtime_seconds']) == (400, RUNTIME_SECONDS)
+    assert (grant['approved_cents'], grant['max_runtime_seconds']) == (POD_CAP_CENTS, RUNTIME_SECONDS)
     # Retain the prior signed preparation as evidence. It never reached the DB.
     history = TRIAL / 'pre-admission-history'
     history.mkdir(mode=0o700, exist_ok=True)
@@ -443,7 +463,7 @@ def refresh_unregistered_validation(c, saved):
     grant['source_sha256'] = _sources()
     grant['valid_until'] = stamp(utcnow() + timedelta(hours=6))
     attestation = deepcopy(host['payload'])
-    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison')),
+    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison'), grant.get('continuous_queue')),
                        source_sha256=grant['source_sha256'], valid_until=grant['valid_until'])
     saved = dict(saved, pricing=current, source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip())
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
@@ -466,8 +486,8 @@ def admit():
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
-    request = dict(approval_id=APPROVAL_ID, shot_ids=['duration-05','duration-15'] if COMPARISON else [saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
-        reservation_cents=400, runtime_seconds=RUNTIME_SECONDS, idempotency_key=IDEMPOTENCY_KEY)
+    request = dict(approval_id=APPROVAL_ID, shot_ids=saved['shot_ids'] if SINGING else ['duration-05','duration-15'] if COMPARISON else [saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
+        reservation_cents=POD_CAP_CENTS, runtime_seconds=RUNTIME_SECONDS, idempotency_key=IDEMPOTENCY_KEY)
     result = a.submit(OWNER, saved['project'], request)
     batch = result['batch']['id']
     atomic_json(TRIAL / 'job.json', dict(project=saved['project'], batch=batch,
@@ -591,6 +611,10 @@ def launch():
 
 
 def export():
+    if SINGING:
+        import sys
+        from deployment.song_trial import export as export_song
+        return export_song(sys.modules[__name__])
     assert COMPARISON
     summary=observe()
     assert summary['batch']['cleanup_state']=='confirmed' and summary['batch']['state'] in ('succeeded','failed','canceled')
@@ -617,7 +641,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe','export'])
-    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation','comparison'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation','comparison','singing'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe,'export':export}[args.operation]()

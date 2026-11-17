@@ -18,6 +18,7 @@ from tests.test_live_execution import HTTP
 class SingingAdmissionTests(unittest.TestCase):
     def setUp(self):
         test_live_admission.LiveAdmissionTests.setUp(self)
+        self.control.max_attempts=1
         state=self.studio.get(self.owner);bundle=state['projects'][0]['bundle']
         original=deepcopy(bundle['shots'][0]);bundle['shots']=[]
         for i in range(2):
@@ -101,6 +102,10 @@ class SingingAdmissionTests(unittest.TestCase):
             return dict(model_profile=deepcopy(c['batch']['model_profile']),model_load_seconds=1,generation_seconds=2,
                 decode_encode_seconds=1,gpu_peak_allocated_bytes=100,gpu_peak_reserved_bytes=200,process_start='warm')
         first=client.claim();validate_claim(first)
+        client.fail(first['attempt'],'render_failed')
+        retried=client.claim();self.assertIsNotNone(retried)
+        self.assertNotEqual(first['attempt']['id'],retried['attempt']['id'])
+        first=retried
         self.assertEqual(client.claim()['attempt']['id'],first['attempt']['id'])
         other=workers.issue(self.owner,self.project,batch,'other-song-worker',ttl_seconds=14700)['token']
         self.assertIsNone(workers.call('Bearer '+other,'claim',{}))

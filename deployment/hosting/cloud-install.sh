@@ -76,6 +76,7 @@ if [[ "$operation" == trial-* ]]; then
         fallback) trial_dir=/var/lib/wan/fallback-trial-20261116 ;;
         allocation) trial_dir=/var/lib/wan/allocation-trial-20261116 ;;
         comparison) trial_dir=/var/lib/wan/comparison-trial-20261116 ;;
+        singing) trial_dir=/var/lib/wan/singing-trial-20261117 ;;
         *) fail 'Unknown trial scope' ;;
     esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then
@@ -106,6 +107,11 @@ PY
     fi
     ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}' --trial '$trial'"
     if [[ "$operation" == trial-export ]]; then
+        if [[ "$trial" == singing ]]; then
+            mkdir -p "$RUNNER_TEMP/wan-song"
+            scp -r "${ssh_options[@]}" "root@$host:$trial_dir/song-output/." "$RUNNER_TEMP/wan-song/"
+            exit
+        fi
         [[ "$trial" == comparison ]] || fail 'Comparison export scope required'
         mkdir -p "$RUNNER_TEMP/wan-comparison"
         scp -r "${ssh_options[@]}" "root@$host:$trial_dir/comparison-output/." "$RUNNER_TEMP/wan-comparison/"

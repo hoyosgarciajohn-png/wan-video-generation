@@ -1,0 +1,90 @@
+[
+    {
+        "Id": "sha256:04dc806e3fe0d69dbc304a240f170470f12b17d4fa8ec108352663a38273ddf8",
+        "RepoTags": [
+            "wan-gpu-verify:ac9d3fab4adb"
+        ],
+        "RepoDigests": [],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-11-17T08:08:32.625863716Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NVIDIA_VISIBLE_DEVICES=all",
+                "NVIDIA_DRIVER_CAPABILITIES=compute,utility",
+                "LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64",
+                "PYTORCH_VERSION=2.8.0",
+                "WAN_SOURCE=/opt/wan",
+                "HF_HUB_OFFLINE=1",
+                "TRANSFORMERS_OFFLINE=1",
+                "IMAGEIO_FFMPEG_EXE=/usr/local/bin/ffmpeg",
+                "PYTHONDONTWRITEBYTECODE=1"
+            ],
+            "Cmd": null,
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "/app",
+            "Entrypoint": [
+                "python",
+                "-m",
+                "workers.gpu.cli"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "com.nvidia.volumes.needed": "nvidia_driver",
+                "org.opencontainers.image.ref.name": "ubuntu",
+                "org.opencontainers.image.version": "22.04"
+            }
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 10507209804,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/g5m8ew1yk5vjd4hopzy0rjttr/diff:/var/lib/docker/overlay2/6nuwrjbeam19u03v2q907sc9i/diff:/var/lib/docker/overlay2/td7kwpxex228umrrqij54p5sy/diff:/var/lib/docker/overlay2/6kuqbl3qiml02f12h6bxmqm2e/diff:/var/lib/docker/overlay2/mug5u0xmvx26f9iaqkl6deltq/diff:/var/lib/docker/overlay2/okobtrgomrku8739mp9c0ne9f/diff:/var/lib/docker/overlay2/jq2u3u308c2l2v8d3wbs2tldg/diff:/var/lib/docker/overlay2/2lqydcnlmk7i8rfh1o4vlq1gy/diff:/var/lib/docker/overlay2/4g4hg6vajd69qgl4h0k2jy9lj/diff:/var/lib/docker/overlay2/n0x7wjarlgxnmeqnbk9hwcec8/diff:/var/lib/docker/overlay2/g8agubh0qzpwf8ofsm7bwr5l8/diff:/var/lib/docker/overlay2/7v9zmbifi6i481g5ei5udxw8h/diff:/var/lib/docker/overlay2/a10866638cd7a34a0aecd253170ea0a017545ab7032bdd4e48b46fb0bf342795/diff:/var/lib/docker/overlay2/ea5f58edc82a63092f24a345b7494077caf90a826a94e13b5ed8cf74ac7a9d1f/diff:/var/lib/docker/overlay2/8f2cf4d326b63d8de9ba4d7284abd987e64d956a8baaeb0f9469dca770a6bd65/diff:/var/lib/docker/overlay2/384a2af329ae08e03bf38ad07b21956f1cbdc4c5da4dc3894cb1349cf727f724/diff:/var/lib/docker/overlay2/01dad4e7d4834c33edb1ef05985a3875673c9dc308f2b8a4c00a353a1e427c71/diff",
+                "MergedDir": "/var/lib/docker/overlay2/jegwtbz1jrc8vfxiero3dh8u9/merged",
+                "UpperDir": "/var/lib/docker/overlay2/jegwtbz1jrc8vfxiero3dh8u9/diff",
+                "WorkDir": "/var/lib/docker/overlay2/jegwtbz1jrc8vfxiero3dh8u9/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:3cc982388b71ef357e0157e0b7d3059dcefa4dc9fd2e3815bde6c6ce040302f3",
+                "sha256:574501c8d7d0c0a3e4756cf91d6d517a50d69b3355f3eadd9a6cb7b8f88334e1",
+                "sha256:99a4f2df9c934e6a4efc4f61a96ebe8f44727f5213776355b1795290b197533c",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+                "sha256:026db027580493d2f7409238901521387c4961a6d0f99242e20394f994904412",
+                "sha256:d6836a2c048f3f5013eaa5a29381f6eef207332486a4030582e0f0210ff2e1f6",
+                "sha256:322c91ceb3d77e2aa1ceb55070f0835d0c3613b915bd678bb3c8ebe795499990",
+                "sha256:953fdb0e75a2a51296f646bafc82ff9760e2fa7aa88532af230f3c4cfd123260",
+                "sha256:a7c9748fa6a96787d348f6615e0a67beb6692f87a391ac168263a7994fa93560",
+                "sha256:a41dac9f4b4a39a6577a439933778f9a845544177574eea66394b5ae3744e608",
+                "sha256:b5990b7ff3d432d62fc062f4363f890ae6c0c8effe6b8a3dfb0d28124ba68761",
+                "sha256:c74d174442cd608b3a4570f39ae72fe2a404434124295bee15ec349e84593544",
+                "sha256:b034fd27d0639482219a8754a6ada55dc2afbc02f0b2133f8c7d00ee30d3664f",
+                "sha256:c4d86af55091eb761dd1869398d8c61350350ca5b21f1eceac67e562934afd19",
+                "sha256:cc0b4495acb2ddf0b16c5784ba8e834521691d88bdabde6f7ada2f052c224352",
+                "sha256:6002c1153203f7c10a2df63a6fcfb3c96d9b4a4905d5dd3324ba40a046037b8e",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+                "sha256:c5489f5e9d1b97bb910da4a398f21353e6abf299dad5858702b3c9a5347683f6"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-11-17T08:09:10.858357091Z"
+        }
+    }
+]

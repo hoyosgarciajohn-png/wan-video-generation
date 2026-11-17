@@ -1,0 +1,7 @@
+# Full-song operational preparation
+
+Issue #8. Fictional checks only: 210 controller/lifecycle/export tests, 18 Studio tests, production build and shared contract validation passed. Full 68-segment, 340.126-second preparation and complete HD draft export exercised; a 67-segment input remains explicitly partial. Live identity, lip synchronization, motion, throughput and GPU fit remain unverified.
+
+The private singing worker was published by run 44043457639 from ac9d3fab4adb93872d1b8462d5d3022610d7ff21. Build evidence verifies the immutable digest and exact worker sources. No worker changes are introduced in this operational release.
+
+Fresh B07 only: $20 total, $18 GPU, $2 storage, four hours from admission, at most $4.50/hour, one H100, two attempts per clip, three capacity-only allocation requests. The original seven scopes, liabilities and unresolved historical request are retained. Completed clips survive worker deletion. A complete draft still requires owner creative acceptance.
