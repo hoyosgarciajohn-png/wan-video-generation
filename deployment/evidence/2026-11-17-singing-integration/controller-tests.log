@@ -1,0 +1,268 @@
+test_empty_or_skipped_discovery_cannot_pass (integration.test_evidence.EvidenceReportingTests.test_empty_or_skipped_discovery_cannot_pass) ... ok
+test_failed_command_is_preserved (integration.test_evidence.EvidenceReportingTests.test_failed_command_is_preserved) ... ok
+test_missing_executable_and_timeout_are_failures (integration.test_evidence.EvidenceReportingTests.test_missing_executable_and_timeout_are_failures) ... ok
+test_successful_discovery_records_count (integration.test_evidence.EvidenceReportingTests.test_successful_discovery_records_count) ... ok
+test_failed_attempt_retry_cannot_receive_a_committed_take (integration.test_preparation.IntegrationPreparationTests.test_failed_attempt_retry_cannot_receive_a_committed_take) ... ok
+test_foreign_assets_cannot_be_grafted_by_rewriting_project_id (integration.test_preparation.IntegrationPreparationTests.test_foreign_assets_cannot_be_grafted_by_rewriting_project_id) ... ok
+test_foreign_references_are_rejected_across_component_boundaries (integration.test_preparation.IntegrationPreparationTests.test_foreign_references_are_rejected_across_component_boundaries) ... ok
+test_missing_and_partial_uploads_fail_media_verification (integration.test_preparation.IntegrationPreparationTests.test_missing_and_partial_uploads_fail_media_verification) ... ok
+test_music_film_and_cartoon_timeline_boundaries (integration.test_preparation.IntegrationPreparationTests.test_music_film_and_cartoon_timeline_boundaries) ... ok
+test_replacement_preserves_old_take_and_export_revision (integration.test_preparation.IntegrationPreparationTests.test_replacement_preserves_old_take_and_export_revision) ... ok
+test_retry_with_expired_lease_cannot_commit (integration.test_preparation.IntegrationPreparationTests.test_retry_with_expired_lease_cannot_commit) ... ok
+test_symlink_cannot_escape_media_root (integration.test_preparation.IntegrationPreparationTests.test_symlink_cannot_escape_media_root) ... ok
+test_synthetic_sources_decode_completely_without_mutation (integration.test_preparation.IntegrationPreparationTests.test_synthetic_sources_decode_completely_without_mutation) ... ok
+test_two_project_fixtures_validate_with_scoped_media (integration.test_preparation.IntegrationPreparationTests.test_two_project_fixtures_validate_with_scoped_media) ... ok
+test_500_with_capacity_text_is_uncertain_not_retryable (test_allocation_candidates.AllocationCandidateTests.test_500_with_capacity_text_is_uncertain_not_retryable) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 500, "request_id": "fictional-1", "outcome": "unknown", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_cancellation_during_backoff_prevents_next_post (test_allocation_candidates.AllocationCandidateTests.test_cancellation_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_crash_after_start_is_never_reposted (test_allocation_candidates.AllocationCandidateTests.test_crash_after_start_is_never_reposted) ... ok
+test_deadline_during_backoff_prevents_next_post (test_allocation_candidates.AllocationCandidateTests.test_deadline_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_old_host_attestation_does_not_authorize_plan (test_allocation_candidates.AllocationCandidateTests.test_old_host_attestation_does_not_authorize_plan) ... ok
+test_other_400_and_server_failure_do_not_retry (test_allocation_candidates.AllocationCandidateTests.test_other_400_and_server_failure_do_not_retry) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "Invalid image"}
+ok
+test_rejected_twice_then_one_allocation_and_no_replay (test_allocation_candidates.AllocationCandidateTests.test_rejected_twice_then_one_allocation_and_no_replay) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_revocation_during_backoff_prevents_next_post (test_allocation_candidates.AllocationCandidateTests.test_revocation_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_signed_policy_cannot_expand_attempts_or_use_boolean (test_allocation_candidates.AllocationCandidateTests.test_signed_policy_cannot_expand_attempts_or_use_boolean) ... ok
+test_skips_unavailable_candidate_and_never_repeats_one (test_allocation_candidates.AllocationCandidateTests.test_skips_unavailable_candidate_and_never_repeats_one) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_stale_quote_after_rejection_stops_before_next_post (test_allocation_candidates.AllocationCandidateTests.test_stale_quote_after_rejection_stops_before_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_switches_gpu_locations_preserving_identity_and_constraints (test_allocation_candidates.AllocationCandidateTests.test_switches_gpu_locations_preserving_identity_and_constraints) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_tampered_plan_ceiling_gpu_and_commands_rejected (test_allocation_candidates.AllocationCandidateTests.test_tampered_plan_ceiling_gpu_and_commands_rejected) ... ok
+test_three_rejections_exhaust_cap_without_new_reservation_or_deadline (test_allocation_candidates.AllocationCandidateTests.test_three_rejections_exhaust_cap_without_new_reservation_or_deadline) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-3", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_unknown_response_stops_and_restart_only_reconciles (test_allocation_candidates.AllocationCandidateTests.test_unknown_response_stops_and_restart_only_reconciles) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_500_with_capacity_text_is_uncertain_not_retryable (test_allocation_retry.AllocationRetryTests.test_500_with_capacity_text_is_uncertain_not_retryable) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 500, "request_id": "fictional-1", "outcome": "unknown", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_cancellation_during_backoff_prevents_next_post (test_allocation_retry.AllocationRetryTests.test_cancellation_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_crash_after_start_is_never_reposted (test_allocation_retry.AllocationRetryTests.test_crash_after_start_is_never_reposted) ... ok
+test_deadline_during_backoff_prevents_next_post (test_allocation_retry.AllocationRetryTests.test_deadline_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_other_400_and_server_failure_do_not_retry (test_allocation_retry.AllocationRetryTests.test_other_400_and_server_failure_do_not_retry) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "Invalid image"}
+ok
+test_rejected_twice_then_one_allocation_and_no_replay (test_allocation_retry.AllocationRetryTests.test_rejected_twice_then_one_allocation_and_no_replay) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_revocation_during_backoff_prevents_next_post (test_allocation_retry.AllocationRetryTests.test_revocation_during_backoff_prevents_next_post) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_signed_policy_cannot_expand_attempts_or_use_boolean (test_allocation_retry.AllocationRetryTests.test_signed_policy_cannot_expand_attempts_or_use_boolean) ... ok
+test_three_rejections_exhaust_cap_without_new_reservation_or_deadline (test_allocation_retry.AllocationRetryTests.test_three_rejections_exhaust_cap_without_new_reservation_or_deadline) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-2", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-3", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+ok
+test_unknown_response_stops_and_restart_only_reconciles (test_allocation_retry.AllocationRetryTests.test_unknown_response_stops_and_restart_only_reconciles) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "fictional-1", "outcome": "rejected", "detail": "There are no longer any instances available with the requested specifications. Please refresh and try again."}
+WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_ambiguous_create_reconciles_after_restart (test_b02_lifecycle.LifecycleTests.test_ambiguous_create_reconciles_after_restart) ... ok
+test_cancel_and_failed_delete_are_independent (test_b02_lifecycle.LifecycleTests.test_cancel_and_failed_delete_are_independent) ... ok
+test_cancel_before_dispatch_and_late_pod_after_timeout (test_b02_lifecycle.LifecycleTests.test_cancel_before_dispatch_and_late_pod_after_timeout) ... ok
+test_deadline_and_success_preserve_distinct_outcomes (test_b02_lifecycle.LifecycleTests.test_deadline_and_success_preserve_distinct_outcomes) ... ok
+test_duplicate_request_and_project_scope (test_b02_lifecycle.LifecycleTests.test_duplicate_request_and_project_scope) ... ok
+test_old_unknown_history_migrates_without_inventing_rejection (test_b02_lifecycle.LifecycleTests.test_old_unknown_history_migrates_without_inventing_rejection) ... ok
+test_unknown_dispatch_is_not_retried_or_marked_clean (test_b02_lifecycle.LifecycleTests.test_unknown_dispatch_is_not_retried_or_marked_clean) ... ok
+test_bad_or_repeated_pagination_never_returns_partial_matches (test_b02_runpod.RunpodTests.test_bad_or_repeated_pagination_never_returns_partial_matches) ... ok
+test_create_and_paginated_inventory_match_exact_scoped_name (test_b02_runpod.RunpodTests.test_create_and_paginated_inventory_match_exact_scoped_name) ... ok
+test_create_error_retains_safe_status_without_retry_or_secret (test_b02_runpod.RunpodTests.test_create_error_retains_safe_status_without_retry_or_secret) ... ok
+test_create_wrong_identity_and_unexpected_status_are_uncertain (test_b02_runpod.RunpodTests.test_create_wrong_identity_and_unexpected_status_are_uncertain) ... WAN_PROVIDER_CREATE_RESULT {"kind": "invalid_identity", "http_status": 201, "request_id": null, "outcome": "unknown"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": 200, "request_id": null, "outcome": "unknown"}
+ok
+test_default_network_disabled_and_profile_copied (test_b02_runpod.RunpodTests.test_default_network_disabled_and_profile_copied) ... ok
+test_delete_is_only_acknowledgment_then_get_confirms_absence (test_b02_runpod.RunpodTests.test_delete_is_only_acknowledgment_then_get_confirms_absence) ... ok
+test_failures_never_establish_absence_or_leak_body (test_b02_runpod.RunpodTests.test_failures_never_establish_absence_or_leak_body) ... ok
+test_multiple_data_centers_are_explicit_unique_and_bounded (test_b02_runpod.RunpodTests.test_multiple_data_centers_are_explicit_unique_and_bounded) ... ok
+test_network_profile_and_rejected_mounts_queue_legacy (test_b02_runpod.RunpodTests.test_network_profile_and_rejected_mounts_queue_legacy) ... ok
+test_oversized_invalid_json_and_redirect_rejected (test_b02_runpod.RunpodTests.test_oversized_invalid_json_and_redirect_rejected) ... ok
+test_oversized_or_non_json_error_is_bounded_without_changing_rejection (test_b02_runpod.RunpodTests.test_oversized_or_non_json_error_is_bounded_without_changing_rejection) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 422, "request_id": null, "outcome": "rejected"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 422, "request_id": null, "outcome": "rejected"}
+ok
+test_rejection_keeps_detail_and_request_id_redacts_secrets_and_input (test_b02_runpod.RunpodTests.test_rejection_keeps_detail_and_request_id_redacts_secrets_and_input) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": "req-fictional-123", "outcome": "rejected", "title": "Bad Request", "detail": "No capacity. [redacted] [redacted] [redacted-url] Bearer [redacted] next line", "validation_messages": ["Invalid configuration"]}
+ok
+test_timeout_408_5xx_and_invalid_success_stay_unknown (test_b02_runpod.RunpodTests.test_timeout_408_5xx_and_invalid_success_stay_unknown) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 408, "request_id": null, "outcome": "unknown"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 500, "request_id": null, "outcome": "unknown"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 503, "request_id": null, "outcome": "unknown"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_unknown_or_foreign_identity_cannot_delete (test_b02_runpod.RunpodTests.test_unknown_or_foreign_identity_cannot_delete) ... ok
+test_wrong_id_does_not_bind_and_opener_refuses_redirect (test_b02_runpod.RunpodTests.test_wrong_id_does_not_bind_and_opener_refuses_redirect) ... ok
+test_concurrent_claims_allocate_one_attempt (test_b02_service.ServiceTests.test_concurrent_claims_allocate_one_attempt) ... ok
+test_expired_lease_fenced_after_restart_and_bounded_retries (test_b02_service.ServiceTests.test_expired_lease_fenced_after_restart_and_bounded_retries) ... ok
+test_idempotency_restart_and_cross_owner (test_b02_service.ServiceTests.test_idempotency_restart_and_cross_owner) ... ok
+test_paid_mode_disabled_and_foreign_snapshot_rejected (test_b02_service.ServiceTests.test_paid_mode_disabled_and_foreign_snapshot_rejected) ... ok
+test_real_worker_completion_restart_and_replay (test_b02_service.ServiceTests.test_real_worker_completion_restart_and_replay) ... ok
+test_unuploaded_output_cannot_commit_and_cancel_fences (test_b02_service.ServiceTests.test_unuploaded_output_cannot_commit_and_cancel_fences) ... ok
+test_corrupt_database_or_asset_rejected_before_restore (test_backup.BackupTests.test_corrupt_database_or_asset_rejected_before_restore) ... ok
+test_manifest_tamper_traversal_and_unlisted_file (test_backup.BackupTests.test_manifest_tamper_traversal_and_unlisted_file) ... ok
+test_restore_checksums_and_empty_destination_no_overwrite (test_backup.BackupTests.test_restore_checksums_and_empty_destination_no_overwrite) ... ok
+test_source_updates_after_snapshot_do_not_change_backup (test_backup.BackupTests.test_source_updates_after_snapshot_do_not_change_backup) ... ok
+test_symlinks_and_hardlinks_are_not_restored (test_backup.BackupTests.test_symlinks_and_hardlinks_are_not_restored) ... ok
+test_uncertain_provider_obligations_and_unknown_tables_rejected (test_backup.BackupTests.test_uncertain_provider_obligations_and_unknown_tables_rejected) ... ok
+test_wal_snapshot_is_self_contained_without_sidecar_files (test_backup.BackupTests.test_wal_snapshot_is_self_contained_without_sidecar_files) ... ok
+test_actual_project_export_and_pending_work_restore (test_backup_integration.BackupIntegrationTests.test_actual_project_export_and_pending_work_restore) ... ok
+test_atomic_reservation_admission_and_concurrent_budget_limit (test_budget.BudgetTests.test_atomic_reservation_admission_and_concurrent_budget_limit) ... ok
+test_charge_replay_race_and_explicit_cap_increase_carries_history (test_budget.BudgetTests.test_charge_replay_race_and_explicit_cap_increase_carries_history) ... ok
+test_cleanup_does_not_settle_and_late_charge_preserved (test_budget.BudgetTests.test_cleanup_does_not_settle_and_late_charge_preserved) ... ok
+test_exhausted_cap_blocks_dispatch_even_without_residual_reservation (test_budget.BudgetTests.test_exhausted_cap_blocks_dispatch_even_without_residual_reservation) ... ok
+test_immutable_approval_replay_scope_and_simulation_gate (test_budget.BudgetTests.test_immutable_approval_replay_scope_and_simulation_gate) ... ok
+test_newly_observed_overrun_blocks_queued_dispatch_atomically (test_budget.BudgetTests.test_newly_observed_overrun_blocks_queued_dispatch_atomically) ... ok
+test_revocation_blocks_new_dispatch_but_deadline_cleanup_remains_independent (test_budget.BudgetTests.test_revocation_blocks_new_dispatch_but_deadline_cleanup_remains_independent) ... ok
+test_unknown_create_restart_retains_reservation_and_no_blind_retry (test_budget.BudgetTests.test_unknown_create_restart_retains_reservation_and_no_blind_retry) ... ok
+test_backup_refuses_inconsistent_settlement_history (test_budget_integration.BudgetIntegrationTests.test_backup_refuses_inconsistent_settlement_history) ... ok
+test_unknown_creation_cleanup_settlement_overrun_and_backup (test_budget_integration.BudgetIntegrationTests.test_unknown_creation_cleanup_settlement_overrun_and_backup) ... ok
+test_render_review_export_survives_restart (test_command_center_flow.CommandCenterFlow.test_render_review_export_survives_restart) ... ok
+test_budget_types_and_cost_envelope (test_contract.ContractTests.test_budget_types_and_cost_envelope) ... ok
+test_complete_fixture_and_media (test_contract.ContractTests.test_complete_fixture_and_media) ... ok
+test_corrupt_media_and_traversal_are_rejected (test_contract.ContractTests.test_corrupt_media_and_traversal_are_rejected) ... ok
+test_cross_project_and_owner_references_are_rejected (test_contract.ContractTests.test_cross_project_and_owner_references_are_rejected) ... ok
+test_export_tracks_timeline_revision_and_output (test_contract.ContractTests.test_export_tracks_timeline_revision_and_output) ... ok
+test_frozen_revision_and_attempt_configuration (test_contract.ContractTests.test_frozen_revision_and_attempt_configuration) ... ok
+test_historical_timeline_revision_and_approval_are_preserved (test_contract.ContractTests.test_historical_timeline_revision_and_approval_are_preserved) ... ok
+test_render_success_can_have_unconfirmed_cleanup (test_contract.ContractTests.test_render_success_can_have_unconfirmed_cleanup) ... ok
+test_six_minute_policy_preserves_smaller_project_limits (test_contract.ContractTests.test_six_minute_policy_preserves_smaller_project_limits) ... ok
+test_take_link_and_lease (test_contract.ContractTests.test_take_link_and_lease) ... ok
+test_timeline_approval_trim_duration_and_project_limit (test_contract.ContractTests.test_timeline_approval_trim_duration_and_project_limit) ... ok
+test_lost_telemetry_ack_replays_without_render_or_new_claim (test_duration_comparison.DurationComparisonTests.test_lost_telemetry_ack_replays_without_render_or_new_claim) ... ok
+test_memory_and_timing_projections_refuse_unsafe_long_attempt (test_duration_comparison.DurationComparisonTests.test_memory_and_timing_projections_refuse_unsafe_long_attempt) ... ok
+test_no_second_worker_claim_before_first_completes_and_failure_preserves_first (test_duration_comparison.DurationComparisonTests.test_no_second_worker_claim_before_first_completes_and_failure_preserves_first) ... ok
+test_order_telemetry_completion_and_cleanup_survive_restart (test_duration_comparison.DurationComparisonTests.test_order_telemetry_completion_and_cleanup_survive_restart) ... ok
+test_remaining_time_gate_skips_second_without_losing_first (test_duration_comparison.DurationComparisonTests.test_remaining_time_gate_skips_second_without_losing_first) ... ok
+test_ambiguous_create_is_discoverable (test_fake_provider.FakeProviderTests.test_ambiguous_create_is_discoverable) ... ok
+test_blind_retry_exposes_duplicate_allocations (test_fake_provider.FakeProviderTests.test_blind_retry_exposes_duplicate_allocations) ... ok
+test_failed_delete_preserves_resource_until_retry (test_fake_provider.FakeProviderTests.test_failed_delete_preserves_resource_until_retry) ... ok
+test_repeated_delete_succeeds (test_fake_provider.FakeProviderTests.test_repeated_delete_succeeds) ... ok
+test_concurrent_atomic_admission_restart_and_cancel_replay (test_live_admission.LiveAdmissionTests.test_concurrent_atomic_admission_restart_and_cancel_replay) ... ok
+test_even_consistent_installed_host_evidence_cannot_enable_dispatch (test_live_admission.LiveAdmissionTests.test_even_consistent_installed_host_evidence_cannot_enable_dispatch) ... ok
+test_final_link_insert_failure_rolls_back_bundle_reservation_and_lifecycle (test_live_admission.LiveAdmissionTests.test_final_link_insert_failure_rolls_back_bundle_reservation_and_lifecycle) ... ok
+test_new_grant_does_not_reset_project_cap_and_revocation_is_sticky (test_live_admission.LiveAdmissionTests.test_new_grant_does_not_reset_project_cap_and_revocation_is_sticky) ... ok
+test_no_dispatch_or_simulated_approval_promotion (test_live_admission.LiveAdmissionTests.test_no_dispatch_or_simulated_approval_promotion) ... ok
+test_signature_owner_domain_expiry_source_and_boolean_rejected (test_live_admission.LiveAdmissionTests.test_signature_owner_domain_expiry_source_and_boolean_rejected) ... ok
+test_simulated_watchdog_does_not_touch_pending_live_job (test_live_admission.LiveAdmissionTests.test_simulated_watchdog_does_not_touch_pending_live_job) ... ok
+test_transaction_rollback_invalid_claim_and_source_changed (test_live_admission.LiveAdmissionTests.test_transaction_rollback_invalid_claim_and_source_changed) ... ok
+test_backup_refuses_released_record_with_any_dispatch_evidence (test_live_admission_integration.LiveAdmissionIntegrationTests.test_backup_refuses_released_record_with_any_dispatch_evidence) ... ok
+test_backup_revokes_copied_authority_without_changing_source (test_live_admission_integration.LiveAdmissionIntegrationTests.test_backup_revokes_copied_authority_without_changing_source) ... ok
+test_session_signature_and_replay_boundaries (test_live_admission_integration.LiveAdmissionIntegrationTests.test_session_signature_and_replay_boundaries) ... ok
+test_default_no_transport_and_tampered_host_fail_before_post (test_live_execution.LiveExecutionTests.test_default_no_transport_and_tampered_host_fail_before_post) ... ok
+test_last_failed_attempt_closes_batch_and_deletes_without_another_claim (test_live_execution.LiveExecutionTests.test_last_failed_attempt_closes_batch_and_deletes_without_another_claim) ... ok
+test_late_charge_blocks_previously_reserved_launch_and_wrong_billing_key (test_live_execution.LiveExecutionTests.test_late_charge_blocks_previously_reserved_launch_and_wrong_billing_key) ... ok
+test_multi_location_grant_is_frozen_and_covered_by_host_signature (test_live_execution.LiveExecutionTests.test_multi_location_grant_is_frozen_and_covered_by_host_signature) ... ok
+test_rejection_preserves_billing_reservation_and_private_diagnostic (test_live_execution.LiveExecutionTests.test_rejection_preserves_billing_reservation_and_private_diagnostic) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 402, "request_id": "fictional-balance", "outcome": "rejected", "detail": "Insufficient balance"}
+ok
+test_startup_claim_is_idle_inside_post_then_resource_claims (test_live_execution.LiveExecutionTests.test_startup_claim_is_idle_inside_post_then_resource_claims) ... ok
+test_unknown_create_restart_cleanup_after_revoke_source_change_and_settle (test_live_execution.LiveExecutionTests.test_unknown_create_restart_cleanup_after_revoke_source_change_and_settle) ... WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_watchdog_ignores_not_due_and_confirmed_without_credentials (test_live_execution.LiveExecutionTests.test_watchdog_ignores_not_due_and_confirmed_without_credentials) ... ok
+test_completion_cleanup_settlement_restore_and_late_overrun (test_live_execution_integration.LiveExecutionIntegrationTests.test_completion_cleanup_settlement_restore_and_late_overrun) ... ok
+test_failed_attempt_backup_requires_cleanup_and_preserves_reservation (test_live_execution_integration.LiveExecutionIntegrationTests.test_failed_attempt_backup_requires_cleanup_and_preserves_reservation) ... ok
+test_unknown_create_restart_cleanup_ignores_revoked_keys_and_current_model (test_live_execution_integration.LiveExecutionIntegrationTests.test_unknown_create_restart_cleanup_ignores_revoked_keys_and_current_model) ... WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_all_supported_image_formats_and_dimension_limit (test_media_commands.MediaCommandTests.test_all_supported_image_formats_and_dimension_limit) ... ok
+test_assembly_requires_selection_and_export_project_scope (test_media_commands.MediaCommandTests.test_assembly_requires_selection_and_export_project_scope) ... ok
+test_hd_export_and_legacy_snapshot_keep_their_own_resolution (test_media_commands.MediaCommandTests.test_hd_export_and_legacy_snapshot_keep_their_own_resolution) ... ok
+test_timeline_revision_replay_and_export_resume_frozen_snapshot (test_media_commands.MediaCommandTests.test_timeline_revision_replay_and_export_resume_frozen_snapshot) ... ok
+test_upload_rejects_bad_signature_payload_and_cross_owner (test_media_commands.MediaCommandTests.test_upload_rejects_bad_signature_payload_and_cross_owner) ... ok
+test_upload_verified_and_idempotent_after_restart (test_media_commands.MediaCommandTests.test_upload_verified_and_idempotent_after_restart) ... ok
+test_invalid_upload_formats_and_foreign_media_are_rejected (test_media_http.MediaHTTPTests.test_invalid_upload_formats_and_foreign_media_are_rejected) ... ok
+test_upload_timeline_export_restart_and_scoped_download (test_media_http.MediaHTTPTests.test_upload_timeline_export_restart_and_scoped_download) ... ok
+test_consistent_synthetic_build_evidence_and_modified_log (test_preflight.PreflightTests.test_consistent_synthetic_build_evidence_and_modified_log) ... ok
+test_empty_report_lists_actual_missing_implementation (test_preflight.PreflightTests.test_empty_report_lists_actual_missing_implementation) ... ok
+test_exact_intent_and_source_bound_immutable_artifact (test_preflight.PreflightTests.test_exact_intent_and_source_bound_immutable_artifact) ... ok
+test_expired_mismatched_and_consistent_attestations_never_authorize (test_preflight.PreflightTests.test_expired_mismatched_and_consistent_attestations_never_authorize) ... ok
+test_malformed_evidence_shapes_are_actionable_failures (test_preflight.PreflightTests.test_malformed_evidence_shapes_are_actionable_failures) ... ok
+test_pass_strings_without_executed_evidence_do_not_satisfy_image_gate (test_preflight.PreflightTests.test_pass_strings_without_executed_evidence_do_not_satisfy_image_gate) ... ok
+test_secret_fields_and_credential_urls_are_not_echoed (test_preflight.PreflightTests.test_secret_fields_and_credential_urls_are_not_echoed) ... ok
+test_separate_private_publication_must_match_build_and_manifest_bytes (test_preflight.PreflightTests.test_separate_private_publication_must_match_build_and_manifest_bytes) ... ok
+test_missing_inputs_remain_actionable_and_non_executable (test_preflight_review.PreflightReviewTests.test_missing_inputs_remain_actionable_and_non_executable) ... ok
+test_pass_text_does_not_establish_build_evidence (test_preflight_review.PreflightReviewTests.test_pass_text_does_not_establish_build_evidence) ... ok
+test_write_once_tamper_current_source_and_forged_authority (test_preflight_review.PreflightReviewTests.test_write_once_tamper_current_source_and_forged_authority) ... ok
+test_concurrent_idempotency_creates_one_canonical_lifecycle_reservation (test_real_jobs.RealJobTests.test_concurrent_idempotency_creates_one_canonical_lifecycle_reservation) ... ok
+test_default_disarmed_bridge_does_not_break_backup (test_real_jobs.RealJobTests.test_default_disarmed_bridge_does_not_break_backup) ... ok
+test_invalid_profile_rolls_back_all_admission_records (test_real_jobs.RealJobTests.test_invalid_profile_rolls_back_all_admission_records) ... ok
+test_unknown_create_restart_and_default_transport_stays_closed (test_real_jobs.RealJobTests.test_unknown_create_restart_and_default_transport_stays_closed) ... ok
+test_verified_completion_and_lifecycle_terminal_transition_are_atomic (test_real_jobs.RealJobTests.test_verified_completion_and_lifecycle_terminal_transition_are_atomic) ... ok
+test_canonical_completion_cleanup_settlement_and_restore (test_real_jobs_integration.RealJobsIntegrationTests.test_canonical_completion_cleanup_settlement_and_restore) ... ok
+test_deadline_fences_claim_and_reconciles_cleanup (test_real_jobs_integration.RealJobsIntegrationTests.test_deadline_fences_claim_and_reconciles_cleanup) ... ok
+test_default_disarm_cannot_be_replaced_by_preflight_or_boolean (test_real_jobs_integration.RealJobsIntegrationTests.test_default_disarm_cannot_be_replaced_by_preflight_or_boolean) ... ok
+test_revocation_does_not_cancel_but_explicit_cancel_fences (test_real_jobs_integration.RealJobsIntegrationTests.test_revocation_does_not_cancel_but_explicit_cancel_fences) ... ok
+test_expired_credentials_and_restore_revocation (test_remote_bridge.RemoteBridgeTests.test_expired_credentials_and_restore_revocation) ... ok
+test_separate_process_render_upload_completion_and_replay (test_remote_bridge.RemoteBridgeTests.test_separate_process_render_upload_completion_and_replay) ... ok
+test_wrong_worker_attempt_and_bad_output_cannot_commit (test_remote_bridge.RemoteBridgeTests.test_wrong_worker_attempt_and_bad_output_cannot_commit) ... ok
+test_admission_idempotency_after_restart_and_creator_edit (test_render_commands.RenderCommandTests.test_admission_idempotency_after_restart_and_creator_edit) ... ok
+test_cancel_during_render_fences_completion_and_runner_restart (test_render_commands.RenderCommandTests.test_cancel_during_render_fences_completion_and_runner_restart) ... ok
+test_concurrent_duplicate_admission_and_cross_owner (test_render_commands.RenderCommandTests.test_concurrent_duplicate_admission_and_cross_owner) ... ok
+test_real_render_then_atomic_review_and_selection (test_render_commands.RenderCommandTests.test_real_render_then_atomic_review_and_selection) ... ok
+test_restart_abandoned_claim_retry_bound_and_deadline (test_render_commands.RenderCommandTests.test_restart_abandoned_claim_retry_bound_and_deadline) ... ok
+test_runner_lock_and_continuous_loop (test_render_commands.RenderCommandTests.test_runner_lock_and_continuous_loop) ... ok
+test_admission_idempotency_frozen_shot_and_owner_boundary (test_render_http.RenderHTTPTests.test_admission_idempotency_frozen_shot_and_owner_boundary) ... ok
+test_background_worker_completion_review_and_authorized_playback (test_render_http.RenderHTTPTests.test_background_worker_completion_review_and_authorized_playback) ... ok
+test_cancel_is_scoped_idempotent_and_prevents_claim (test_render_http.RenderHTTPTests.test_cancel_is_scoped_idempotent_and_prevents_claim) ... ok
+test_ambiguous_create_restart_transient_inventory_and_confirmed_absence (test_runpod_integration.RunpodHTTPIntegrationTests.test_ambiguous_create_restart_transient_inventory_and_confirmed_absence) ... WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_cleanup_after_restart_requires_durable_expected_identity (test_runpod_integration.RunpodHTTPIntegrationTests.test_cleanup_after_restart_requires_durable_expected_identity) ... ok
+test_explicit_rejection_closes_immediately_and_survives_restart_without_retry (test_runpod_integration.RunpodHTTPIntegrationTests.test_explicit_rejection_closes_immediately_and_survives_restart_without_retry) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 400, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 401, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 402, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 403, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 404, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 409, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 413, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 422, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 429, "request_id": null, "outcome": "rejected", "detail": "No deployment was accepted"}
+ok
+test_inventory_failure_never_means_no_resources (test_runpod_integration.RunpodHTTPIntegrationTests.test_inventory_failure_never_means_no_resources) ... WAN_PROVIDER_CREATE_RESULT {"kind": "transport_or_response", "http_status": null, "request_id": null, "outcome": "unknown"}
+ok
+test_unknown_without_allocation_never_closes_from_empty_inventory (test_runpod_integration.RunpodHTTPIntegrationTests.test_unknown_without_allocation_never_closes_from_empty_inventory) ... WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 408, "request_id": null, "outcome": "unknown"}
+WAN_PROVIDER_CREATE_RESULT {"kind": "http_error", "http_status": 500, "request_id": null, "outcome": "unknown"}
+ok
+test_frozen_shots_and_dollar_ceiling_reject_changes (test_singing_admission.SingingAdmissionTests.test_frozen_shots_and_dollar_ceiling_reject_changes) ... ok
+test_multishot_admission_scoped_credential_and_no_budget_reset (test_singing_admission.SingingAdmissionTests.test_multishot_admission_scoped_credential_and_no_budget_reset) ... ok
+test_serial_claims_durable_metrics_retry_and_cleanup (test_singing_admission.SingingAdmissionTests.test_serial_claims_durable_metrics_retry_and_cleanup) ... ok
+test_versioned_shared_workspace_fixture (test_studio_contract.StudioContractTest.test_versioned_shared_workspace_fixture) ... ok
+test_asset_download_tenancy_ranges_and_path_confinement (test_studio_http.StudioHTTPTests.test_asset_download_tenancy_ranges_and_path_confinement) ... ok
+test_authentication_cookie_expiry_and_logout (test_studio_http.StudioHTTPTests.test_authentication_cookie_expiry_and_logout) ... ok
+test_bad_payloads_and_login_rate_limit (test_studio_http.StudioHTTPTests.test_bad_payloads_and_login_rate_limit) ... ok
+test_client_cannot_inject_execution_or_preview_authority (test_studio_http.StudioHTTPTests.test_client_cannot_inject_execution_or_preview_authority) ... ok
+test_concurrent_revision_writes_commit_once (test_studio_http.StudioHTTPTests.test_concurrent_revision_writes_commit_once) ... ok
+test_cross_owner_workspace_cannot_be_read_or_written (test_studio_http.StudioHTTPTests.test_cross_owner_workspace_cannot_be_read_or_written) ... ok
+test_login_csrf_and_host_boundaries (test_studio_http.StudioHTTPTests.test_login_csrf_and_host_boundaries) ... ok
+test_revision_conflict_preserves_data_and_restart (test_studio_http.StudioHTTPTests.test_revision_conflict_preserves_data_and_restart) ... ok
+test_creator_fields_history_and_canonical_project_shared (test_studio_service.StudioServiceTests.test_creator_fields_history_and_canonical_project_shared) ... ok
+test_edit_does_not_expand_existing_limit_or_accept_client_override (test_studio_service.StudioServiceTests.test_edit_does_not_expand_existing_limit_or_accept_client_override) ... ok
+test_editing_shot_preserves_frozen_admitted_snapshot (test_studio_service.StudioServiceTests.test_editing_shot_preserves_frozen_admitted_snapshot) ... ok
+test_empty_workspace_create_restart_and_owner_boundaries (test_studio_service.StudioServiceTests.test_empty_workspace_create_restart_and_owner_boundaries) ... ok
+test_forged_execution_and_media_are_ignored (test_studio_service.StudioServiceTests.test_forged_execution_and_media_are_ignored) ... ok
+test_invalid_revisions_scene_links_and_cross_project_selection (test_studio_service.StudioServiceTests.test_invalid_revisions_scene_links_and_cross_project_selection) ... ok
+test_malformed_envelopes_and_boolean_revisions_are_rejected (test_studio_service.StudioServiceTests.test_malformed_envelopes_and_boolean_revisions_are_rejected) ... ok
+test_optimistic_concurrency_and_whole_save_rollback (test_studio_service.StudioServiceTests.test_optimistic_concurrency_and_whole_save_rollback) ... ok
+test_server_progress_survives_stale_workspace_and_selection_validates (test_studio_service.StudioServiceTests.test_server_progress_survives_stale_workspace_and_selection_validates) ... ok
+test_large_wav_restart_prefix_retry_and_single_commit (test_upload_http.UploadHTTPTests.test_large_wav_restart_prefix_retry_and_single_commit) ... ok
+test_owner_scope_order_limits_and_abort (test_upload_http.UploadHTTPTests.test_owner_scope_order_limits_and_abort) ... ok
+test_caps_active_session_bound_and_no_full_body_storage (test_uploads.UploadTests.test_caps_active_session_bound_and_no_full_body_storage) ... ok
+test_expiry_abort_cleanup_and_owner_isolation (test_uploads.UploadTests.test_expiry_abort_cleanup_and_owner_isolation) ... ok
+test_finish_restart_receipt_preserves_concurrent_creator_edit (test_uploads.UploadTests.test_finish_restart_receipt_preserves_concurrent_creator_edit) ... ok
+test_restart_removes_terminal_staging_and_uncommitted_publication (test_uploads.UploadTests.test_restart_removes_terminal_staging_and_uncommitted_publication) ... ok
+test_sequential_chunks_exact_size_conflicts_and_incomplete_finish (test_uploads.UploadTests.test_sequential_chunks_exact_size_conflicts_and_incomplete_finish) ... ok
+test_staged_corruption_and_interrupted_chunk_write (test_uploads.UploadTests.test_staged_corruption_and_interrupted_chunk_write) ... ok
+test_claim_replay_concurrency_and_expired_attempt_replacement (test_worker_transport.WorkerTransportTests.test_claim_replay_concurrency_and_expired_attempt_replacement) ... ok
+test_expiry_during_media_probe_rolls_back_commit (test_worker_transport.WorkerTransportTests.test_expiry_during_media_probe_rolls_back_commit) ... ok
+test_hash_only_credentials_scope_expiry_and_revocation (test_worker_transport.WorkerTransportTests.test_hash_only_credentials_scope_expiry_and_revocation) ... ok
+test_stream_expiry_cleanup_and_non_mp4_rejection (test_worker_transport.WorkerTransportTests.test_stream_expiry_cleanup_and_non_mp4_rejection) ... ok
+test_upload_replay_immutable_content_and_independent_completion (test_worker_transport.WorkerTransportTests.test_upload_replay_immutable_content_and_independent_completion) ... ok
+
+----------------------------------------------------------------------
+Ran 207 tests in 45.321s
+
+OK
+{"status": "RETAINED_OUTPUTS_COLLECTED", "takes": 2}
+{"status": "COMPARISON_COPIES_VERIFIED", "clips": 2, "cleanup": "confirmed"}

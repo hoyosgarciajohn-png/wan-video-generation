@@ -4,8 +4,8 @@ FROM --platform=linux/amd64 pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256
 WORKDIR /app
 COPY --from=ffmpeg /ffmpeg /usr/local/bin/ffmpeg
 COPY --from=ffmpeg /ffprobe /usr/local/bin/ffprobe
-COPY workers/gpu/requirements.lock /app/workers/gpu/requirements.lock
-RUN python -m pip install --require-hashes --only-binary=:all: -r workers/gpu/requirements.lock
+COPY workers/gpu/singing-requirements.lock /app/workers/gpu/singing-requirements.lock
+RUN python -m pip install --require-hashes --only-binary=:all: -r workers/gpu/singing-requirements.lock
 COPY workers/gpu/flash-attention.lock /app/workers/gpu/flash-attention.lock
 RUN python -m pip install --no-deps --require-hashes -r workers/gpu/flash-attention.lock
 COPY contracts /app/contracts

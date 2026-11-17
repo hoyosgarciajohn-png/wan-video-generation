@@ -53,11 +53,14 @@ class WorkerTransport:
     def issue(self, owner, project, batch_id, worker_id, *, ttl_seconds=300):
         """Trusted host/CLI only; return plaintext once and persist only its SHA256."""
         require(isinstance(worker_id, str) and len(worker_id) <= 200 and re.fullmatch(IDENTIFIER, worker_id), 'Invalid worker ID')
-        require(type(ttl_seconds) is int and 0 < ttl_seconds <= 3600, 'Worker credential TTL must be 1 to 3600 seconds')
+        require(type(ttl_seconds) is int and 0 < ttl_seconds <= 14700, 'Worker credential TTL outside bounds')
         with self.control.transaction() as db:
             bundle = self.control._load(db, owner, project)
             batch = self.control._batch(bundle, batch_id)
             self._allowed_batch(db, owner, project, batch)
+            from .production import policy as production_policy
+            ceiling = 14700 if production_policy(db,batch) is not None else 3600
+            require(ttl_seconds <= ceiling, 'Worker credential TTL exceeds signed scope')
             now = self.control.clock()
             expiry = now + timedelta(seconds=ttl_seconds)
             # Tokens may outlive a render deadline briefly to reconcile a completion

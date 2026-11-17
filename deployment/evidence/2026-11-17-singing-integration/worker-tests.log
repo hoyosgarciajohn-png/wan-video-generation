@@ -1,0 +1,65 @@
+test_auth_and_ambiguous_transport_errors_are_not_retried (test_claim_wait.ClaimWaitTests.test_auth_and_ambiguous_transport_errors_are_not_retried) ... ok
+test_default_zero_wait_never_sleeps (test_claim_wait.ClaimWaitTests.test_default_zero_wait_never_sleeps) ... ok
+test_empty_then_ready_returns_first_assignment (test_claim_wait.ClaimWaitTests.test_empty_then_ready_returns_first_assignment) ... ok
+test_nonfinite_and_unbounded_configuration_rejected_before_claim (test_claim_wait.ClaimWaitTests.test_nonfinite_and_unbounded_configuration_rejected_before_claim) ... ok
+test_polls_stop_at_deadline_without_last_request (test_claim_wait.ClaimWaitTests.test_polls_stop_at_deadline_without_last_request) ... ok
+test_sigterm_interrupts_wait_immediately (test_claim_wait.ClaimWaitTests.test_sigterm_interrupts_wait_immediately) ... ok
+test_slow_empty_reply_does_not_extend_window (test_claim_wait.ClaimWaitTests.test_slow_empty_reply_does_not_extend_window) ... ok
+test_animation_and_unsupported_mime_refused (test_inference_adapter.InferenceAdapterTests.test_animation_and_unsupported_mime_refused) ... ok
+test_bad_reference_rejected_before_weight_read_or_model_import (test_inference_adapter.InferenceAdapterTests.test_bad_reference_rejected_before_weight_read_or_model_import) ... ok
+test_bf16_absence_blocks_constructor (test_inference_adapter.InferenceAdapterTests.test_bf16_absence_blocks_constructor) ... ok
+test_cuda_absence_blocks_constructor (test_inference_adapter.InferenceAdapterTests.test_cuda_absence_blocks_constructor) ... ok
+test_phase_hooks_preserve_calls_and_identify_decode_failure (test_inference_adapter.InferenceAdapterTests.test_phase_hooks_preserve_calls_and_identify_decode_failure) ... ok
+test_real_profile_text_invocation_and_unbilled_metrics (test_inference_adapter.InferenceAdapterTests.test_real_profile_text_invocation_and_unbilled_metrics) ... WAN_STAGE:model_load
+WAN_STAGE:generation
+WAN_STAGE:video_encode
+ok
+test_reference_is_detached_rgb_before_model_invocation (test_inference_adapter.InferenceAdapterTests.test_reference_is_detached_rgb_before_model_invocation) ... WAN_STAGE:model_load
+WAN_STAGE:generation
+WAN_STAGE:video_encode
+ok
+test_artifact_put_streams_and_checks_receipt (test_remote_client.RemoteWorkerTests.test_artifact_put_streams_and_checks_receipt) ... ok
+test_claim_journal_refuses_other_origin_or_credentials (test_remote_client.RemoteWorkerTests.test_claim_journal_refuses_other_origin_or_credentials) ... ok
+test_cli_error_redacts_environment_token (test_remote_client.RemoteWorkerTests.test_cli_error_redacts_environment_token) ... ok
+test_completion_ambiguity_skips_already_confirmed_upload (test_remote_client.RemoteWorkerTests.test_completion_ambiguity_skips_already_confirmed_upload) ... ok
+test_http_policy_and_bounded_safe_json (test_remote_client.RemoteWorkerTests.test_http_policy_and_bounded_safe_json) ... ok
+test_reference_download_verifies_before_publishing (test_remote_client.RemoteWorkerTests.test_reference_download_verifies_before_publishing) ... ok
+test_upload_ambiguity_replays_existing_local_output (test_remote_client.RemoteWorkerTests.test_upload_ambiguity_replays_existing_local_output) ... ok
+test_frozen_singing_inputs_and_native_frame_rounding (test_singing.SingingTests.test_frozen_singing_inputs_and_native_frame_rounding) ... ok
+test_lost_lease_terminates_resident_process (test_singing.SingingTests.test_lost_lease_terminates_resident_process) ... ok
+test_one_model_two_distinct_audio_clips_and_no_frame_drop (test_singing.SingingTests.test_one_model_two_distinct_audio_clips_and_no_frame_drop) ... WAN_STAGE:model_load
+WAN_STAGE:generation
+WAN_STAGE:video_encode
+WAN_STAGE:generation
+WAN_STAGE:video_encode
+ok
+test_queue_reuses_renderer_and_retains_ambiguous_completion (test_singing.SingingTests.test_queue_reuses_renderer_and_retains_ambiguous_completion) ... ok
+test_server_protocol_constructs_session_once (test_singing.SingingTests.test_server_protocol_constructs_session_once) ... ok
+test_child_failure_classification_never_returns_private_log_text (test_worker.WorkerTests.test_child_failure_classification_never_returns_private_log_text) ... ok
+test_child_oom_phase_survives_journal_and_safe_terminal_log (test_worker.WorkerTests.test_child_oom_phase_survives_journal_and_safe_terminal_log) ... ok
+test_concurrent_replay_creates_one_output (test_worker.WorkerTests.test_concurrent_replay_creates_one_output) ... ok
+test_conflicting_retry_is_rejected (test_worker.WorkerTests.test_conflicting_retry_is_rejected) ... ok
+test_corrupt_durable_output_blocks_completion (test_worker.WorkerTests.test_corrupt_durable_output_blocks_completion) ... ok
+test_emitted_records_fit_complete_shared_bundle (test_worker.WorkerTests.test_emitted_records_fit_complete_shared_bundle) ... ok
+test_expired_batch_prevents_render (test_worker.WorkerTests.test_expired_batch_prevents_render) ... ok
+test_expired_lease_prevents_render (test_worker.WorkerTests.test_expired_lease_prevents_render) ... ok
+test_failed_attempt_cannot_render_again_after_container_restart (test_worker.WorkerTests.test_failed_attempt_cannot_render_again_after_container_restart) ... {"event": "wan_attempt_failed", "code": "render_failed", "phase": "render"}
+ok
+test_fixture_cli_is_credential_free (test_worker.WorkerTests.test_fixture_cli_is_credential_free) ... ok
+test_fixture_output_and_replay (test_worker.WorkerTests.test_fixture_output_and_replay) ... ok
+test_heartbeat_loss_terminates_child_and_prevents_completion (test_worker.WorkerTests.test_heartbeat_loss_terminates_child_and_prevents_completion) ... {"event": "wan_attempt_failed", "code": "render_failed", "phase": "render"}
+ok
+test_http_client_paths_and_auth_policy (test_worker.WorkerTests.test_http_client_paths_and_auth_policy) ... ok
+test_input_ownership_and_scope (test_worker.WorkerTests.test_input_ownership_and_scope) ... ok
+test_invalid_claims_rejected (test_worker.WorkerTests.test_invalid_claims_rejected) ... ok
+test_paths_and_symlinks_rejected (test_worker.WorkerTests.test_paths_and_symlinks_rejected) ... ok
+test_render_failure_reports_safe_code (test_worker.WorkerTests.test_render_failure_reports_safe_code) ... {"event": "wan_attempt_failed", "code": "render_failed", "phase": "render"}
+ok
+test_replay_after_ambiguous_completion_survives_restart (test_worker.WorkerTests.test_replay_after_ambiguous_completion_survives_restart) ... ok
+test_wan_profile_rounding_and_limits (test_worker.WorkerTests.test_wan_profile_rounding_and_limits) ... ok
+test_weights_require_every_pinned_file (test_worker.WorkerTests.test_weights_require_every_pinned_file) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 4.246s
+
+OK

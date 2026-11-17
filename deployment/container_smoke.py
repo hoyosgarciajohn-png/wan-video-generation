@@ -58,6 +58,12 @@ def gpu():
     assert sys.version_info[:2] == (3, 11)
     assert flash_attn
     source_files = source_syntax('/opt/wan/wan')
+    import librosa
+    import decord
+    import peft
+    singing = json.loads(Path('/app/workers/gpu/singing-model.lock.json').read_text())
+    assert Path('/opt/wan-s2v/REVISION').read_text().strip() == singing['profile']['code_revision']
+    source_syntax('/opt/wan-s2v/wan')
     return {'runtime_import': 'PASS', 'source_revision': lock['profile']['code_revision'],
             'torch': torch.__version__, 'runtime_import_scope': 'torch_and_flash_attn_only',
             'wan_source_syntax': 'PASS', 'wan_source_files': source_files,

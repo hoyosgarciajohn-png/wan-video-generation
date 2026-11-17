@@ -111,7 +111,7 @@ def execute(command, lease):
                     process.wait()
 
 
-def render(claim, destination, lease, input_root, weights):
+def render(claim, destination, lease, input_root, weights, resident=None):
     snapshot = claim['shot_snapshot']
     frames = frame_count(snapshot, claim['batch']['execution_mode'])
     if claim['batch']['execution_mode'] == 'fixture':
@@ -121,17 +121,21 @@ def render(claim, destination, lease, input_root, weights):
                  '-map_metadata', '-1', '-movflags', '+faststart', str(destination)], lease)
         return {'mode': 'fixture', 'gpu_peak_allocated_bytes': None, 'cost_cents': 0}
     require(weights is not None, 'Model directory required')
-    image = None
-    if claim['input_assets']:
-        asset = claim['input_assets'][0]
-        image = scoped(input_root, asset['object_key'])
-        require(image.stat().st_size == asset['bytes'] and digest(image) == asset['sha256'],
+    inputs = {}
+    for asset in claim['input_assets']:
+        path = scoped(input_root, asset['object_key'])
+        require(path.stat().st_size == asset['bytes'] and digest(path) == asset['sha256'],
                 'Reference checksum mismatch')
+        inputs[asset['kind']] = str(path)
     spec = {'snapshot': snapshot, 'frames': frames, 'weights': str(Path(weights).resolve()),
-            'image': str(image) if image else None, 'output': str(destination)}
+            'model_profile': claim['batch']['model_profile'], 'audio': inputs.get('audio'),
+            'image': inputs.get('image'), 'output': str(destination)}
     spec_path = destination.with_suffix('.json')
     atomic_json(spec_path, spec)
-    execute([sys.executable, '-m', 'workers.gpu.inference', str(spec_path)], lease)
+    if resident is None:
+        execute([sys.executable, '-m', 'workers.gpu.inference', str(spec_path)], lease)
+    else:
+        resident.render(spec, lease)
     return json.loads(destination.with_suffix('.metrics.json').read_text())
 
 
@@ -179,6 +183,16 @@ def publish(client, claim, manifest, destination, journal):
         atomic_json(journal, saved)
     # Confirm remote durable bytes before completion; completion may already commit
     # before its response is lost, so retries must not require a still-active upload lease.
+    if 'continuous_queue' in claim:
+        telemetry = dict(protocol='wan-song-queue-v1',attempt_id=claim['attempt']['id'],
+            batch_id=claim['batch']['id'],asset_sha256=manifest['asset']['sha256'],
+            asset_bytes=manifest['asset']['bytes'],metrics=saved['metrics'])
+        expected = hashlib.sha256(json.dumps(telemetry,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+        if not saved.get('telemetry_acknowledged'):
+            reply = client.telemetry(claim['attempt'],telemetry)
+            require(reply == {'sha256':expected}, 'Production telemetry acknowledgement mismatch')
+            saved['telemetry_acknowledged'] = reply
+            atomic_json(journal,saved)
     if 'duration_comparison' in claim:
         from .comparison import PROTOCOL, validate_metrics, receipt as metric_receipt
         if 'telemetry' not in saved:
@@ -201,7 +215,7 @@ def publish(client, claim, manifest, destination, journal):
             atomic_json(journal,saved)
 
 
-def run_once(claim, client, output_root, *, input_root=None, weights=None, interval=5):
+def run_once(claim, client, output_root, *, input_root=None, weights=None, interval=5, resident=None):
     validate_claim(claim)
     a, p = claim['attempt'], claim['project']
     key = f"projects/{p['id']}/attempts/{a['id']}/output.mp4"
@@ -232,7 +246,8 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
                 with tempfile.TemporaryDirectory(prefix='render-', dir=destination.parent) as work:
                     local = Path(work) / 'output.mp4'
                     lease.progress = 0.1
-                    metrics = render(claim, local, lease, input_root, weights)
+                    metrics = (render(claim, local, lease, input_root, weights) if resident is None else
+                               render(claim, local, lease, input_root, weights, resident=resident))
                     stage = 'output_validation'
                     lease.progress = 0.8
                     media = probe(local, a['settings'], frame_count(claim['shot_snapshot'],
@@ -267,6 +282,9 @@ def run_once(claim, client, output_root, *, input_root=None, weights=None, inter
                       file=sys.stderr, flush=True)
                 try:
                     client.fail(a, code)
+                    saved_failure = json.loads(failure.read_text())
+                    saved_failure['acknowledged'] = True
+                    atomic_json(failure, saved_failure)
                 except Exception:
                     pass
                 raise

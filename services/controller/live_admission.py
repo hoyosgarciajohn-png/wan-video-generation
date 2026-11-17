@@ -28,7 +28,8 @@ GRANT_FIELDS = {'id','owner','project','currency','approved_cents','max_runtime_
                 'valid_until','profile','launch_profile','source_sha256'}
 GRANT_SHAPES = (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'},
                 GRANT_FIELDS | {'capacity_retry', 'allocation_plan'},
-                GRANT_FIELDS | {'capacity_retry', 'duration_comparison'})
+                GRANT_FIELDS | {'capacity_retry', 'duration_comparison'},
+                GRANT_FIELDS | {'capacity_retry', 'continuous_queue'})
 
 
 def _sources():
@@ -42,16 +43,23 @@ def _build(directory, image_ref):
     return verify_build(directory, image_ref)
 
 
-def configuration_hash(profile, launch_profile, allocation_plan=None, duration_comparison=None):
+def configuration_hash(profile, launch_profile, allocation_plan=None, duration_comparison=None, continuous_queue=None):
     RealJobBridge.configuration_hash(profile)
     launch = validate_launch_profile(launch_profile)
-    value = dict(profile=profile, launch_profile=launch, model_lock=LOCK)
+    from workers.gpu.profiles import model_lock
+    value = dict(profile=profile, launch_profile=launch, model_lock=model_lock(profile['model_profile']))
     if allocation_plan is not None:
         value['allocation_plan'] = validate_plan(allocation_plan, launch)
     if duration_comparison is not None:
         from workers.gpu.comparison import validate_policy, GPU
         value['duration_comparison'] = validate_policy(duration_comparison)
         require(profile['gpu_type']==GPU and duration_comparison['image_ref']==profile['image_ref'], 'Comparison configuration mismatch')
+    if continuous_queue is not None:
+        from workers.gpu.production import validate_policy, GPU
+        from workers.gpu.profiles import singing_profile
+        value['continuous_queue'] = validate_policy(continuous_queue)
+        require(profile['gpu_type'] == GPU and profile['model_profile'] == singing_profile() and
+                continuous_queue['image_ref'] == profile['image_ref'], 'Production configuration mismatch')
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
@@ -129,7 +137,8 @@ class LiveAdmission:
         require(isinstance(grant['id'], str) and re.fullmatch(r'[A-Za-z0-9_-]{1,200}', grant['id']), 'Route-compatible approval ID required')
         require(grant['currency'] == 'USD', 'Only USD approval supported')
         cents(grant['approved_cents'], positive=True)
-        require(type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= 3600,
+        ceiling = 14400 if 'continuous_queue' in grant else 3600
+        require(type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= ceiling,
                 'Benchmark runtime must be 1 to 3600 seconds')
         expiry = timestamp(grant['valid_until'])
         profile = grant['profile']
@@ -142,7 +151,10 @@ class LiveAdmission:
         if current:
             require(expiry > self.control.clock(), 'Approval expired')
             require(grant['source_sha256'] == _sources(), 'Approved source inventory changed')
-        return grant, configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison'))
+        if 'continuous_queue' in grant:
+            require(grant['max_runtime_seconds'] == 14400 and grant['approved_cents'] == 1800,
+                    'Production budget and runtime must match owner scope')
+        return grant, configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison'), grant.get('continuous_queue'))
 
     def _approval(self, db, owner, project, approval_id, *, current=True):
         row = db.execute('SELECT envelope,revoked FROM live_approvals WHERE id=? AND owner=? AND project=?',
@@ -184,10 +196,10 @@ class LiveAdmission:
         for key in ('approval_id', 'idempotency_key'):
             self._identifier(request[key])
         cents(request['reservation_cents'], positive=True)
-        require(type(request['runtime_seconds']) is int and 1 <= request['runtime_seconds'] <= 3600 and
+        require(type(request['runtime_seconds']) is int and 1 <= request['runtime_seconds'] <= 14400 and
                 type(request['expected_revision']) is int and request['expected_revision'] >= 0, 'Invalid runtime or revision')
         ids = request['shot_ids']
-        require(isinstance(ids,list) and 1<=len(ids)<=2 and all(isinstance(x,str) for x in ids) and len(set(ids))==len(ids), 'Distinct saved shots required')
+        require(isinstance(ids,list) and 1<=len(ids)<=100 and all(isinstance(x,str) for x in ids) and len(set(ids))==len(ids), 'Distinct saved shots required')
         with self.control.transaction() as db:
             bundle = self.control._load(db, owner, project)
             prior = db.execute('SELECT batch,request FROM live_reservations WHERE owner=? AND project=? AND idem=?',
@@ -202,7 +214,14 @@ class LiveAdmission:
                     raise StudioConflict('Canonical idempotency key already used')
                 grant, config_hash = self._approval(db, owner, project, request['approval_id'])
                 experiment=grant.get('duration_comparison')
-                require(ids==(experiment['shot_ids'] if experiment else ids[:1]), 'Shot selection exceeds signed scope')
+                queue=grant.get('continuous_queue')
+                scope=queue or experiment
+                require(ids==(scope['shot_ids'] if scope else ids[:1]), 'Shot selection exceeds signed scope')
+                if queue:
+                    require(request['runtime_seconds'] == 14400 and request['reservation_cents'] == 1800,
+                            'Production reservation or deadline changed')
+                    require(not db.execute('SELECT batch FROM live_job_links WHERE owner=? AND project=?', (owner,project)).fetchone(),
+                            'Production envelope already consumed')
                 if experiment:
                     require(request['runtime_seconds']<=2700 and grant['max_runtime_seconds']==2700 and
                             grant['approved_cents']==400 and request['reservation_cents']==400, 'Comparison budget or runtime changed')
@@ -223,14 +242,14 @@ class LiveAdmission:
                            if k not in ('id','project_id','scene_id')}) for identity in ids]
                 batch_id = uuid4().hex
                 batch = dict(id=batch_id, project_id=project, idempotency_key=request['idempotency_key'], execution_mode='runpod',
-                             model_profile=deepcopy(LOCK['profile']), shot_snapshots=snapshots,
+                             model_profile=deepcopy(grant['profile']['model_profile']), shot_snapshots=snapshots,
                              budget=dict(currency='USD', approved_cents=grant['approved_cents'], reserved_cents=request['reservation_cents'], spent_cents=0),
                              approved_at=stamp(now), deadline_at=stamp(datetime.fromtimestamp(deadline, timezone.utc)),
                              state='queued', cleanup_state='pending', provider_resource_id=None)
                 probe = dict(batch, state='rendering')
                 for snapshot in snapshots:
                     attempt = self.control._attempt(probe, snapshot, 'live-admission-check', now)
-                    validate_claim(self.control._envelope(bundle, probe, attempt, snapshot, experiment))
+                    validate_claim(self.control._envelope(bundle, probe, attempt, snapshot, experiment, queue))
                 bundle['batches'].append(batch)
                 self.control._save(db, bundle)
                 db.execute('INSERT INTO live_reservations (batch,owner,project,approval,idem,request,reserved_cents,created) VALUES (?,?,?,?,?,?,?,?)',

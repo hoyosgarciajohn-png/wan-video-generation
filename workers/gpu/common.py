@@ -81,9 +81,13 @@ def sync_dir(path):
 
 
 def frame_count(snapshot, mode):
-    requested = math.ceil(snapshot['target_duration_ms'] * 24 / 1000)
+    fps = snapshot['settings']['frame_rate']
+    rate = Fraction(fps['numerator'], fps['denominator'])
+    requested = math.ceil(snapshot['target_duration_ms'] * rate / 1000)
     if mode == 'fixture':
         return requested
+    if rate == 16:
+        return 4 * math.ceil(requested / 4)
     # Round upward to the first 4n+1 count, preserving enough footage to trim.
     return 4 * math.ceil((requested - 1) / 4) + 1
 
@@ -105,10 +109,12 @@ def validate_claim(claim):
     require(timestamp(b['approved_at']) <= timestamp(a['started_at']) < timestamp(b['deadline_at']),
             'Invalid batch window')
     settings = s['settings']
-    require(settings['frame_rate'] == {'numerator': 24, 'denominator': 1}, 'Requires 24 fps')
+    singing = b['model_profile'].get('id') == 'wan22-s2v-14b' and b['execution_mode'] == 'runpod'
+    require(settings['frame_rate'] == {'numerator': 16 if singing else 24, 'denominator': 1}, 'Unsupported frame rate')
     require(settings['seed'] <= 2**63 - 1 and len(s['prompt']) <= 10000, 'Input exceeds limits')
     mode = b['execution_mode']
-    profile = FIXTURE_PROFILE if mode == 'fixture' else LOCK['profile']
+    from .profiles import model_lock
+    profile = FIXTURE_PROFILE if mode == 'fixture' else model_lock(a['model_profile'])['profile']
     require(a['model_profile'] == profile, 'Unsupported model revision')
     if mode == 'fixture':
         require(all(b['budget'][k] == 0 for k in ('approved_cents','reserved_cents','spent_cents')),
@@ -117,6 +123,15 @@ def validate_claim(claim):
                 'Fixture requires 320x180 and one step')
         require(1 <= s['target_duration_ms'] <= 5000 and not s['reference_asset_ids'],
                 'Fixture duration or references unsupported')
+    elif singing:
+        require('continuous_queue' in claim, 'Singing requires production authority')
+        from .production import validate_policy, validate_snapshots
+        validate_policy(claim['continuous_queue'])
+        validate_snapshots(claim['continuous_queue'], b['shot_snapshots'])
+        require(b['budget']['approved_cents'] == 1800, 'Missing production budget')
+        require((settings['width'], settings['height'], settings['steps']) == (832,448,40), 'Unsupported singing settings')
+        require(1000 <= s['target_duration_ms'] <= 6000, 'Singing duration outside scope')
+        require(len(s['reference_asset_ids']) == 2, 'Singing needs one image and one audio clip')
     else:
         require(b['budget']['approved_cents'] > 0, 'Missing approved budget')
         require((settings['width'], settings['height']) in ((1280,704), (704,1280)),
@@ -136,9 +151,15 @@ def validate_claim(claim):
         record('asset', asset)
         require(asset['project_id'] == p['id'] and asset['owner_id'] == p['owner_id'],
                 'Input ownership mismatch')
-        require(asset['kind'] == 'image' and 0 < asset['bytes'] <= 20_000_000
-                and asset['mime_type'] in ('image/png', 'image/jpeg', 'image/webp'), 'Invalid reference')
+        image = (asset['kind'] == 'image' and 0 < asset['bytes'] <= 20_000_000
+                 and asset['mime_type'] in ('image/png', 'image/jpeg', 'image/webp'))
+        audio = (singing and asset['kind'] == 'audio' and 0 < asset['bytes'] <= 256_000
+                 and asset['mime_type'] == 'audio/wav'
+                 and asset['duration_ms'] == frame_count(s, mode) * 1000 // 16)
+        require(image or audio, 'Invalid reference')
         require(asset['object_key'].startswith(f"projects/{p['id']}/"), 'Unscoped input')
+    if singing:
+        require(sorted(a['kind'] for a in assets) == ['audio','image'], 'Singing input kinds mismatch')
 
 
 def probe(path, settings, frames):
@@ -152,10 +173,11 @@ def probe(path, settings, frames):
     require(video['codec_name'] == 'h264', 'Requires H264')
     require((video['width'], video['height']) == (settings['width'], settings['height']),
             'Output dimensions mismatch')
-    require(Fraction(video['avg_frame_rate']) == 24 and int(video['nb_frames']) == frames,
+    rate = Fraction(settings['frame_rate']['numerator'], settings['frame_rate']['denominator'])
+    require(rate in (16,24) and Fraction(video['avg_frame_rate']) == rate and int(video['nb_frames']) == frames,
             'Output frame count or rate mismatch')
     duration_ms = round(float(result['format']['duration']) * 1000)
-    require(abs(duration_ms - round(frames * 1000 / 24)) <= 1, 'Output duration mismatch')
+    require(abs(duration_ms - round(frames * 1000 / rate)) <= 1, 'Output duration mismatch')
     return dict(duration_ms=duration_ms, width=video['width'], height=video['height'],
-                frame_rate={'numerator': 24, 'denominator': 1})
+                frame_rate=dict(settings['frame_rate']))
 
