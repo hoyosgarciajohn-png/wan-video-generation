@@ -139,7 +139,7 @@ export class StudioClient {
     const mime_type = file.type === "audio/x-wav" ? "audio/wav" : file.type;
     const image = ["image/png", "image/jpeg", "image/webp"].includes(mime_type);
     if (
-      (!image && !["audio/wav", "audio/mpeg"].includes(mime_type)) ||
+      (!image && !["audio/wav", "audio/mpeg", "audio/mp4"].includes(mime_type)) ||
       file.size < 1 ||
       file.size > (image ? CHUNK_BYTES : 128 * CHUNK_BYTES)
     )

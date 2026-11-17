@@ -1,0 +1,1 @@
+{"cuda_inference": "UNVERIFIED", "runtime_import": "PASS", "runtime_import_scope": "torch_and_flash_attn_only", "source_revision": "e5058c08fada388b04bb3d1a4734bddbd2fdeac5", "torch": "2.8.0+cu128", "wan_cuda_import": "UNVERIFIED_REQUIRES_GPU", "wan_source_files": 28, "wan_source_syntax": "PASS", "weights": "UNVERIFIED"}

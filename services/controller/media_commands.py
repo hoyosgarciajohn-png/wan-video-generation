@@ -21,6 +21,7 @@ TYPES = {
     'image/webp': ('image', 'webp_pipe', 'webp', '.webp'),
     'audio/wav': ('audio', 'wav', None, '.wav'),
     'audio/mpeg': ('audio', 'mp3', 'mp3', '.mp3'),
+    'audio/mp4': ('audio', 'mov', 'aac', '.m4a'),
 }
 
 
@@ -30,6 +31,7 @@ def inspect_upload(path, data, mime, duration_cap):
         'image/png': data.startswith(b'\x89PNG\r\n\x1a\n'),
         'image/jpeg': data.startswith(b'\xff\xd8\xff'),
         'image/webp': data[:4] == b'RIFF' and data[8:12] == b'WEBP',
+        'audio/mp4': len(data) >= 12 and data[4:8] == b'ftyp',
         'audio/wav': data[:4] == b'RIFF' and data[8:12] == b'WAVE',
         'audio/mpeg': data.startswith(b'ID3') or (len(data) > 1 and data[0] == 255 and data[1] & 224 == 224),
     }

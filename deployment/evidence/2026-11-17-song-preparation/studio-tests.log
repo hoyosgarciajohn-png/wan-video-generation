@@ -1,0 +1,48 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> wan-studio@0.1.0 pretest
+> npm run generate:validator
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> wan-studio@0.1.0 generate:validator
+> node scripts/generate-validator.mjs
+
+
+> wan-studio@0.1.0 test
+> node --import tsx --test tests/model.test.ts tests/api.test.ts tests/validator-csp.test.mjs
+
+WAN connection returned HTTP 401
+WAN connection returned HTTP 404
+WAN connection returned HTTP 409
+WAN connection returned HTTP 422
+WAN connection returned HTTP 503
+WAN connection failed before receiving an HTTP response
+✔ default browser transport preserves the native fetch receiver (5.21197ms)
+✔ session and workspace client use same-origin cookies and revision envelopes (2.660512ms)
+✔ client preserves safe HTTP status and masks network/server details (3.066665ms)
+✔ server commands preserve identity revision and idempotency (2.181119ms)
+✔ protected upload timeline and export commands preserve full payload (1.49828ms)
+WAN connection failed before receiving an HTTP response
+WAN connection failed before receiving an HTTP response
+✔ chunk upload resumes committed chunks and ambiguous finish with bounded reads (128.789399ms)
+✔ chunk upload rejects changed prefixes expired sessions and oversize before writes (1.35271ms)
+✔ shot edits and regeneration preserve accepted take, frozen batch and historical timeline (166.913704ms)
+✔ same batch key is idempotent and rejects changed input (0.756611ms)
+✔ partial failure, cancellation and new batch retain committed takes (128.955109ms)
+✔ all project kinds enforce runtime caps and isolate project records (261.892251ms)
+✔ reusable image references are frozen and retained across shot revisions (98.346097ms)
+✔ reload restores approvals and rejects a stale browser write (5.332412ms)
+✔ storage failure leaves the last saved state recoverable (0.441446ms)
+✔ removed or malformed storage rejects stale writes without restoring old data (0.411671ms)
+✔ unavailable storage reads have the same recoverable error as writes (0.305421ms)
+✔ ownership and service errors use safe messages (3.999211ms)
+✔ bundle validation works when runtime string compilation is forbidden (13.620031ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 827.148326

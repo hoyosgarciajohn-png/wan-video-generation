@@ -27,7 +27,7 @@ export function References({
       );
       const audio = (
         upload
-          ? ["audio/wav", "audio/x-wav", "audio/mpeg"]
+          ? ["audio/wav", "audio/x-wav", "audio/mpeg", "audio/mp4"]
           : ["audio/wav", "audio/x-wav", "audio/mpeg", "audio/mp4", "audio/ogg"]
       ).includes(file.type);
       if (
@@ -102,7 +102,7 @@ export function References({
       <h2 id="refs-heading">References and source material</h2>
       <p className="muted">
         {upload
-          ? "Upload PNG, JPEG or WebP images up to 1 MiB, or WAV/MP3 audio up to 128 MiB in resumable 1 MiB chunks. Keep this tab open to resume an interrupted transfer. The server verifies media bytes. Image references can be stored for future Wan workflows; current synthetic renders do not support them."
+          ? "Upload PNG, JPEG or WebP images up to 1 MiB, or WAV, MP3 or M4A audio up to 128 MiB. Keep this tab open to resume an interrupted transfer. Your references are saved with this project."
           : allowImport
             ? "Reuse character and location images across shots. Images up to 1 MB and audio up to 4 MB are saved in this browser for the rehearsal."
             : "Review server references and edit their names or your creative brief. Use Save to server to persist changes."}
@@ -115,7 +115,7 @@ export function References({
           disabled={busy || !allowImport}
           accept={
             upload
-              ? "image/png,image/jpeg,image/webp,audio/wav,audio/x-wav,audio/mpeg"
+              ? "image/png,image/jpeg,image/webp,audio/wav,audio/x-wav,audio/mpeg,audio/mp4"
               : "image/png,image/jpeg,image/webp,audio/wav,audio/mpeg,audio/mp4,audio/ogg"
           }
           onChange={(e) => {

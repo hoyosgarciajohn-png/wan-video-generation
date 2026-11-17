@@ -134,7 +134,7 @@ class RealJobBridge:
         batch.update(state=row[0], cleanup_state=row[1], provider_resource_id=row[2])
         batch['budget'].update(spent_cents=total, reserved_cents=(max(0, reservation['reserved_cents'] - total)
                                if reservation['state'] == 'reserved' else 0))
-        self.control._reconcile(bundle, batch, self.control.clock())
+        self.control._reconcile(bundle, batch, self.control.clock(), db)
         # If canonical deadline reconciliation closed a rendering job, persist that
         # transition here so worker authority never sees contradictory states.
         if batch['state'] != row[0]:

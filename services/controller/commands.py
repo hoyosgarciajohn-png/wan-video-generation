@@ -86,7 +86,7 @@ class RenderCommands:
             require(batch['execution_mode'] == 'fixture', 'Only fixture batches supported')
             if batch['state'] in ('queued','provisioning','rendering'):
                 batch.update(state='canceled', cleanup_state='confirmed')
-            self.control._reconcile(bundle, batch, self.control.clock())
+            self.control._reconcile(bundle, batch, self.control.clock(), db)
             self.control._save(db, bundle)
             return dict(batch=deepcopy(batch), workspace=self.studio._get(db, owner))
 

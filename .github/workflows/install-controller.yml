@@ -12,7 +12,7 @@ on:
       trial:
         description: Exact approved trial scope (only for trial operations)
         type: choice
-        options: [first, diagnostic, repair, validation, fallback, allocation, comparison]
+        options: [first, diagnostic, repair, validation, fallback, allocation, comparison, singing]
         default: first
         required: true
       host_fingerprint:
@@ -41,7 +41,7 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: ${{ inputs.trial == 'singing' && 250 || 50 }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -69,8 +69,16 @@ jobs:
           WAN_GPU_QUOTE: ${{ inputs.gpu_quote }}
           WAN_BILLING_RECORD: ${{ inputs.billing_record }}
         run: bash deployment/hosting/cloud-install.sh
+      - name: Preserve song footage and technical draft
+        if: inputs.operation == 'trial-export' && inputs.trial == 'singing'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: wan-song-${{ github.run_id }}
+          path: ${{ runner.temp }}/wan-song
+          if-no-files-found: error
+          retention-days: 7
       - name: Preserve retained comparison outputs
-        if: inputs.operation == 'trial-export'
+        if: inputs.operation == 'trial-export' && inputs.trial == 'comparison'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: wan-comparison-${{ github.run_id }}

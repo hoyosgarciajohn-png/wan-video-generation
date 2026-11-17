@@ -5,7 +5,7 @@ on:
       trial:
         description: Exact approved trial scope for readiness receipt
         type: choice
-        options: [first, diagnostic, repair, validation, fallback, allocation, comparison]
+        options: [first, diagnostic, repair, validation, fallback, allocation, comparison, singing]
         default: first
         required: true
       scope:
@@ -26,7 +26,7 @@ jobs:
   cleanup:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 52
+    timeout-minutes: ${{ inputs.trial == 'singing' && 250 || 52 }}
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:

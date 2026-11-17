@@ -31,7 +31,7 @@ class FixtureRunner:
                     if batch['execution_mode'] != 'fixture':
                         continue
                     before = json.dumps([batch, bundle['attempts']], sort_keys=True)
-                    self.control._reconcile(bundle, batch, self.control.clock())
+                    self.control._reconcile(bundle, batch, self.control.clock(), db)
                     changed |= before != json.dumps([batch, bundle['attempts']], sort_keys=True)
                     if batch['state'] == 'rendering':
                         candidates.append((owner, bundle['project']['id'], batch['id']))
