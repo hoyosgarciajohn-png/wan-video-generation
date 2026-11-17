@@ -44,6 +44,59 @@ class SingingAdmissionTests(unittest.TestCase):
 
     def signed(self,*args,**kwargs): return test_live_admission.LiveAdmissionTests.signed(self,*args,**kwargs)
 
+    def recovery_fixture(self):
+        from workers.gpu.common import timestamp
+        self.live.approve(self.owner,self.project,self.signed())
+        parent=self.live.submit(self.owner,self.project,self.request)['batch']
+        self.control.clock=lambda:timestamp(parent['approved_at'])+timedelta(seconds=600)
+        with self.control.transaction() as db:
+            bundle=self.control._load(db,self.owner,self.project)
+            self.control._batch(bundle,parent['id']).update(state='failed',cleanup_state='confirmed')
+            self.control._save(db,bundle)
+            db.execute("UPDATE pod_batches SET state='failed',cleanup='confirmed' WHERE id=?",(parent['id'],))
+        self.payload.update(id='fictional-recovery',production_recovery=dict(parent_batch=parent['id'],
+            original_deadline=int(timestamp(parent['deadline_at']).timestamp()),retained_cents=76,
+            correction='conditioning_asset_ownership_v1'))
+        self.request.update(approval_id='fictional-recovery',idempotency_key='recovery',reservation_cents=1724,
+            runtime_seconds=13790,expected_revision=self.studio.get(self.owner)['revision'])
+        return parent
+
+    def test_recovery_retains_history_liability_and_original_deadline(self):
+        from services.controller.live_billing import totals
+        from workers.gpu.common import timestamp
+        parent=self.recovery_fixture()
+        self.live.approve(self.owner,self.project,self.signed())
+        job=self.live.submit(self.owner,self.project,self.request)
+        self.assertLess(timestamp(job['batch']['deadline_at']),timestamp(parent['deadline_at']))
+        with self.control.transaction() as db:
+            self.assertEqual(totals(db,self.owner,self.project)['reserved_cents'],1800)
+            self.assertEqual(tuple(db.execute('SELECT reserved_cents,state FROM live_reservations WHERE batch=?',
+                (parent['id'],)).fetchone()),(1800,'reserved'))
+            self.assertEqual(db.execute('SELECT count(*) FROM live_billing_events').fetchone()[0],0)
+            self.assertEqual(db.execute('SELECT retained_cents FROM live_recovery_caps').fetchone()[0],76)
+        self.assertEqual(self.live.submit(self.owner,self.project,self.request)['batch']['id'],job['batch']['id'])
+        self.live.cancel(self.owner,self.project,job['batch']['id'])
+        with self.assertRaisesRegex(ValueError,'exactly the original'):
+            self.live.submit(self.owner,self.project,dict(self.request,idempotency_key='another-recovery'))
+
+    def test_recovery_rejects_reset_overlap_and_understated_liability_atomically(self):
+        parent=self.recovery_fixture()
+        original=deepcopy(self.payload)
+        for field,value in [('original_deadline',original['production_recovery']['original_deadline']+1),
+                            ('retained_cents',75),('correction','unknown')]:
+            candidate=deepcopy(original);candidate['id']='bad-'+field;candidate['production_recovery'][field]=value
+            self.live.approve(self.owner,self.project,self.signed(candidate))
+            with self.assertRaises(ValueError):self.live.submit(self.owner,self.project,dict(self.request,approval_id=candidate['id']))
+        self.payload['id']='valid-recovery';self.request['approval_id']=self.payload['id']
+        self.live.approve(self.owner,self.project,self.signed())
+        for changes in [dict(runtime_seconds=14400),dict(reservation_cents=1800)]:
+            with self.assertRaises(ValueError):self.live.submit(self.owner,self.project,dict(self.request,**changes))
+        with self.control.transaction() as db:
+            db.execute("UPDATE pod_batches SET cleanup='failed' WHERE id=?",(parent['id'],))
+        with self.assertRaisesRegex(ValueError,'confirmed cleanup'):self.live.submit(self.owner,self.project,self.request)
+        with self.control.transaction() as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM live_recovery_caps').fetchone()[0],0)
+
     def test_multishot_admission_scoped_credential_and_no_budget_reset(self):
         self.live.approve(self.owner,self.project,self.signed())
         job=self.live.submit(self.owner,self.project,self.request)

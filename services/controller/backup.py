@@ -22,7 +22,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 TABLES = {'worker_telemetry','comparison_gates','projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
-          'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings'}
+          'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings','live_recovery_caps'}
 DB_NAME = 'database.sqlite'
 
 
@@ -190,7 +190,7 @@ def _inspect_live_admission(db, names, projects):
     """Preserve closed live history, including unpaid liabilities; keys stay external."""
     tables = {'live_approvals','live_reservations','live_job_links'}
     if not names & tables:
-        require(not names & {'live_billing_events','live_execution_bindings'}, 'Orphan live execution schema')
+        require(not names & {'live_billing_events','live_execution_bindings','live_recovery_caps'}, 'Orphan live execution schema')
         return set()
     require(tables <= names, 'Incomplete live admission schema')
     from services.controller.live_admission import GRANT_FIELDS, configuration_hash
@@ -212,7 +212,7 @@ def _inspect_live_admission(db, names, projects):
         require(isinstance(grant, dict) and set(grant) in GRANT_SHAPES and
                 (grant['id'],grant['owner'],grant['project']) == (identity,owner,project) and grant['currency'] == 'USD' and
                 type(grant['approved_cents']) is int and 0 < grant['approved_cents'] <= 2**53-1 and
-                type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= 3600,
+                type(grant['max_runtime_seconds']) is int and 1 <= grant['max_runtime_seconds'] <= (14400 if 'continuous_queue' in grant else 3600),
                 'Invalid live approval terms')
         if 'capacity_retry' in grant:
             from services.controller.allocation_retry import validate_policy
@@ -220,7 +220,7 @@ def _inspect_live_admission(db, names, projects):
         timestamp(grant['valid_until'])
         require(isinstance(grant['source_sha256'], dict) and bool(grant['source_sha256']) and
                 all(isinstance(k,str) and hex_hash(v) for k,v in grant['source_sha256'].items()), 'Invalid signed source inventory')
-        config_hash = configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison'))
+        config_hash = configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison'), grant.get('continuous_queue'))
         launch = validate_launch_profile(grant['launch_profile'])
         require(launch['env'] == {} and launch['image'] == grant['profile']['image_ref'] and
                 launch['gpu']['id'] == grant['profile']['gpu_type'] and launch['gpu']['count'] == 1 and
@@ -269,7 +269,7 @@ def _inspect_live_admission(db, names, projects):
                 (state == 'reserved' and settlements == 0 and link[4] == 'attempted'),
                 'Live released/settled history lacks matching final evidence')
         batch = next((b for b in projects[project]['batches'] if b['id'] == batch_id),None)
-        require(batch and batch['execution_mode'] == 'runpod' and batch['model_profile'] == LOCK['profile'] and
+        require(batch and batch['execution_mode'] == 'runpod' and batch['model_profile'] == approvals[approval][2]['profile']['model_profile'] and
                 (batch['state'],batch['cleanup_state'],batch['provider_resource_id']) == tuple(pod[1:4]) and
                 batch['budget'] == dict(currency='USD',approved_cents=approvals[approval][2]['approved_cents'],
                                        reserved_cents=max(0,reserved-spent) if state == 'reserved' else 0,spent_cents=spent),
@@ -325,9 +325,19 @@ def _inspect_live_admission(db, names, projects):
                 'Live immutable snapshot mismatch')
         seen.add(batch_id)
     require(seen == {row[0] for row in db.execute('SELECT batch FROM live_job_links')}, 'Unmatched live authority link')
-    for table in ('live_billing_events','live_execution_bindings'):
+    for table in ('live_billing_events','live_execution_bindings','live_recovery_caps'):
         if table in names:
             require({row[0] for row in db.execute('SELECT batch FROM '+table)} <= seen, 'Orphan live execution history')
+    if 'live_recovery_caps' in names:
+        for parent,approval,retained,created in db.execute('SELECT * FROM live_recovery_caps'):
+            require(approval in approvals, 'Recovery approval missing')
+            terms=approvals[approval][2].get('production_recovery')
+            parent_scope=db.execute('SELECT owner,project FROM live_job_links WHERE batch=?',(parent,)).fetchone()
+            require(isinstance(terms,dict) and terms.get('parent_batch')==parent and
+                    parent_scope and tuple(parent_scope)==approvals[approval][:2] and
+                    type(retained) is int and 0<retained<1800 and terms.get('retained_cents')==retained,
+                    'Recovery liability does not match signed history')
+            timestamp(created)
     return seen
 
 

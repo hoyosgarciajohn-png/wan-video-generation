@@ -3,6 +3,7 @@ import base64
 from copy import deepcopy
 from datetime import timedelta
 import json
+import os
 from pathlib import Path
 import secrets
 import subprocess
@@ -18,6 +19,34 @@ from services.controller.allocation_retry import POLICY
 from workers.gpu.common import atomic_json, digest, scoped, utcnow
 from workers.gpu.production import PROTOCOL, snapshot_hash
 from workers.gpu.profiles import singing_profile
+
+
+def service_access(control, owner, project, *, repair=False, service_user=None):
+    """Verify frozen bytes and readability as the asset-root service account."""
+    import pwd
+    root=control.asset_root;identity=root.stat()
+    if service_user is not None:assert identity.st_uid==pwd.getpwnam(service_user).pw_uid
+    bundle=control.bundle(owner,project);report=[];paths=[]
+    for asset in bundle['assets']:
+        if asset['kind'] not in ('image','audio'):continue
+        path=scoped(root,asset['object_key']);before=path.stat()
+        assert path.is_file() and not path.is_symlink() and before.st_size==asset['bytes'] and digest(path)==asset['sha256']
+        if repair and before.st_uid!=identity.st_uid:
+            assert os.geteuid()==0 and before.st_uid==0 and asset['mime_type']=='audio/wav', 'Unexpected ownership'
+            os.chown(path,identity.st_uid,identity.st_gid)
+            os.chmod(path,0o600)
+        report.append(dict(asset_id=asset['id'],uid_before=before.st_uid,uid_after=path.stat().st_uid,
+                           mode=oct(path.stat().st_mode & 0o777),sha256=asset['sha256']))
+        paths.append(dict(path=str(path),sha256=asset['sha256']))
+    command=['python3','-c',
+        'import sys,json,hashlib; rows=json.load(sys.stdin); '
+        'assert all(hashlib.sha256(open(r["path"],"rb").read()).hexdigest()==r["sha256"] for r in rows); '
+        'print("SERVICE_INPUT_BYTES_VERIFIED",len(rows))']
+    if os.geteuid()!=identity.st_uid:
+        assert os.geteuid()==0
+        command=['runuser','-u',pwd.getpwuid(identity.st_uid).pw_name,'--']+command
+    subprocess.run(command,input=json.dumps(paths),text=True,check=True)
+    return dict(status='SERVICE_INPUT_BYTES_VERIFIED',service_uid=identity.st_uid,assets=report)
 
 
 def prepare(op):
@@ -71,6 +100,7 @@ def prepare(op):
     p['scenes']=[dict(id=scene_ids[i],title=city['name']) for i,city in enumerate(proposal['cities'])]
     p['bundle']['shots']=shots;p['script']=proposal['treatment']
     workspace=studio.save(op.OWNER,workspace,workspace['revision'])
+    atomic_json(op.TRIAL/'input-access.json',service_access(c,op.OWNER,project,repair=True,service_user=getattr(op,"SERVICE_USER",None)))
     snapshots=[dict(shot_id=s['id'],**{k:v for k,v in s.items() if k not in ('id','project_id','scene_id')}) for s in shots]
     profile=dict(model_profile=singing_profile(),image_ref=op.IMAGE,gpu_type=op.GPU,gpu_count=1,
         region=pricing['region'],worker_endpoint=op.ORIGIN,storage_id='wan-controller-01-artifacts')
@@ -94,6 +124,46 @@ def prepare(op):
         overall_cap_cents=2000,pod_cap_cents=1800,storage_allowance_cents=200,runtime_seconds=14400,max_attempts=136,
         max_create_requests=3,original_song_asset_id=song['id'],original_song_sha256=song['sha256']))
     print(json.dumps(dict(status='FULL_SONG_PREPARED_NO_GPU',project=project,shots=68,duration_ms=start,quote=pricing)))
+
+
+def prepare_recovery(op):
+    """Repair the consumed B07 input files without changing its grant or attempts."""
+    import math
+    from workers.gpu.common import timestamp
+    op.primary_ready()
+    assert not op.TRIAL.exists() and not op.AUTH.exists(), 'Recovery preparation is immutable'
+    c=op.control()
+    with c.transaction() as db:op.prior_history_closed(db)
+    original=op.STATE/'singing-trial-20261117';job=op.read(original/'job.json')
+    assert job['batch']=='7e89330141794b85827d48341def92fe' and job['deadline']==1794919601
+    inventory=op.provider_get('/pods')
+    assert inventory['pods']==[] and inventory['pagination']==dict(hasNextPage=False,nextCursor=None), 'Complete provider inventory must be empty before recovery'
+    bundle=c.bundle(op.OWNER,job['project'])
+    parent=next(b for b in bundle['batches'] if b['id']==job['batch'])
+    assert parent['state']=='failed' and parent['cleanup_state']=='confirmed' and not bundle['takes']
+    op.TRIAL.mkdir(mode=0o700)
+    access=service_access(c,op.OWNER,job['project'],repair=True,service_user=op.SERVICE_USER)
+    atomic_json(op.TRIAL/'input-access.json',access)
+    build=op.materialize_build(op.TRIAL/'build')
+    atomic_json(op.AUTH,{k:secrets.token_hex(32) for k in ('owner','host','billing')})
+    grant=deepcopy(op.read(original/'approval.json')['payload'])
+    host=deepcopy(op.read(original/'host.json')['payload'])
+    # Retain an extra ten minutes of liability so admission cannot under-reserve
+    # startup/previous compute while waiting for the independent guard.
+    hold=math.ceil((utcnow().timestamp()-timestamp(parent['approved_at']).timestamp()+600)*450/3600)+1
+    assert hold<1800
+    grant.update(id=op.APPROVAL_ID,source_sha256=_sources(),production_recovery=dict(parent_batch=job['batch'],
+        original_deadline=job['deadline'],retained_cents=hold,correction='conditioning_asset_ownership_v1'))
+    host.update(source_sha256=grant['source_sha256'],build_manifest_sha256=build['manifest_sha256'])
+    saved=op.read(original/'prepared.json')
+    saved.update(source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        recovery=grant['production_recovery'],build=build,pod_cap_cents=1800-hold)
+    atomic_json(op.TRIAL/'approval.json',op.sign(grant,'owner',APPROVAL_DOMAIN))
+    atomic_json(op.TRIAL/'host.json',op.sign(host,'host',HOST_DOMAIN))
+    atomic_json(op.TRIAL/'prepared.json',saved)
+    print(json.dumps(dict(status='INPUT_REPAIR_VERIFIED_NO_GPU',project=job['project'],assets=len(access['assets']),
+        corrected=sum(a['uid_before']!=a['uid_after'] for a in access['assets']),retained_liability_cents=hold,
+        remaining_gpu_cents=1800-hold,original_deadline=job['deadline'])))
 
 
 def export(op):

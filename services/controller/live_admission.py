@@ -29,7 +29,8 @@ GRANT_FIELDS = {'id','owner','project','currency','approved_cents','max_runtime_
 GRANT_SHAPES = (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'},
                 GRANT_FIELDS | {'capacity_retry', 'allocation_plan'},
                 GRANT_FIELDS | {'capacity_retry', 'duration_comparison'},
-                GRANT_FIELDS | {'capacity_retry', 'continuous_queue'})
+                GRANT_FIELDS | {'capacity_retry', 'continuous_queue'},
+                GRANT_FIELDS | {'capacity_retry', 'continuous_queue', 'production_recovery'})
 
 
 def _sources():
@@ -218,10 +219,13 @@ class LiveAdmission:
                 scope=queue or experiment
                 require(ids==(scope['shot_ids'] if scope else ids[:1]), 'Shot selection exceeds signed scope')
                 if queue:
-                    require(request['runtime_seconds'] == 14400 and request['reservation_cents'] == 1800,
-                            'Production reservation or deadline changed')
-                    require(not db.execute('SELECT batch FROM live_job_links WHERE owner=? AND project=?', (owner,project)).fetchone(),
-                            'Production envelope already consumed')
+                    if 'production_recovery' in grant:
+                        self._production_recovery(db, owner, project, bundle, grant, request)
+                    else:
+                        require(request['runtime_seconds'] == 14400 and request['reservation_cents'] == 1800,
+                                'Production reservation or deadline changed')
+                        require(not db.execute('SELECT batch FROM live_job_links WHERE owner=? AND project=?', (owner,project)).fetchone(),
+                                'Production envelope already consumed')
                 if experiment:
                     require(request['runtime_seconds']<=2700 and grant['max_runtime_seconds']==2700 and
                             grant['approved_cents']==400 and request['reservation_cents']==400, 'Comparison budget or runtime changed')
@@ -260,6 +264,37 @@ class LiveAdmission:
                 db.execute('INSERT INTO live_job_links (batch,owner,project,approval,config_hash) VALUES (?,?,?,?,?)',
                            (batch_id, owner, project, grant['id'], config_hash))
             return self._status(db, owner, project, batch_id)
+
+    def _production_recovery(self, db, owner, project, bundle, grant, request):
+        """One audited input-transfer repair; original attempts and invoice remain open."""
+        recovery=grant['production_recovery']
+        require(isinstance(recovery,dict) and set(recovery)=={'parent_batch','original_deadline','retained_cents','correction'},
+                'Exact production recovery required')
+        require(recovery['correction']=='conditioning_asset_ownership_v1', 'Unsupported production correction')
+        cents(recovery['retained_cents'],positive=True)
+        links=db.execute('SELECT batch,approval FROM live_job_links WHERE owner=? AND project=?',(owner,project)).fetchall()
+        require(len(links)==1 and links[0][0]==recovery['parent_batch'], 'Recovery requires exactly the original batch')
+        parent=self.control._batch(bundle,recovery['parent_batch'])
+        row=db.execute('SELECT state,cleanup,deadline FROM pod_batches WHERE id=?',(parent['id'],)).fetchone()
+        require(row and row[0]=='failed' and row[1]=='confirmed' and parent['state']=='failed' and
+                parent['cleanup_state']=='confirmed' and not bundle['takes'], 'Recovery requires confirmed cleanup and no accepted takes')
+        require(type(recovery['original_deadline']) is int and recovery['original_deadline']==row[2]==
+                timestamp(parent['deadline_at']).timestamp(), 'Recovery cannot reset original deadline')
+        prior=json.loads(db.execute('SELECT envelope FROM live_approvals WHERE id=?',(links[0][1],)).fetchone()[0])['payload']
+        require('production_recovery' not in prior and prior.get('continuous_queue')==grant['continuous_queue'] and
+                prior['profile']==grant['profile'] and prior['launch_profile']==grant['launch_profile'], 'Recovery scope changed')
+        require(not db.execute('SELECT batch FROM live_recovery_caps WHERE batch=?',(parent['id'],)).fetchone(), 'Recovery already consumed')
+        now=self.control.clock().timestamp()
+        elapsed=now-timestamp(parent['approved_at']).timestamp()
+        # Conservatively charge the entire elapsed interval, including idle repair
+        # time, at the signed maximum. This is a liability hold, not a paid invoice.
+        minimum=math.ceil(max(0,elapsed)*grant['continuous_queue']['max_hourly_cents']/3600)+1
+        require(minimum<=recovery['retained_cents']<1800, 'Prior compute liability understated')
+        require(request['reservation_cents']==1800-recovery['retained_cents'] and
+                math.floor(now)+request['runtime_seconds']<=recovery['original_deadline'] and
+                request['runtime_seconds']*450<=request['reservation_cents']*3600, 'Recovery exceeds remaining budget or time')
+        db.execute('INSERT INTO live_recovery_caps VALUES (?,?,?,?)',
+                   (parent['id'],grant['id'],recovery['retained_cents'],stamp(self.control.clock())))
 
     def _status(self, db, owner, project, batch_id):
         bundle = self.control._load(db, owner, project)

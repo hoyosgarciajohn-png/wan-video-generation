@@ -77,6 +77,7 @@ if [[ "$operation" == trial-* ]]; then
         allocation) trial_dir=/var/lib/wan/allocation-trial-20261116 ;;
         comparison) trial_dir=/var/lib/wan/comparison-trial-20261116 ;;
         singing) trial_dir=/var/lib/wan/singing-trial-20261117 ;;
+        singing-recovery) trial_dir=/var/lib/wan/singing-recovery-20261117 ;;
         *) fail 'Unknown trial scope' ;;
     esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then
@@ -105,17 +106,17 @@ assert value['path']=='.github/workflows/deadline-guard.yml' and value['head_sha
 print('INDEPENDENT_GUARD_RUNNING_VERIFIED')
 PY
     fi
-    if [[ "$operation" == trial-launch && "$trial" == singing ]]; then
+    if [[ "$operation" == trial-launch && ( "$trial" == singing || "$trial" == singing-recovery ) ]]; then
         # The existing host owns orchestration; only the independent deadline
         # guard needs a long-running Actions runner. The fixed unit prevents a
         # duplicate launch and preserves logs after this short SSH session ends.
-        ssh "${ssh_options[@]}" "root@$host" "systemd-run --unit=wan-song-launch-20261117 --collect --property=WorkingDirectory=/opt/wan/current --property=StandardOutput=append:$trial_dir/launch.log --property=StandardError=append:$trial_dir/launch.log --setenv=WAN_VERIFIED_GUARD_RUN=$guard_run /opt/wan/venv/bin/python -u -m deployment.first_trial launch --trial singing"
+        ssh "${ssh_options[@]}" "root@$host" "systemd-run --unit=wan-$trial-launch-20261117 --collect --property=WorkingDirectory=/opt/wan/current --property=StandardOutput=append:$trial_dir/launch.log --property=StandardError=append:$trial_dir/launch.log --setenv=WAN_VERIFIED_GUARD_RUN=$guard_run /opt/wan/venv/bin/python -u -m deployment.first_trial launch --trial $trial"
         printf '%s\n' 'SONG_LAUNCH_MONITOR_STARTED_ON_EXISTING_HOST; GPU_OUTCOME_NOT_YET_CONFIRMED'
         exit
     fi
     ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}' --trial '$trial'"
     if [[ "$operation" == trial-export ]]; then
-        if [[ "$trial" == singing ]]; then
+        if [[ ( "$trial" == singing || "$trial" == singing-recovery ) ]]; then
             mkdir -p "$RUNNER_TEMP/wan-song"
             scp -r "${ssh_options[@]}" "root@$host:$trial_dir/song-output/." "$RUNNER_TEMP/wan-song/"
             exit
