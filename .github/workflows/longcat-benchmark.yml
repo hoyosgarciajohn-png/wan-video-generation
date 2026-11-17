@@ -27,6 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with: {persist-credentials: false}
+      - name: Verify disposable build runner capacity
+        run: python3 deployment/cloud_build.py preflight --target gpu --output "$RUNNER_TEMP/longcat-capacity"
       - name: Build and verify without renting GPUs
         env:
           GH_TOKEN: ${{ github.token }}
