@@ -1,6 +1,6 @@
 # Wan Video Generation
 
-A private foundation for self-hosted Wan production using temporary Runpod GPU Pods. Target projects are music videos up to 5 minutes and short films and cartoons up to 30 minutes.
+A private foundation for self-hosted Wan production using temporary Runpod GPU Pods. Target projects are music videos up to 6 minutes and short films and cartoons up to 30 minutes. See the [full-song production acceptance plan](docs/B07_FULL_SONG_PRODUCTION.md) for the current 5:40.126 music-video goal and remaining GPU capabilities.
 
 The local integration checkpoint includes the storyboard fixture UI, durable fixture controller, Wan worker source, CPU exporter and QA checks. See [integration evidence and remaining gates](docs/B05_INTEGRATION_CHECKPOINT.md). The [connected Studio checkpoint](docs/STUDIO_API_V1.md) adds local authenticated project persistence and protected media reads. [Connected fixture render commands](docs/RENDER_COMMANDS_V1.md) now submit, cancel and review actual synthetic worker outputs. [Protected uploads and timeline/export controls](docs/MEDIA_COMMANDS_V1.md) complete the local synthetic workflow through MP4 download. Durable chunk uploads support WAV/MP3 tracks up to 128 MiB; see [upload protocol](docs/UPLOADS_V1.md). [Checked local recovery](docs/BACKUP_RESTORE.md) and [staging preparation](docs/DEPLOYMENT_READINESS.md) are available. [Budget/lifecycle rehearsals](docs/BUDGET_ORCHESTRATION.md) use only the built-in fake provider; they cannot dispatch Runpod. [Scoped remote worker transfer](docs/WORKER_TRANSPORT.md) now supports separate controller/worker storage roots for fixture batches, with expiring credentials and replay-safe completion. The CPU controller is hosted with HTTPS and durable disk. Owner browser sign-in and the synthetic hosted workflow with independent recovery are verified. The first bounded live trial is recorded separately from synthetic acceptance.
 
@@ -44,6 +44,16 @@ still-unverified Runpod download.
 records the initial hosted release and resource/cost. Later [access and recovery evidence](deployment/evidence/2026-11-16-access-recovery/README.md) supersedes its original sign-in and recovery gaps. See the [first live trial](deployment/evidence/2026-11-16-first-live-trial/README.md) for GPU execution, cleanup, costs and remaining gates.
 
 ## Current continuation status
+
+John has directed the full 5:40.126 concert video as the production acceptance
+goal, including corrective retries. Six-minute project/export support is prepared
+in source. Five-second ordinary Wan generation has passed; audio-driven singing
+and the full production queue still need implementation and live validation.
+John approved $20 total and four cumulative GPU hours for the new production;
+see the [budget and queue plan](docs/B07_BUDGET_AND_QUEUE_PLAN.md). The old grants
+remain consumed, and the new performance worker/queue are not yet ready to launch.
+
+### Earlier progressive-validation checkpoints
 
 The 1280x704/24fps exporter and hosted one-minute synthetic rehearsal passed.
 No real Wan clip has been saved yet. PR #76's launch diagnostics and multiple-data-center

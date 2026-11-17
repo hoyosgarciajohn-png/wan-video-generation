@@ -1,0 +1,27 @@
+name: Prepare singing model
+run-name: Prepare S2V source and metadata · ${{ github.sha }}
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wan-singing-preparation
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Freeze official metadata without GPU allocation
+        run: python3 deployment/prepare_singing_model.py --output "$RUNNER_TEMP/singing-preparation"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: singing-preparation-${{ github.run_id }}
+          path: ${{ runner.temp }}/singing-preparation
+          if-no-files-found: error
+          retention-days: 1

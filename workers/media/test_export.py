@@ -35,7 +35,7 @@ class ExportTest(unittest.TestCase):
         )
 
     def bundle(self, kind, seconds):
-        cap = 300 if kind == "music_video" else 1800
+        cap = 360 if kind == "music_video" else 1800
         items = []
         for start in range(0, seconds, 299):
             items.append(dict(
@@ -75,7 +75,7 @@ class ExportTest(unittest.TestCase):
 
     def test_runtime_caps_playback_and_soundtrack_sync(self):
         original = self.assets[-1]["sha256"]
-        for kind, seconds in (("music_video", 300), ("short_film", 1800), ("cartoon", 1800)):
+        for kind, seconds in (("music_video", 360), ("short_film", 1800), ("cartoon", 1800)):
             with self.subTest(kind=kind):
                 output = self.run_job(self.bundle(kind, seconds))
                 video = probe(output, "v:0")
@@ -94,6 +94,32 @@ class ExportTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "cap exceeded"):
                     self.run_job(self.bundle(kind, seconds + 1))
         self.assertEqual(digest(self.root / "tone.wav"), original)
+
+    def test_full_song_fractional_duration_and_legacy_limit(self):
+        # Fictional full-length soundtrack exercises the real CPU encoder.
+        soundtrack = self.media("full-song", "audio", "sine=frequency=440:duration=340.126")
+        soundtrack["duration_ms"] = 340126
+        self.assets.append(soundtrack)
+        bundle = self.bundle("music_video", 340)
+        timeline = bundle["timelines"][0]
+        timeline["duration_ms"] = 340126
+        timeline["items"][-1]["source_out_ms"] += 126
+        timeline["audio"] = [dict(asset_id="full-song", source_in_ms=0,
+                                  source_out_ms=340126, timeline_start_ms=0)]
+        output = self.run_job(bundle)
+        # At four frames/sec the last picture rounds to 340.25 seconds.
+        self.assertEqual(float(probe(output, "v:0")["duration"]), 340.25)
+        self.assertGreaterEqual(float(probe(output, "a:0")["duration"]), 340.125)
+        subprocess.run(["ffmpeg", "-v", "error", "-xerror", "-i", str(output),
+                        "-f", "null", "-"], check=True)
+        self.assertEqual(digest(self.root / "full-song.wav"), soundtrack["sha256"])
+        # Retrying an already completed export preserves the existing file.
+        before = output.stat().st_mtime_ns
+        self.assertEqual(self.run_job(bundle), output)
+        self.assertEqual(output.stat().st_mtime_ns, before)
+        bundle["project"]["runtime_limit_ms"] = 300000
+        with self.assertRaisesRegex(ValueError, "cap exceeded"):
+            self.run_job(bundle)
 
     def test_replacement_retry_and_snapshot_isolation(self):
         bundle = self.bundle("music_video", 4)

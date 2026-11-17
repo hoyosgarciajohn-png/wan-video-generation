@@ -8,6 +8,10 @@ from datetime import datetime
 from fractions import Fraction
 from pathlib import Path
 
+RUNTIME_CAPS = json.loads(
+    (Path(__file__).resolve().parents[2] / "contracts" / "runtime-policy.json").read_text()
+)["runtime_caps_ms"]
+
 
 def probe(path, stream):
     result = subprocess.check_output([
@@ -144,11 +148,7 @@ def export_bundle(bundle, export_id, project_id, media_root, job_root, progress=
         segments.append((source, start, end, count, checksum))
         previous_frame = boundary
 
-    maximum = {
-        "music_video": 300_000,
-        "short_film": 1_800_000,
-        "cartoon": 1_800_000,
-    }[project["kind"]]
+    maximum = RUNTIME_CAPS[project["kind"]]
     if not 0 < elapsed == timeline["duration_ms"] <= min(maximum, project["runtime_limit_ms"]):
         raise ValueError("Invalid timeline duration or project cap exceeded")
 

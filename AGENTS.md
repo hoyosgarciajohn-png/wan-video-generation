@@ -138,3 +138,22 @@ Independent guard 44026572576 continues through 06:34:51 UTC; preserve the old
 unknown exception and all seven consumed scopes. No additional rental or render
 is authorized. Owner creative acceptance and continuous 15s remain pending.
 Read deployment/evidence/2026-11-17-duration-comparison/ for measured results.
+
+John subsequently directed completing the whole 5:40.126 music video as the real
+capability test, learning from failures, fixing problems and retrying until done.
+This authorizes preparation and corrective retries for the new B07 production;
+a short sample alone does not meet the goal. Preserve successful takes and retry
+affected work. See docs/B07_FULL_SONG_PRODUCTION.md and issue #8. No new numeric
+production budget or rental runtime envelope was supplied. Prepare the full
+workflow, but obtain that missing financial scope before paid admission. Never
+reset/replay any of the seven consumed grants. The older one-attempt rules remain
+historical facts for those scopes; they do not negate the new retry direction.
+
+John then set the B07 production ceiling to $20 total and approved four hours
+of GPU usage, with continuous queued rendering and corrective retries. These
+numeric approvals are now present; do not request them again. Use a fresh
+production scope, one GPU at a time, up to $18 GPU at <=$4.50/hour and $2 storage/
+cleanup reserve, with at most four cumulative GPU hours including startup and
+retries. Two hours remains the optimization target. Never reset the limits on
+retry. See docs/B07_BUDGET_AND_QUEUE_PLAN.md. This authorizes the bounded work;
+it does not establish audio-driven worker, resident queue or release readiness.

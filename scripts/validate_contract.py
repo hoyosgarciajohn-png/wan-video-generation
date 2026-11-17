@@ -12,6 +12,8 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RUNTIME_POLICY = json.loads((ROOT / "contracts" / "runtime-policy.json").read_text())
+RUNTIME_CAPS = RUNTIME_POLICY["runtime_caps_ms"]
 SCHEMA = json.loads((ROOT / "contracts" / "bundle.schema.json").read_text())
 VALIDATOR = Draft202012Validator(SCHEMA, format_checker=FormatChecker())
 COLLECTIONS = ("assets", "shots", "batches", "attempts", "takes", "reviews", "timelines", "exports")
@@ -35,7 +37,7 @@ def validate_bundle(bundle, media_root=None):
     """Check static contract consistency. Runtime authorization belongs to B02."""
     VALIDATOR.validate(bundle)
     project = bundle["project"]
-    runtime_cap = 300000 if project["kind"] == "music_video" else 1800000
+    runtime_cap = RUNTIME_CAPS[project["kind"]]
     require(project["runtime_limit_ms"] <= runtime_cap, "Project exceeds the supported runtime cap")
     indexes = {}
     for collection in COLLECTIONS:
