@@ -105,6 +105,14 @@ assert value['path']=='.github/workflows/deadline-guard.yml' and value['head_sha
 print('INDEPENDENT_GUARD_RUNNING_VERIFIED')
 PY
     fi
+    if [[ "$operation" == trial-launch && "$trial" == singing ]]; then
+        # The existing host owns orchestration; only the independent deadline
+        # guard needs a long-running Actions runner. The fixed unit prevents a
+        # duplicate launch and preserves logs after this short SSH session ends.
+        ssh "${ssh_options[@]}" "root@$host" "systemd-run --unit=wan-song-launch-20261117 --collect --property=WorkingDirectory=/opt/wan/current --property=StandardOutput=append:$trial_dir/launch.log --property=StandardError=append:$trial_dir/launch.log --setenv=WAN_VERIFIED_GUARD_RUN=$guard_run /opt/wan/venv/bin/python -u -m deployment.first_trial launch --trial singing"
+        printf '%s\n' 'SONG_LAUNCH_MONITOR_STARTED_ON_EXISTING_HOST; GPU_OUTCOME_NOT_YET_CONFIRMED'
+        exit
+    fi
     ssh "${ssh_options[@]}" "root@$host" "cd /opt/wan/current; WAN_VERIFIED_GUARD_RUN='$guard_run' /opt/wan/venv/bin/python -u -m deployment.first_trial '${operation#trial-}' --trial '$trial'"
     if [[ "$operation" == trial-export ]]; then
         if [[ "$trial" == singing ]]; then
