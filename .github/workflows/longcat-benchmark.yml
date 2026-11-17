@@ -1,0 +1,84 @@
+name: LongCat bounded benchmark
+run-name: LongCat ${{ inputs.operation }}
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [prepare, guard]
+        default: prepare
+        required: true
+      pod_name:
+        type: string
+        description: Exact approved benchmark name, guard only
+      deadline:
+        type: string
+        description: Absolute Unix deadline, at most 900 seconds ahead, guard only
+permissions:
+  contents: read
+jobs:
+  build:
+    if: inputs.operation == 'prepare' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Build and verify without renting GPUs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$RUNNER_TEMP/longcat-docker-auth"
+          mkdir -m 700 "$DOCKER_CONFIG"
+          trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+          python -c "import os; from deployment.publish_image import package_visibility; assert package_visibility(os.environ['GH_TOKEN']) == 'private'"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          tag="ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu:longcat-$GITHUB_SHA"
+          docker build -f benchmarks/longcat/Dockerfile -t "$tag" .
+          docker run --rm --entrypoint python "$tag" -m pip freeze > "$RUNNER_TEMP/longcat-packages.txt"
+          docker push "$tag"
+          python -c "import os; from deployment.publish_image import package_visibility; assert package_visibility(os.environ['GH_TOKEN']) == 'private'"
+          docker inspect --format '{{json .RepoDigests}}' "$tag" > "$RUNNER_TEMP/longcat-image.json"
+          cat "$RUNNER_TEMP/longcat-image.json"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: longcat-runtime-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/longcat-image.json
+            ${{ runner.temp }}/longcat-packages.txt
+          retention-days: 7
+          if-no-files-found: error
+  inputs:
+    if: inputs.operation == 'prepare' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Copy and verify existing singer and audio inputs
+        env:
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: bash benchmarks/longcat/host_inputs.sh
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: longcat-inputs-${{ github.run_id }}
+          path: ${{ runner.temp }}/longcat-inputs
+          retention-days: 7
+          if-no-files-found: error
+  guard:
+    if: inputs.operation == 'guard' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Watch exact Pod and terminate within rental allowance
+        env:
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          BENCHMARK_NAME: ${{ inputs.pod_name }}
+          BENCHMARK_DEADLINE: ${{ inputs.deadline }}
+        run: python3 -u benchmarks/longcat/guard.py
