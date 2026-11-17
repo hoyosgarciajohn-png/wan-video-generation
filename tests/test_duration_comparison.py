@@ -95,6 +95,26 @@ class DurationComparisonTests(unittest.TestCase):
         self.assertEqual(self.http.posts,1)
         self.assertEqual(self.http.pods,{})
         self.assertIsNone(self.client.claim())
+        # Exercise the delivery pipeline with fictional HD clips, including exact trims.
+        from deployment.comparison_report import make_report
+        from deployment import first_trial
+        trial=self.control.asset_root.parent/'delivery';trial.mkdir()
+        directory=trial/'comparison-output'
+        with self.control.transaction() as db:
+            metrics=[json.loads(r[0]) for r in db.execute('SELECT payload FROM worker_telemetry')]
+        bundle=self.control.bundle(self.owner,self.project)
+        summary=dict(batch=bundle['batches'][0],telemetry=metrics,takes=bundle['takes'],billing={'status':'FICTIONAL'},
+                     pricing={'usd_per_hour':'4.39'},allocation_attempts=[{'started_at':'2026-11-16T23:00:00Z'}],
+                     attempts=[{'started_at':'2026-11-16T23:20:00Z'}],checked_at=1794873600,
+                     cleanup_confirmed_observed_at=1794871800)
+        with patch.multiple(first_trial,COMPARISON=True,TRIAL=trial,OWNER=self.owner), \
+                patch.object(first_trial,'observe',return_value=summary),patch.object(first_trial,'control',return_value=self.control):
+            first_trial.export()
+        report=make_report(directory)
+        self.assertEqual([r['media']['duration_ms'] for r in report['results']],[5000,15000])
+        self.assertTrue((directory/'wan-side-by-side-first-5s.mp4').is_file())
+        self.assertAlmostEqual(report['shared_startup_seconds'],1200)
+        self.assertAlmostEqual(report['total_elapsed_compute_estimate_usd'],2.195)
         destination=self.control.asset_root.parent/'comparison-backup'
         backup.create_backup(self.control.db_path,self.control.asset_root,destination)
         restored=backup.restore_backup(destination,self.control.asset_root.parent/'comparison-restored')

@@ -47,3 +47,13 @@ Reserve estimated remaining cost before launch and before a retry. Move settled 
 ## Compatibility
 
 The earlier starter ZIP used a compact draft with singular record keys. Keep it as archived planning evidence. Use the versioned bundle for new work. This is a new repository, with no production data to migrate. An additive or breaking change must increment contract version and provide an updated fixture and consumer handoff.
+
+## Private duration experiment protocol v1
+
+The owner-approved B06 pair uses `wan-duration-comparison-v1` alongside canonical
+bundle version 0.1.0. This separately versioned private extension is described in
+[B06 duration comparison](B06_DURATION_COMPARISON_PLAN.md). It adds a signed
+`duration_comparison` capability to trusted worker claims and an authenticated
+telemetry acknowledgement endpoint. B01 worker, B02 controller/operator and B05
+verification are coordinated in issue #7. It does not alter stored canonical
+records or enable fifteen-second work in other scopes.

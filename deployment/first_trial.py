@@ -545,9 +545,12 @@ def observe():
         allocation_history = json.loads(allocation_row[0]) if allocation_row else []
         metrics=[json.loads(x[0]) for x in db.execute('SELECT payload FROM worker_telemetry WHERE batch=?',(job['batch'],))]
         gate=db.execute('SELECT decision FROM comparison_gates WHERE batch=?',(job['batch'],)).fetchone()
-    summary = dict(checked_at=time.time(), batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
+    summary = dict(checked_at=time.time(), pricing=job['pricing'], batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
         provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'],
         provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None, allocation_attempts=allocation_history, telemetry=metrics, comparison_gate=json.loads(gate[0]) if gate else None)
+    if summary['batch']['cleanup_state'] == 'confirmed':
+        previous = read(TRIAL / 'status.json') if (TRIAL / 'status.json').exists() else {}
+        summary['cleanup_confirmed_observed_at'] = previous.get('cleanup_confirmed_observed_at', summary['checked_at'])
     atomic_json(TRIAL / 'status.json', summary)
     # Keep complete evidence on disk, but put lifecycle fields first in a short
     # live log line so the Actions viewer does not truncate the useful status.
@@ -587,6 +590,25 @@ def launch():
         raise SystemExit('Cleanup remains unresolved; separate guard remains responsible')
 
 
+def export():
+    assert COMPARISON
+    summary=observe()
+    assert summary['batch']['cleanup_state']=='confirmed' and summary['batch']['state'] in ('succeeded','failed','canceled')
+    destination=TRIAL/'comparison-output'
+    destination.mkdir(mode=0o700,exist_ok=True)
+    bundle=control().bundle(OWNER,summary['batch']['project_id'])
+    for take in summary['takes']:
+        metrics=next(m for m in summary['telemetry'] if m['attempt_id']==take['attempt_id'])
+        asset=next(a for a in bundle['assets'] if a['id']==take['asset_id'])
+        source=scoped(control().asset_root,asset['object_key'])
+        assert digest(source)==asset['sha256']==metrics['asset_sha256'] and source.stat().st_size==asset['bytes']==metrics['asset_bytes']
+        target=destination/f"wan-{metrics['target_duration_ms']//1000:02d}s-original.mp4"
+        if target.exists():assert digest(target)==asset['sha256']
+        else:shutil.copyfile(source,target)
+    atomic_json(destination/'status.json',summary)
+    print(json.dumps(dict(status='RETAINED_OUTPUTS_COLLECTED',takes=len(summary['takes']))))
+
+
 def main():
     os.umask(0o077)
     assert os.geteuid() == 0 and subprocess.check_output(['hostname'],text=True).strip() == 'wan-controller-01'
@@ -594,11 +616,11 @@ def main():
     subprocess.run(['git','diff','--quiet'], check=True)
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
-    parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
+    parser.add_argument('operation', choices=['prepare','admit','launch','observe','export'])
     parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation','comparison'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
-    {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()
+    {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe,'export':export}[args.operation]()
 
 
 if __name__ == '__main__':
