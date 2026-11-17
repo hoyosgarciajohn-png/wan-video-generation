@@ -17,6 +17,7 @@ WORKER_CMD = ['worker','--output-root','/worker','--weights','/models',
 BOOTSTRAP_ENTRYPOINT = ['bash', '-c']
 COMPARISON_CMD = ['python -m workers.gpu.weights download /models && exec python -m workers.gpu.cli ' + ' '.join(WORKER_CMD) + ' --comparison-pair']
 BOOTSTRAP_CMD = ['python -m workers.gpu.weights download /models && exec python -m workers.gpu.cli ' + ' '.join(WORKER_CMD)]
+PRODUCTION_CMD = ['python -m workers.gpu.weights download /models --singing && exec python -m workers.gpu.cli ' + ' '.join(WORKER_CMD) + ' --continuous']
 
 
 class LiveExecution:
@@ -91,7 +92,7 @@ class LiveExecution:
                         selected = eligible[0]
                         provider._profile = candidate_profile(profile, candidates[selected])
                         event['candidate'] = selected
-                    if 'duration_comparison' in grant:
+                    if 'duration_comparison' in grant or 'continuous_queue' in grant:
                         require(callable(self._candidate_check) and self._candidate_check(
                             dict(gpu_type=profile['gpu']['id'],data_center_ids=profile['dataCenterIds']),450),
                             'Fresh comparison quote required')
@@ -127,7 +128,10 @@ class LiveExecution:
         bootstrap = launch.get('cmd') == BOOTSTRAP_CMD and launch.get('entrypoint') == BOOTSTRAP_ENTRYPOINT and launch['mounts'] == {}
         comparison = (grant.get('duration_comparison') is not None and launch.get('cmd')==COMPARISON_CMD
                       and launch.get('entrypoint')==BOOTSTRAP_ENTRYPOINT and launch['mounts']=={})
-        require(comparison if grant.get('duration_comparison') else direct or bootstrap, 'Exact scoped worker command required')
+        production = (grant.get('continuous_queue') is not None and launch.get('cmd') == PRODUCTION_CMD
+                      and launch.get('entrypoint') == BOOTSTRAP_ENTRYPOINT and launch['mounts'] == {})
+        require(production if grant.get('continuous_queue') else comparison if grant.get('duration_comparison')
+                else direct or bootstrap, 'Exact scoped worker command required')
         require(row[3]-timestamp(batch['approved_at']).timestamp()>60, 'Runtime must include bounded startup wait')
         require(isinstance(worker_token,str), 'Trusted worker bootstrap credential required')
         credential=db.execute('SELECT id,expires,revoked FROM worker_credentials WHERE token_hash=? AND owner=? AND project=? AND batch=?',

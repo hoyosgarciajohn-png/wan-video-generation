@@ -1,0 +1,4 @@
+-r requirements.in
+librosa==0.11.0
+decord==0.6.0
+peft==0.17.1

@@ -77,7 +77,7 @@ def validate_bundle(bundle, media_root=None):
     for shot in bundle["shots"]:
         for asset_id in shot["reference_asset_ids"]:
             asset = linked(indexes["assets"], asset_id, "reference asset")
-            require(asset["kind"] == "image", "Shot reference must be an image")
+            require(asset["kind"] in ("image", "audio"), "Shot conditioning must be image or audio")
 
     snapshot_indexes = {}
     for batch in bundle["batches"]:
@@ -100,7 +100,7 @@ def validate_bundle(bundle, media_root=None):
             require(snapshot["revision"] <= shot["revision"], "Snapshot references a future shot revision")
             for asset_id in snapshot["reference_asset_ids"]:
                 asset = linked(indexes["assets"], asset_id, "snapshot reference")
-                require(asset["kind"] == "image", "Snapshot reference must be an image")
+                require(asset["kind"] in ("image", "audio"), "Snapshot conditioning must be image or audio")
             if snapshot["revision"] == shot["revision"]:
                 for key in ("prompt", "reference_asset_ids", "target_duration_ms", "settings"):
                     require(snapshot[key] == shot[key], f"Snapshot differs from shot revision in {key}")

@@ -43,7 +43,7 @@ class InferenceAdapterTests(unittest.TestCase):
                               max_memory_reserved=lambda:2)
         torch = SimpleNamespace(cuda=gpu, bfloat16='mock-bf16', __version__='2.8.0+cu128',
                                 version=SimpleNamespace(cuda='12.8'))
-        video = Mock(); video.__getitem__ = Mock(return_value='mock tensor')
+        video = Mock(shape=(3,self.spec['frames'],704,1280)); video.__getitem__ = Mock(return_value='mock tensor')
         model = Mock(); model.generate.return_value = video
         constructor, saver = Mock(return_value=model), Mock()
         modules = {'torch':torch, 'wan':SimpleNamespace(WanTI2V=constructor),
@@ -61,7 +61,7 @@ class InferenceAdapterTests(unittest.TestCase):
                 constructor.assert_not_called()
             else:
                 main(self.spec_path)
-                verify.assert_called_once_with(self.spec['weights'])
+                verify.assert_called_once_with(self.spec['weights'], lock=LOCK)
         return constructor, model, saver
 
     def test_real_profile_text_invocation_and_unbilled_metrics(self):

@@ -144,11 +144,12 @@ class ControlService:
                     model_profile=deepcopy(batch['model_profile']), state='claimed', failure_reason=None)
 
     @staticmethod
-    def _envelope(bundle, batch, attempt, snapshot, experiment=None):
+    def _envelope(bundle, batch, attempt, snapshot, experiment=None, queue=None):
         envelope = deepcopy(dict(contract_version='0.1.0', project=bundle['project'], batch=batch,
                              attempt=attempt, shot_snapshot=snapshot,
                              input_assets=[a for a in bundle['assets'] if a['id'] in snapshot['reference_asset_ids']]))
         if experiment is not None: envelope['duration_comparison'] = deepcopy(experiment)
+        if queue is not None: envelope['continuous_queue'] = deepcopy(queue)
         return envelope
 
     def _reconcile(self, bundle, batch, now):
@@ -183,6 +184,8 @@ class ControlService:
             now = self.clock()
             self._reconcile(bundle, batch, now)
             experiment = comparison.experiment(db,batch)
+            from .production import policy as production_policy
+            queue = production_policy(db,batch)
             if experiment and batch['state']=='rendering' and any(a['batch_id']==batch['id'] and a['state']=='failed' for a in bundle['attempts']):
                 batch['state']='failed'
             if action == 'claim':
@@ -198,7 +201,7 @@ class ControlService:
                         if client.synchronize is not None:
                             client.synchronize(db, bundle, batch)
                         client.authorize(db)
-                        return self._envelope(bundle, batch, existing, snapshot, experiment)
+                        return self._envelope(bundle, batch, existing, snapshot, experiment, queue)
                     for snapshot in batch['shot_snapshots']:
                         attempts = [a for a in bundle['attempts'] if a['batch_id'] == batch['id'] and a['shot_id'] == snapshot['shot_id']]
                         if any(a['state'] in ('claimed','running','succeeded') for a in attempts):
@@ -208,9 +211,12 @@ class ControlService:
                             break
                         if not comparison.claim_gate(db,bundle,batch,snapshot,now):
                             break
+                        from .production import claim_gate
+                        if not claim_gate(db,bundle,batch,now):
+                            break
                         attempt = self._attempt(batch, snapshot, client.worker, now)
                         bundle['attempts'].append(attempt)
-                        answer = self._envelope(bundle, batch, attempt, snapshot, experiment)
+                        answer = self._envelope(bundle, batch, attempt, snapshot, experiment, queue)
                         break
                 self._save(db, bundle)
                 if client.synchronize is not None:
@@ -237,12 +243,15 @@ class ControlService:
                                                                          timestamp(batch['deadline_at']))))
                 result = {'lease_expires_at': attempt['lease_expires_at']}
             elif action == 'telemetry':
-                result = comparison.save_metrics(db,batch,attempt,payload)
+                from .production import save_metrics
+                result = save_metrics(db,batch,attempt,payload) if queue else comparison.save_metrics(db,batch,attempt,payload)
             elif action == 'fail':
                 if payload not in ('render_failed','worker_failed','gpu_out_of_memory','model_load_failed',
                                    'generation_failed','video_encode_failed','output_validation_failed'):
                     raise ValueError('Unknown failure code')
                 attempt.update(state='failed', completed_at=stamp(now), failure_reason=payload)
+                if queue and payload in ('gpu_out_of_memory','model_load_failed'):
+                    batch['state'] = 'failed'
                 self._reconcile(bundle, batch, now)
                 result = None
             elif action == 'complete':
@@ -270,6 +279,8 @@ class ControlService:
         if probe(path, attempt['settings'], frame_count(snapshot, batch['execution_mode'])) != media:
             raise ValueError('Output metadata mismatch')
         comparison.require_metrics(db,batch,attempt,asset)
+        from .production import require_metrics
+        require_metrics(db,batch,attempt,asset)
         if comparison.experiment(db,batch) is not None:
             subprocess.run(['ffmpeg','-v','error','-xerror','-nostdin','-i',str(path),'-f','null','-'],
                            check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=20)

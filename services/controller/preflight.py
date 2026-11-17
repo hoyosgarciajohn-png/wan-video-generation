@@ -17,7 +17,7 @@ from workers.gpu.common import digest, sync_dir, timestamp
 ROOT = Path(__file__).resolve().parents[2]
 FIELDS = {'project_id','owner_id','batch_id','worker_id','provider','region','gpu_type','gpu_count',
           'image_ref','worker_endpoint','runtime_seconds','reservation_cents','worker_ttl_seconds','storage','pod'}
-CRITICAL = ('deployment/comparison_report.py','services/controller/comparison.py','services/controller/live_execution.py','services/controller/live_billing.py','services/controller/live_admission.py','services/controller/http_api.py','services/controller/preflight.py','services/controller/service.py',
+CRITICAL = ('services/controller/production.py','deployment/comparison_report.py','services/controller/comparison.py','services/controller/live_execution.py','services/controller/live_billing.py','services/controller/live_admission.py','services/controller/http_api.py','services/controller/preflight.py','services/controller/service.py',
             'services/controller/worker_transport.py','services/controller/orchestration.py',
             'services/controller/budget.py','services/controller/real_jobs.py','services/controller/lifecycle.py','services/controller/runpod.py','services/controller/allocation_retry.py',
             'deployment/build_verify.py','deployment/container_smoke.py',

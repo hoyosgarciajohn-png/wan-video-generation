@@ -33,7 +33,7 @@ def make_report(directory):
         subprocess.run(['ffmpeg','-v','error','-nostdin','-y','-i',str(directory/results[0]['comparison']),
                         '-i',str(directory/results[1]['comparison']),'-filter_complex',filters,'-map','[v]',
                         '-frames:v','120','-an','-c:v','libx264','-crf','18','-threads','2','-movflags','+faststart',str(output)],check=True)
-        probe(output,dict(width=1280,height=352),120)
+    probe(output,dict(width=1280,height=352,frame_rate={'numerator':24,'denominator':1}),120)
     report=dict(results=results,batch=summary['batch']['id'],cleanup=summary['batch']['cleanup_state'],
                 billing=summary['billing'],continuation_gate=summary.get('comparison_gate'),
                 quality_acceptance='PENDING_OWNER_LIVE_REVIEW',provider_bill_is_batch_level=True)

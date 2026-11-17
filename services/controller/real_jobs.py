@@ -44,7 +44,8 @@ class RealJobBridge:
     def configuration_hash(profile):
         require(isinstance(profile, dict) and set(profile) == {'model_profile','image_ref','gpu_type','gpu_count','region','worker_endpoint','storage_id'},
                 'Exact approved run configuration required')
-        require(profile['model_profile'] == LOCK['profile'], 'Configuration must use the exact pinned Wan profile')
+        from workers.gpu.profiles import model_lock
+        lock = model_lock(profile['model_profile'])
         require(isinstance(profile['image_ref'], str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/:-]*@sha256:[a-f0-9]{64}', profile['image_ref']),
                 'Immutable image reference required')
         require(type(profile['gpu_count']) is int and profile['gpu_count'] == 1, 'One GPU is supported')
@@ -53,7 +54,7 @@ class RealJobBridge:
         endpoint = urlsplit(profile['worker_endpoint'])
         require(endpoint.scheme == 'https' and endpoint.hostname and not endpoint.username and not endpoint.password and
                 endpoint.path in ('','/') and not endpoint.query and not endpoint.fragment, 'Private worker endpoint must be an HTTPS origin')
-        return hashlib.sha256(canonical(dict(profile=profile, model_lock=LOCK)).encode()).hexdigest()
+        return hashlib.sha256(canonical(dict(profile=profile, model_lock=lock)).encode()).hexdigest()
 
     def _link(self, db, owner, project, batch_id):
         self.control._load(db, owner, project)
