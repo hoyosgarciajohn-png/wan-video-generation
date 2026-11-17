@@ -15,11 +15,15 @@ def initialize(db):
         id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL,
         batch TEXT NOT NULL, kind TEXT NOT NULL, amount_cents INTEGER NOT NULL,
         envelope TEXT NOT NULL, created TEXT NOT NULL)''')
+    db.execute('''CREATE TABLE IF NOT EXISTS live_recovery_caps (
+        batch TEXT PRIMARY KEY, approval TEXT NOT NULL UNIQUE,
+        retained_cents INTEGER NOT NULL, created TEXT NOT NULL)''')
 
 
 def totals(db, owner, project):
-    rows = db.execute('''SELECT r.batch,r.reserved_cents,r.state,COALESCE(SUM(e.amount_cents),0)
+    rows = db.execute('''SELECT r.batch,COALESCE(c.retained_cents,r.reserved_cents),r.state,COALESCE(SUM(e.amount_cents),0)
         FROM live_reservations r LEFT JOIN live_billing_events e ON e.batch=r.batch
+        LEFT JOIN live_recovery_caps c ON c.batch=r.batch
         WHERE r.owner=? AND r.project=? GROUP BY r.batch,r.reserved_cents,r.state''', (owner, project)).fetchall()
     return dict(spent_cents=sum(r[3] for r in rows),
                 reserved_cents=sum(max(0,r[1]-r[3]) for r in rows if r[2]=='reserved'),

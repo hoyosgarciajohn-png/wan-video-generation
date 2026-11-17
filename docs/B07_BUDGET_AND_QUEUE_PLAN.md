@@ -126,3 +126,37 @@ creative acceptance remain pending.
 Sources: retained five-second measurements in
 `deployment/evidence/2026-11-17-duration-comparison/`, current worker source, and
 [Runpod pricing](https://www.runpod.io/pricing). Related: issue #8 and PR #89.
+
+## B07 input-transfer failure and bounded repair — November 17
+
+PRs #90–92 installed the pinned S2V adapter, resident queue, 68 real audio
+windows and ten anchors. First B07 batch `7e89330141794b85827d48341def92fe`
+used H100 Pod `22hk9nt6u1t76z` at $4.39/hour. All model files downloaded, but
+both first-shot attempts failed before inference. No take exists. Cleanup is
+confirmed; complete provider inventory is empty. The current bill is not yet
+reported. An empty billing response is not a zero bill.
+
+Owner HTTP reads isolated the problem: first reference image 200, conditioning
+WAV 500. Root preparation creates private WAVs that the unprivileged controller
+cannot read. The repair verifies original checksums, changes only root-owned
+conditioning WAVs to the existing asset service identity (mode 0600), and reads
+all inputs under that identity. Preparation, admission and launch now require
+this check. It does not make media public or broaden worker access.
+
+A separate `singing-recovery` scope admits only this input correction after the
+original failed batch has confirmed cleanup and no accepted take. It preserves
+all original records and pending invoices. A signed, separate liability hold
+conservatively covers the entire elapsed interval since original admission at
+$4.50/hour, plus a preparation buffer. Original reservation rows are immutable;
+project totals use the audited hold plus the new remaining reservation, at most
+$18. No invoice is invented or settled. Time and price bounds must both fit,
+and the original hard deadline remains 2026-11-17 12:46:41 UTC (7:46 a.m.
+Eastern); this recovery can end earlier. A fresh exact-batch independent guard
+is required. Further recovery cannot replay this grant.
+
+Validation: root suite 213 checks (212 passed; root-only OS ownership case
+skipped locally), 65 affected admission/cleanup/backup checks passed, 14 final
+backup checks passed, contract and shell syntax passed. The root-only ownership
+regression must run on the host before its source swap. Corrected GPU retry not
+yet launched; full video and creative acceptance remain pending. Historical scopes,
+the exact older unresolved request, and persistent cleanup remain preserved.

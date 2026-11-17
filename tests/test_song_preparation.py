@@ -21,6 +21,25 @@ from workers.gpu.common import digest
 ROOT=Path(__file__).resolve().parents[1]
 
 class SongPreparationTests(unittest.TestCase):
+    def test_root_import_is_unreadable_until_repaired_for_service_account(self):
+        import os,pwd
+        from deployment.song_trial import service_access
+        if os.geteuid()!=0:self.skipTest('Linux privilege separation requires root')
+        identity=pwd.getpwnam('nobody')
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);root.chmod(0o755)
+            assets=root/'assets';assets.mkdir(mode=0o700);os.chown(assets,identity.pw_uid,identity.pw_gid)
+            audio=assets/'conditioning.wav';audio.write_bytes(b'fictional-conditioning-bytes');audio.chmod(0o600)
+            bundle=dict(assets=[dict(id='fictional',kind='audio',object_key=audio.name,mime_type='audio/wav',
+                bytes=audio.stat().st_size,sha256=digest(audio))])
+            control=SimpleNamespace(asset_root=assets,bundle=lambda *_:bundle)
+            with self.assertRaises(subprocess.CalledProcessError):service_access(control,'owner','project')
+            result=service_access(control,'owner','project',repair=True)
+            self.assertEqual(result['assets'][0]['uid_before'],0)
+            self.assertEqual(audio.stat().st_uid,identity.pw_uid)
+            self.assertEqual(audio.stat().st_mode & 0o777,0o600)
+            service_access(control,'owner','project')
+
     def test_full_export_and_missing_coverage_are_distinct(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);proposal=json.loads((ROOT/'deployment/song-production.json').read_text())

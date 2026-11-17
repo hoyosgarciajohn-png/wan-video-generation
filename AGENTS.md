@@ -157,3 +157,13 @@ cleanup reserve, with at most four cumulative GPU hours including startup and
 retries. Two hours remains the optimization target. Never reset the limits on
 retry. See docs/B07_BUDGET_AND_QUEUE_PLAN.md. This authorizes the bounded work;
 it does not establish audio-driven worker, resident queue or release readiness.
+
+B07's first production batch `7e89330141794b85827d48341def92fe` failed before
+inference on conditioning-audio transfer; zero takes, two failed attempts.
+Pod `22hk9nt6u1t76z` is deleted and complete inventory is empty. Preserve this
+batch and pending bill. The owner-authorized corrective retry uses the isolated
+`singing-recovery` input ownership repair, a conservative pending-liability hold,
+remaining project GPU budget and the original 1794919601 absolute deadline.
+Never replay the first grant or renew four hours/$20 on retry. CPU verification
+must prove service-account readability before another GPU starts. See the B07
+budget plan for evidence and the precise recovery constraints.

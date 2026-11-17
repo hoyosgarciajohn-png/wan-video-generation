@@ -19,7 +19,7 @@ def validate(scope, batch, deadline, now, *, trial=None):
             any(not isinstance(v, str) or not 1 <= len(v) <= 200 for v in binding) or
             not re.fullmatch(r'[A-Za-z0-9_-]{1,200}', batch)):
         raise ValueError('Exact owner/project and batch binding required')
-    if type(deadline) is not int or not now < deadline <= now + (14400 if trial=='singing' else 2700 if trial=='comparison' else 1800):
+    if type(deadline) is not int or not now < deadline <= now + (14400 if trial in ('singing','singing-recovery') else 2700 if trial=='comparison' else 1800):
         raise ValueError('Deadline must be within the approved scope runtime')
     return json.dumps(binding, sort_keys=True, separators=(',', ':'))
 
@@ -71,7 +71,7 @@ def main():
     provider = CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=scope, transport=https_transport())
     observed = set()
     previous = (CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=OLD_SCOPE, transport=https_transport())
-                if os.environ.get('WAN_TRIAL') in ('validation','fallback','allocation','comparison','singing') else None)
+                if os.environ.get('WAN_TRIAL') in ('validation','fallback','allocation','comparison','singing','singing-recovery') else None)
     previous_observed = set()
     def current_ready():
         value = readiness(provider, scope, batch, deadline, observed)

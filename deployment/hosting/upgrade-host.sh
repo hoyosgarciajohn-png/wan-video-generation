@@ -7,7 +7,7 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-expected_old_sha=7e9a5d270d38499482e96d3149a1c62e25d58b94
+expected_old_sha=2a28f36795ed803502904a52f6ef32dba914098c
 if [[ $old_sha != "$expected_old_sha" ]]; then
     printf 'Upgrade baseline mismatch: expected %s; observed %s\n' "$expected_old_sha" "$old_sha" >&2
     exit 1
@@ -46,6 +46,8 @@ with sqlite3.connect('/var/lib/wan/studio.sqlite') as db:
 verify_absent(Path('/etc/wan/runpod-token').read_text().strip(), transport=https_transport())
 PY_GATE
 )
+(cd "$stage" && /opt/wan/venv/bin/python -m unittest \
+    tests.test_song_preparation.SongPreparationTests.test_root_import_is_unreadable_until_repaired_for_service_account -v)
 systemctl is-active --quiet wan-cleanup
 systemctl stop wan-controller
 trap 'systemctl start wan-controller' EXIT
