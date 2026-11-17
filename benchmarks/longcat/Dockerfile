@@ -1,6 +1,7 @@
 FROM --platform=linux/amd64 ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:08095101e28e595be00d5244277f91d2aa60585212c0e03eae4278dd91541fb5
 USER root
 ENV HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 PYTHONUNBUFFERED=1 OMP_NUM_THREADS=4
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential libsndfile1 libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --no-cache-dir numpy==1.26.4 transformers==4.41.0 diffusers==0.35.1 loguru==0.7.2 einops==0.8.0 ftfy==6.2.0 psutil==6.0.0 av==12.0.0 opencv-python==4.9.0.80 imageio==2.37.0 imageio-ffmpeg==0.6.0 scikit-learn==1.6.1 scikit-image==0.25.2 scipy==1.15.3 soundfile==0.13.1 soxr==0.5.0.post1 librosa==0.11.0 audio-separator==0.30.2 pyloudnorm==0.1.1 onnx==1.18.0 onnxruntime-gpu==1.20.2 nvidia-ml-py==13.580.65
 RUN python - <<'PY'
 import io,tarfile,urllib.request,pathlib
