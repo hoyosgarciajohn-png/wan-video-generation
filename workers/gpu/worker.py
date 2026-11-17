@@ -170,14 +170,35 @@ def publish(client, claim, manifest, destination, journal):
         return
     saved = json.loads(journal.read_text())
     expected = {key: manifest['asset'][key] for key in ('bytes', 'sha256', 'object_key')}
-    if saved.get('uploaded') == expected:
-        return
-    receipt = upload(claim['attempt'], manifest, destination)
-    require(receipt == expected, 'Artifact upload receipt mismatch')
+    if saved.get('uploaded') != expected:
+        start=time.monotonic()
+        receipt = upload(claim['attempt'], manifest, destination)
+        require(receipt == expected, 'Artifact upload receipt mismatch')
+        saved['metrics']['upload_seconds']=time.monotonic()-start
+        saved['uploaded'] = receipt
+        atomic_json(journal, saved)
     # Confirm remote durable bytes before completion; completion may already commit
     # before its response is lost, so retries must not require a still-active upload lease.
-    saved['uploaded'] = receipt
-    atomic_json(journal, saved)
+    if 'duration_comparison' in claim:
+        from .comparison import PROTOCOL, validate_metrics, receipt as metric_receipt
+        if 'telemetry' not in saved:
+            metrics=saved['metrics']
+            required=('gpu_name','gpu_total_bytes','driver_version','model_load_seconds','generation_seconds',
+                      'decode_encode_seconds','upload_seconds','render_and_verify_seconds','gpu_peak_allocated_bytes',
+                      'gpu_peak_reserved_bytes','gpu_model_loaded_reserved_bytes','torch_version','cuda_version','memory_policy','model_profile')
+            telemetry={k:metrics[k] for k in required}
+            telemetry.update(protocol=PROTOCOL,attempt_id=claim['attempt']['id'],batch_id=claim['batch']['id'],
+                image_ref=claim['duration_comparison']['image_ref'],frames=frame_count(claim['shot_snapshot'],'runpod'),
+                width=1280,height=704,fps=24,target_duration_ms=claim['shot_snapshot']['target_duration_ms'],
+                asset_sha256=manifest['asset']['sha256'],asset_bytes=manifest['asset']['bytes'])
+            validate_metrics(telemetry,claim['duration_comparison'],claim['attempt'],claim['shot_snapshot'])
+            saved['telemetry']=telemetry
+            atomic_json(journal,saved)
+        if not saved.get('telemetry_acknowledged'):
+            reply=client.telemetry(claim['attempt'],saved['telemetry'])
+            require(reply=={'sha256':metric_receipt(saved['telemetry'])}, 'Telemetry acknowledgement mismatch')
+            saved['telemetry_acknowledged']=reply
+            atomic_json(journal,saved)
 
 
 def run_once(claim, client, output_root, *, input_root=None, weights=None, interval=5):

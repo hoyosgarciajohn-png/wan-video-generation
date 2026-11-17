@@ -12,7 +12,7 @@ on:
       trial:
         description: Exact approved trial scope (only for trial operations)
         type: choice
-        options: [first, diagnostic, repair, validation, fallback, allocation]
+        options: [first, diagnostic, repair, validation, fallback, allocation, comparison]
         default: first
         required: true
       host_fingerprint:
@@ -41,7 +41,7 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:

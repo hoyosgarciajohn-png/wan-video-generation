@@ -75,6 +75,7 @@ if [[ "$operation" == trial-* ]]; then
         validation) trial_dir=/var/lib/wan/validation-trial-20261116 ;;
         fallback) trial_dir=/var/lib/wan/fallback-trial-20261116 ;;
         allocation) trial_dir=/var/lib/wan/allocation-trial-20261116 ;;
+        comparison) trial_dir=/var/lib/wan/comparison-trial-20261116 ;;
         *) fail 'Unknown trial scope' ;;
     esac
     if [[ "$operation" == trial-prepare || "$operation" == trial-admit || "$operation" == trial-launch ]]; then

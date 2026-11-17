@@ -82,12 +82,15 @@ def wait_for_claim(client, wait_seconds, poll_seconds):
 
 
 def remote_run(client, output_root, result_path, *, input_root=None, weights=None,
-               claim_wait_seconds=0, claim_poll_seconds=2):
+               claim_wait_seconds=0, claim_poll_seconds=2, comparison_pair=False):
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     claim_journal = output_root / 'worker-claim.json'
     with (output_root / 'worker-session.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
+        if comparison_pair and Path(result_path).exists():
+            previous=json.loads(Path(result_path).read_text())
+            if previous.get('comparison_finished'):return
         if claim_journal.exists():
             saved = json.loads(claim_journal.read_text())
             require(saved.get('binding') == client.binding, 'Worker journal credential/origin mismatch')
@@ -98,10 +101,25 @@ def remote_run(client, output_root, result_path, *, input_root=None, weights=Non
                 atomic_json(result_path, {'status': 'idle', 'contract_version': '0.1.0'})
                 return
             atomic_json(claim_journal, {'binding': client.binding, 'claim': claim})
-        result = run_once(claim, client, output_root, input_root=input_root or output_root / 'inputs', weights=weights)
-        atomic_json(result_path, result)
-        claim_journal.unlink()
-        sync_dir(output_root)
+        if comparison_pair:
+            require('duration_comparison' in claim, 'Comparison-pair command requires scoped authority')
+            experiment=claim['duration_comparison']
+            for index in range(2):
+                if index:
+                    claim=client.claim()
+                    if claim is None:break
+                    require(claim.get('duration_comparison')==experiment, 'Comparison scope changed')
+                    atomic_json(claim_journal, {'binding':client.binding,'claim':claim})
+                result=run_once(claim,client,output_root,input_root=input_root or output_root/'inputs',weights=weights)
+                atomic_json(Path(result_path).with_name('result-'+claim['attempt']['id']+'.json'),result)
+                claim_journal.unlink()
+                sync_dir(output_root)
+            atomic_json(result_path,dict(comparison_finished=True,protocol=experiment['protocol']))
+        else:
+            result = run_once(claim, client, output_root, input_root=input_root or output_root / 'inputs', weights=weights)
+            atomic_json(result_path, result)
+            claim_journal.unlink()
+            sync_dir(output_root)
 
 
 
@@ -115,6 +133,7 @@ def main():
     parser.add_argument('--result', required=True, type=Path)
     parser.add_argument('--claim-wait-seconds', type=float, default=0, help='Poll successful empty claims for at most 120 seconds (default: no wait)')
     parser.add_argument('--claim-poll-seconds', type=float, default=2, help='Empty-claim poll interval, 0.1 to 10 seconds')
+    parser.add_argument('--comparison-pair', action='store_true', help='Only the approved two-duration scope')
     parser.add_argument('--allow-local-http', action='store_true', help='Development only: allow HTTP on 127.0.0.1 or localhost')
     args = parser.parse_args()
     if args.mode == 'fixture':
@@ -123,7 +142,7 @@ def main():
     else:
         client = WorkerClient(os.environ['WAN_WORKER_API_URL'], os.environ['WAN_WORKER_TOKEN'], allow_local_http=args.allow_local_http)
         remote_run(client, args.output_root, args.result, input_root=args.input_root, weights=args.weights,
-                   claim_wait_seconds=args.claim_wait_seconds, claim_poll_seconds=args.claim_poll_seconds)
+                   claim_wait_seconds=args.claim_wait_seconds, claim_poll_seconds=args.claim_poll_seconds, comparison_pair=args.comparison_pair)
         print('PASS: worker operation completed under contract 0.1.0')
         return
     result = run_once(claim, client, args.output_root, input_root=args.input_root, weights=args.weights)

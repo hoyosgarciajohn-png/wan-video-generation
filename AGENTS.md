@@ -114,3 +114,12 @@ Guard 43976858968 stays active through the original deadline plus five minutes
 (23:44:46 UTC), including the exact old unresolved repair request. Preserve all
 older reservations and persistent cleanup. A later five-second test must use a
 new scoped authority, actual measurements and durable performance telemetry.
+
+John approved PR #86's concrete duration comparison with "yes I approve": one
+new H100 scope, $5 additional total ($4 Pod / $1 storage), <=$4.50/hour, 2700
+seconds from admission, up to three capacity-only creates and one allocated Pod.
+Run 5 seconds then a fresh continuous 15 seconds, one attempt each, identical
+settings. Implementation, image publication, deployment and execution are
+authorized. Preserve all six consumed scopes and the exact old unknown exception.
+Save first video and durable telemetry before the second claim; gate remaining
+time and memory. No automatic regeneration or additional rental.

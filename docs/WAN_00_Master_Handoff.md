@@ -1264,3 +1264,20 @@ decode passed. The actual image reference and manifest hashes are in the current
 checkpoint and deployment/evidence/2026-11-16-memory-repair-build/. This continuation
 created no Runpod Pod, no new runtime grant and no controller deployment. Both paid
 attempts remain consumed; actual GPU validation of the repair is still pending.
+
+## November 16, 2026 — approved duration comparison implementation
+
+John approved the PR #86 proposal: $5 additional total for one H100 and two
+ordered independent renders (5s then 15s), <=$4.50/hour, 2700 seconds from
+admission, three explicit-capacity-only allocation requests, one Pod. All six
+historical consumed grants and the exact unresolved repair exception remain.
+Private comparison protocol v1 adds signed scope, ordered claims, durable metrics
+acknowledgement, first-output retention and measured continuation gating. Ordinary
+five-second worker limits and canonical contract 0.1.0 remain compatible.
+
+Checks: 202 application tests, 41 GPU-worker CPU-only tests, 79 deployment checks,
+one additional comparison scope regression, contract validator and whitespace
+checks passed (323 automated tests). These are fictional checks, not GPU evidence.
+New image publication, installed release, admission and paid outputs remain pending.
+No new Pod or rental was started during implementation. Next: publish reviewed
+worker, record immutable build evidence, deploy, then run within approved limits.

@@ -11,6 +11,8 @@ from datetime import timedelta
 import json
 from pathlib import Path
 import sqlite3
+import subprocess
+from services.controller import comparison
 from uuid import uuid4
 
 from scripts.validate_contract import COLLECTIONS, validate_bundle
@@ -34,6 +36,7 @@ class ControlService:
         self.clock, self.lease_seconds, self.max_attempts = clock, lease_seconds, max_attempts
         self.asset_root.mkdir(parents=True, exist_ok=True)
         with self.transaction() as db:
+            comparison.initialize(db)
             db.execute('CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, owner TEXT NOT NULL, bundle TEXT NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS admissions (project TEXT, idem TEXT, request TEXT NOT NULL, batch TEXT NOT NULL, PRIMARY KEY(project,idem))')
             db.execute('CREATE TABLE IF NOT EXISTS completions (attempt TEXT PRIMARY KEY, manifest TEXT NOT NULL, take TEXT NOT NULL)')
@@ -141,10 +144,12 @@ class ControlService:
                     model_profile=deepcopy(batch['model_profile']), state='claimed', failure_reason=None)
 
     @staticmethod
-    def _envelope(bundle, batch, attempt, snapshot):
-        return deepcopy(dict(contract_version='0.1.0', project=bundle['project'], batch=batch,
+    def _envelope(bundle, batch, attempt, snapshot, experiment=None):
+        envelope = deepcopy(dict(contract_version='0.1.0', project=bundle['project'], batch=batch,
                              attempt=attempt, shot_snapshot=snapshot,
                              input_assets=[a for a in bundle['assets'] if a['id'] in snapshot['reference_asset_ids']]))
+        if experiment is not None: envelope['duration_comparison'] = deepcopy(experiment)
+        return envelope
 
     def _reconcile(self, bundle, batch, now):
         for attempt in bundle['attempts']:
@@ -177,6 +182,9 @@ class ControlService:
             batch = self._batch(bundle, client.batch)
             now = self.clock()
             self._reconcile(bundle, batch, now)
+            experiment = comparison.experiment(db,batch)
+            if experiment and batch['state']=='rendering' and any(a['batch_id']==batch['id'] and a['state']=='failed' for a in bundle['attempts']):
+                batch['state']='failed'
             if action == 'claim':
                 answer = None
                 if batch['state'] == 'rendering':
@@ -190,7 +198,7 @@ class ControlService:
                         if client.synchronize is not None:
                             client.synchronize(db, bundle, batch)
                         client.authorize(db)
-                        return self._envelope(bundle, batch, existing, snapshot)
+                        return self._envelope(bundle, batch, existing, snapshot, experiment)
                     for snapshot in batch['shot_snapshots']:
                         attempts = [a for a in bundle['attempts'] if a['batch_id'] == batch['id'] and a['shot_id'] == snapshot['shot_id']]
                         if any(a['state'] in ('claimed','running','succeeded') for a in attempts):
@@ -198,9 +206,11 @@ class ControlService:
                         if len(attempts) >= self.max_attempts:
                             batch['state'] = 'failed'
                             break
+                        if not comparison.claim_gate(db,bundle,batch,snapshot,now):
+                            break
                         attempt = self._attempt(batch, snapshot, client.worker, now)
                         bundle['attempts'].append(attempt)
-                        answer = self._envelope(bundle, batch, attempt, snapshot)
+                        answer = self._envelope(bundle, batch, attempt, snapshot, experiment)
                         break
                 self._save(db, bundle)
                 if client.synchronize is not None:
@@ -226,6 +236,8 @@ class ControlService:
                 attempt.update(state='running', lease_expires_at=stamp(min(now + timedelta(seconds=self.lease_seconds),
                                                                          timestamp(batch['deadline_at']))))
                 result = {'lease_expires_at': attempt['lease_expires_at']}
+            elif action == 'telemetry':
+                result = comparison.save_metrics(db,batch,attempt,payload)
             elif action == 'fail':
                 if payload not in ('render_failed','worker_failed','gpu_out_of_memory','model_load_failed',
                                    'generation_failed','video_encode_failed','output_validation_failed'):
@@ -257,6 +269,10 @@ class ControlService:
         snapshot = next(s for s in batch['shot_snapshots'] if s['shot_id'] == attempt['shot_id'])
         if probe(path, attempt['settings'], frame_count(snapshot, batch['execution_mode'])) != media:
             raise ValueError('Output metadata mismatch')
+        comparison.require_metrics(db,batch,attempt,asset)
+        if comparison.experiment(db,batch) is not None:
+            subprocess.run(['ffmpeg','-v','error','-xerror','-nostdin','-i',str(path),'-f','null','-'],
+                           check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=20)
         # Media inspection may outlive the lease; recheck using the clock after I/O.
         now = self.clock()
         if now >= min(timestamp(attempt['lease_expires_at']), timestamp(batch['deadline_at'])):
@@ -331,6 +347,9 @@ class WorkerClient:
 
     def heartbeat(self, attempt, progress):
         return self.service._worker(self, 'heartbeat', attempt, progress)
+
+    def telemetry(self, attempt, payload):
+        return self.service._worker(self, 'telemetry', attempt, payload)
 
     def complete(self, attempt, manifest):
         return self.service._worker(self, 'complete', attempt, manifest)

@@ -126,19 +126,21 @@ class WorkerTransport:
         if route == 'claim':
             require(not payload, 'Claim body must be empty')
             return client.claim()
-        match = re.fullmatch(rf'attempts/({IDENTIFIER})/(heartbeat|complete|fail)', route)
+        match = re.fullmatch(rf'attempts/({IDENTIFIER})/(heartbeat|complete|fail|telemetry)', route)
         if not match:
             raise WorkerAccessError(404)
         attempt_id, action = match.groups()
-        field = {'heartbeat':'progress','complete':'output_asset_manifest','fail':'code'}[action]
+        field = {'heartbeat':'progress','complete':'output_asset_manifest','fail':'code','telemetry':'metrics'}[action]
         require(set(payload) == {'lease_id',field} and isinstance(payload['lease_id'], str), 'Invalid worker message')
         if action == 'heartbeat':
             require(type(payload[field]) in (float,int) and 0 <= payload[field] <= 1, 'Invalid progress')
         elif action == 'fail':
             require(payload[field] in ('render_failed','worker_failed','gpu_out_of_memory','model_load_failed',
                     'generation_failed','video_encode_failed','output_validation_failed'), 'Unknown failure code')
-        else:
+        elif action == 'complete':
             require(isinstance(payload[field], dict) and set(payload[field]) == {'asset','media'}, 'Invalid output manifest')
+        else:
+            require(isinstance(payload[field],dict), 'Invalid telemetry')
         self._attempt(authorization, attempt_id, payload['lease_id'], active=action != 'complete')
         attempt = dict(id=attempt_id, lease_id=payload['lease_id'])
         try:

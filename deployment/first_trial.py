@@ -26,7 +26,8 @@ from deployment import validation_policy
 from services.controller.allocation_retry import POLICY as CAPACITY_POLICY, ALLOCATION_GPUS
 from services.controller.live_admission import LiveAdmission, APPROVAL_DOMAIN, HOST_DOMAIN, configuration_hash
 from services.controller.live_billing import BILLING_DOMAIN
-from services.controller.live_execution import LiveExecution, BOOTSTRAP_CMD, BOOTSTRAP_ENTRYPOINT
+from services.controller.live_execution import LiveExecution, BOOTSTRAP_CMD, BOOTSTRAP_ENTRYPOINT, COMPARISON_CMD
+from workers.gpu import comparison
 from services.controller.preflight import _build, _sources
 from services.controller.runpod import https_transport
 from services.controller.service import canonical, stamp
@@ -54,6 +55,8 @@ EXPECTED_PRIOR_BATCHES = set()
 ALLOW_KNOWN_UNKNOWN = False
 CAPACITY_RETRY = False
 MULTI_GPU = False
+COMPARISON = False
+RUNTIME_SECONDS = 1800
 HOURLY_CEILING = Decimal('1.00')
 
 
@@ -61,12 +64,35 @@ def select_trial(name):
     """Allowlisted operator scope, never an arbitrary path or mutable retry."""
     global TRIAL, AUTH, IMAGE, BUILD_EVIDENCE, TITLE, DURATION_MS
     global APPROVAL_ID, IDEMPOTENCY_KEY, WORKER_ID, EXPECTED_PRIOR_BATCHES
-    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU, MULTI_GPU
+    global ALLOW_KNOWN_UNKNOWN, CAPACITY_RETRY, HOURLY_CEILING, GPU, MULTI_GPU, COMPARISON, RUNTIME_SECONDS
+    COMPARISON = name == 'comparison'
+    RUNTIME_SECONDS = 2700 if COMPARISON else 1800
     MULTI_GPU = name == 'allocation'
-    CAPACITY_RETRY = name in ('fallback', 'allocation')
-    HOURLY_CEILING = Decimal('4.50') if MULTI_GPU else Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
+    CAPACITY_RETRY = name in ('fallback', 'allocation','comparison')
+    HOURLY_CEILING = Decimal('4.50') if MULTI_GPU or COMPARISON else Decimal('1.10') if CAPACITY_RETRY else Decimal('1.00')
     GPU = 'NVIDIA GeForce RTX 4090'
-    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback','allocation')
+    ALLOW_KNOWN_UNKNOWN = name in ('validation','fallback','allocation','comparison')
+    if COMPARISON:
+        select_repair_trial('validation')
+        proposal=read(ROOT/'deployment/duration-comparison-proposal.json')
+        assert proposal['status']=='OWNER_APPROVED_RUNTIME_PREPARATION' and proposal['approval']['new_spending_envelope']=='APPROVED'
+        terms=proposal['proposed_terms']
+        assert (terms['overall_additional_cap_cents'],terms['pod_reservation_cents'],terms['storage_allowance_cents'],
+                terms['runtime_seconds_from_admission'],terms['max_allocation_requests'],terms['max_render_attempts'],
+                terms['max_hourly_cents'],terms['gpu_type'])==(500,400,100,2700,3,2,450,comparison.GPU)
+        TRIAL=STATE/'comparison-trial-20261116'
+        AUTH=Path('/etc/wan/comparison-trial-authority-20261116.json')
+        TITLE='Wan duration comparison · five and fifteen seconds'
+        GPU=comparison.GPU
+        DURATION_MS=5000
+        IMAGE=proposal['image']
+        assert isinstance(IMAGE,str) and '@sha256:' in IMAGE, 'Reviewed comparison image is not yet published'
+        BUILD_EVIDENCE='2026-11-16-duration-comparison-build'
+        APPROVAL_ID='john-duration-comparison-20261116'
+        IDEMPOTENCY_KEY='john-duration-comparison-pair'
+        WORKER_ID='john-duration-comparison-worker'
+        EXPECTED_PRIOR_BATCHES.update({'bee9e55b1d4a4f458771ad4ac69c3318','4e87af47cce0477b8750b2e4681b722d','0a30c22ff1a8493bbe2714ad36cd0321'})
+        return
     if name == 'first':
         return
     if name == 'repair':
@@ -184,7 +210,7 @@ def services():
         host_keys={'host': (OWNER, bytes.fromhex(keys['host']))}, build_evidence=TRIAL / 'build')
     e = LiveExecution(a, runpod_token=Path('/etc/wan/runpod-token').read_text().strip(),
         transport=https_transport(), billing_keys={'billing': (OWNER, bytes.fromhex(keys['billing']))},
-        candidate_check=candidate_available if MULTI_GPU else None)
+        candidate_check=candidate_available if MULTI_GPU else comparison_available if COMPARISON else None)
     return c, a, e
 
 
@@ -218,6 +244,12 @@ def candidate_available(candidate, ceiling):
         return False
     available = {x['id'] for x in value.get('dataCenters', []) if x.get('availability') in ('HIGH','MEDIUM','LOW')}
     return bool(available.intersection(candidate['data_center_ids']))
+
+
+def comparison_available(candidate, ceiling):
+    assert COMPARISON and ceiling==450 and candidate['gpu_type']==GPU
+    checked_quote(candidate['data_center_ids'])
+    return True
 
 
 def allocation_quote(plan=None):
@@ -255,7 +287,7 @@ def checked_quote(region=None):
     if MULTI_GPU:
         return allocation_quote(region)
     value = catalog_snapshot()
-    if CAPACITY_RETRY and region is None:
+    if CAPACITY_RETRY and not COMPARISON and region is None:
         assert value['id'] in ('NVIDIA GeForce RTX 4090','NVIDIA L40S')
         GPU = value['id']
     price = Decimal(str(value['price']['secure']))
@@ -338,26 +370,33 @@ def prepare():
                 prompt='A small blue sailboat moves slowly across a calm lake at sunrise, steady wide camera, no text.')
     shot['settings'].update(width=1280, height=704, steps=50, seed=42)
     p['bundle']['shots'] = [shot]
+    if COMPARISON:
+        shot.update(id='duration-05',prompt=comparison.PROMPT,target_duration_ms=5000)
+        second=deepcopy(shot)
+        second.update(id='duration-15',target_duration_ms=15000)
+        p['bundle']['shots'].append(second)
     workspace = studio.save(OWNER, workspace, workspace['revision'])
     profile = dict(model_profile=deepcopy(LOCK['profile']), image_ref=IMAGE, gpu_type=GPU, gpu_count=1,
         region=pricing['region'], worker_endpoint=ORIGIN, storage_id='wan-controller-01-artifacts')
     launch = dict(image=IMAGE, gpu={'id': GPU, 'count': 1, 'minCudaVersion': '12.8', 'minRamPerGpu': 64}, cloud='SECURE',
         disk=80, dataCenterIds=pricing['data_center_ids'], mounts={}, ports=[], env={}, registry=REGISTRY,
-        entrypoint=BOOTSTRAP_ENTRYPOINT, cmd=BOOTSTRAP_CMD)
+        entrypoint=BOOTSTRAP_ENTRYPOINT, cmd=COMPARISON_CMD if COMPARISON else BOOTSTRAP_CMD)
     expires = stamp(utcnow() + timedelta(hours=6))
     grant = dict(id=APPROVAL_ID, owner=OWNER, project=project, currency='USD', approved_cents=400,
-        max_runtime_seconds=1800, valid_until=expires, profile=profile, launch_profile=launch, source_sha256=_sources())
+        max_runtime_seconds=RUNTIME_SECONDS, valid_until=expires, profile=profile, launch_profile=launch, source_sha256=_sources())
     if CAPACITY_RETRY:
         grant['capacity_retry'] = dict(CAPACITY_POLICY)
     if MULTI_GPU:
         grant['allocation_plan'] = pricing['allocation_plan']
-    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch, grant.get('allocation_plan')), source_sha256=grant['source_sha256'],
+    if COMPARISON:
+        grant['duration_comparison']=comparison.policy(['duration-05','duration-15'],IMAGE)
+    host = dict(owner=OWNER, project=project, config_hash=configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison')), source_sha256=grant['source_sha256'],
         build_manifest_sha256=build['manifest_sha256'], valid_until=expires, worker_endpoint=ORIGIN, storage_id=profile['storage_id'])
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
     atomic_json(TRIAL / 'host.json', sign(host, 'host', HOST_DOMAIN))
     atomic_json(TRIAL / 'prepared.json', dict(owner=OWNER, project=project, shot=shot['id'], pricing=pricing,
         source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(), build=build,
-        overall_cap_cents=500, pod_cap_cents=400, storage_allowance_cents=100, runtime_seconds=1800, max_attempts=1, max_create_requests=3 if CAPACITY_RETRY else 1))
+        overall_cap_cents=500, pod_cap_cents=400, storage_allowance_cents=100, runtime_seconds=RUNTIME_SECONDS, max_attempts=2 if COMPARISON else 1, max_create_requests=3 if CAPACITY_RETRY else 1))
     # Only install a receiver in the web process; provider access stays private.
     env = Path('/etc/wan/controller.env')
     current = env.read_text()
@@ -386,7 +425,7 @@ def refresh_unregistered_validation(c, saved):
     host = read(TRIAL / 'host.json')
     grant = deepcopy(approval['payload'])
     assert grant['id'] == APPROVAL_ID and grant['owner'] == OWNER and grant['project'] == saved['project']
-    assert (grant['approved_cents'], grant['max_runtime_seconds']) == (400, 1800)
+    assert (grant['approved_cents'], grant['max_runtime_seconds']) == (400, RUNTIME_SECONDS)
     # Retain the prior signed preparation as evidence. It never reached the DB.
     history = TRIAL / 'pre-admission-history'
     history.mkdir(mode=0o700, exist_ok=True)
@@ -404,7 +443,7 @@ def refresh_unregistered_validation(c, saved):
     grant['source_sha256'] = _sources()
     grant['valid_until'] = stamp(utcnow() + timedelta(hours=6))
     attestation = deepcopy(host['payload'])
-    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan')),
+    attestation.update(config_hash=configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison')),
                        source_sha256=grant['source_sha256'], valid_until=grant['valid_until'])
     saved = dict(saved, pricing=current, source_commit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip())
     atomic_json(TRIAL / 'approval.json', sign(grant, 'owner', APPROVAL_DOMAIN))
@@ -427,13 +466,13 @@ def admit():
     a.approve(OWNER, saved['project'], read(TRIAL / 'approval.json'))
     with c.transaction() as db:
         a.verify_execution_evidence(db, OWNER, saved['project'], read(TRIAL / 'approval.json')['payload']['id'], read(TRIAL / 'host.json'))
-    request = dict(approval_id=APPROVAL_ID, shot_ids=[saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
-        reservation_cents=400, runtime_seconds=1800, idempotency_key=IDEMPOTENCY_KEY)
+    request = dict(approval_id=APPROVAL_ID, shot_ids=['duration-05','duration-15'] if COMPARISON else [saved['shot']], expected_revision=a.studio.get(OWNER)['revision'],
+        reservation_cents=400, runtime_seconds=RUNTIME_SECONDS, idempotency_key=IDEMPOTENCY_KEY)
     result = a.submit(OWNER, saved['project'], request)
     batch = result['batch']['id']
     atomic_json(TRIAL / 'job.json', dict(project=saved['project'], batch=batch,
         deadline=int(timestamp(result['batch']['deadline_at']).timestamp()), scope=canonical([OWNER,saved['project']]), pricing=pricing))
-    worker = WorkerTransport(c, real_jobs=e).issue(OWNER, saved['project'], batch, WORKER_ID, ttl_seconds=2100)
+    worker = WorkerTransport(c, real_jobs=e).issue(OWNER, saved['project'], batch, WORKER_ID, ttl_seconds=RUNTIME_SECONDS+300)
     atomic_json(TRIAL / 'worker.json', worker)
     print(json.dumps({'status':'ADMITTED_NOT_LAUNCHED', **read(TRIAL / 'job.json')}))
 
@@ -504,9 +543,11 @@ def observe():
         raw_diagnostic = db.execute('SELECT create_diagnostic FROM pod_batches WHERE id=?', (job['batch'],)).fetchone()[0]
         allocation_row = db.execute('SELECT allocation_attempts FROM live_execution_bindings WHERE batch=?',(job['batch'],)).fetchone()
         allocation_history = json.loads(allocation_row[0]) if allocation_row else []
+        metrics=[json.loads(x[0]) for x in db.execute('SELECT payload FROM worker_telemetry WHERE batch=?',(job['batch'],))]
+        gate=db.execute('SELECT decision FROM comparison_gates WHERE batch=?',(job['batch'],)).fetchone()
     summary = dict(checked_at=time.time(), batch=result['batch'], budget=result['budget'], reservation_state=result['reservation_state'],
         provider=provider, billing=billing, unresolved=unresolved, takes=bundle['takes'], attempts=bundle['attempts'],
-        provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None, allocation_attempts=allocation_history)
+        provider_create=json.loads(raw_diagnostic) if raw_diagnostic else None, allocation_attempts=allocation_history, telemetry=metrics, comparison_gate=json.loads(gate[0]) if gate else None)
     atomic_json(TRIAL / 'status.json', summary)
     # Keep complete evidence on disk, but put lifecycle fields first in a short
     # live log line so the Actions viewer does not truncate the useful status.
@@ -521,7 +562,7 @@ def operator_summary(summary):
         takes=len(summary['takes']), attempts=len(summary['attempts']),
         failure_codes=[a['failure_reason'] for a in summary['attempts'] if a.get('failure_reason')],
         billing=summary['billing'], reservation_state=summary['reservation_state'],
-        provider_create=summary.get('provider_create'), allocation_requests=len(summary.get('allocation_attempts',[])))
+        provider_create=summary.get('provider_create'), allocation_requests=len(summary.get('allocation_attempts',[])), telemetry=summary.get('telemetry',[]), comparison_gate=summary.get('comparison_gate'))
 
 
 def launch():
@@ -554,7 +595,7 @@ def main():
     subprocess.run(['git','diff','--cached','--quiet'], check=True)
     parser = argparse.ArgumentParser()
     parser.add_argument('operation', choices=['prepare','admit','launch','observe'])
-    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation'], default='first')
+    parser.add_argument('--trial', choices=['first','diagnostic','repair','validation','fallback','allocation','comparison'], default='first')
     args = parser.parse_args()
     select_trial(args.trial)
     {'prepare':prepare,'admit':admit,'launch':launch,'observe':observe}[args.operation]()

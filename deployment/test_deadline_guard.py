@@ -11,6 +11,8 @@ class DeadlineGuardTests(unittest.TestCase):
         for deadline in (1000, 2801):
             with self.assertRaises(ValueError): validate('["owner","project"]', 'batch', deadline, 1000)
         with self.assertRaises(ValueError): validate('[]', 'batch', 2000, 1000)
+        self.assertEqual(validate('["owner","project"]','batch',3700,1000,trial='comparison'),'["owner","project"]')
+        with self.assertRaises(ValueError):validate('["owner","project"]','batch',3701,1000,trial='comparison')
 
     def test_only_exact_matching_pod_is_terminated_and_late_create_is_found(self):
         http = HTTP()

@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import time
 
 from .common import LOCK, atomic_json, require
@@ -28,7 +29,7 @@ class ObservedTextEncoder:
         return result
 
 
-def configure_memory(model, torch):
+def configure_memory(model, torch, timings=None):
     # The pinned upstream VAE defaults to float32. Use BF16 parameters and its
     # own BF16 autocast context, rather than keeping FP32 decode activations.
     # This candidate requires a new GPU validation; CPU mocks cannot prove fit.
@@ -39,7 +40,13 @@ def configure_memory(model, torch):
 
     def observed_decode(*args, **kwargs):
         stage('video_decode')
-        return decode(*args, **kwargs)
+        if timings is None:return decode(*args, **kwargs)
+        torch.cuda.synchronize()
+        started=time.monotonic()
+        value=decode(*args, **kwargs)
+        torch.cuda.synchronize()
+        timings['decode_seconds']=timings.get('decode_seconds',0)+(time.monotonic()-started)
+        return value
 
     model.vae.decode = observed_decode
 
@@ -83,9 +90,11 @@ def main(spec_path):
                        convert_model_dtype=True)
     # Keep DiT on CPU until upstream generate() has encoded text on GPU and
     # moved T5 back to CPU. Upstream offload_model=True implements that order.
-    configure_memory(model, torch)
+    timings={}
+    configure_memory(model, torch, timings)
     torch.cuda.synchronize()
     loaded = time.monotonic()
+    baseline_reserved=torch.cuda.memory_reserved()
     stage('generation')
     video = model.generate(s['prompt'], img=image, size=size, max_area=size[0]*size[1],
                            frame_num=spec['frames'], shift=5.0, sample_solver='unipc',
@@ -98,7 +107,11 @@ def main(spec_path):
                normalize=True, value_range=(-1, 1))
     atomic_json(Path(spec['output']).with_suffix('.metrics.json'), {
         'mode': 'wan', 'model_load_seconds': loaded-start,
-        'generation_seconds': generated-loaded, 'gpu_name': torch.cuda.get_device_name(0),
+        'generation_seconds': generated-loaded-timings.get('decode_seconds',0),
+        'decode_encode_seconds':timings.get('decode_seconds',0)+time.monotonic()-generated,
+        'gpu_model_loaded_reserved_bytes':baseline_reserved,
+        'gpu_total_bytes':torch.cuda.get_device_properties(0).total_memory,
+        'driver_version':subprocess.check_output(['nvidia-smi','--query-gpu=driver_version','--format=csv,noheader'],text=True,timeout=10).strip(), 'gpu_name': torch.cuda.get_device_name(0),
         'gpu_peak_allocated_bytes': torch.cuda.max_memory_allocated(),
         'gpu_peak_reserved_bytes': torch.cuda.max_memory_reserved(),
         'torch_version': torch.__version__, 'cuda_version': torch.version.cuda,
