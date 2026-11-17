@@ -49,7 +49,9 @@ John has directed the full 5:40.126 concert video as the production acceptance
 goal, including corrective retries. Six-minute project/export support is prepared
 in source. Five-second ordinary Wan generation has passed; audio-driven singing
 and the full production queue still need implementation and live validation.
-The previous GPU budget is consumed; a new numeric production ceiling is pending.
+John approved $20 total and four cumulative GPU hours for the new production;
+see the [budget and queue plan](docs/B07_BUDGET_AND_QUEUE_PLAN.md). The old grants
+remain consumed, and the new performance worker/queue are not yet ready to launch.
 
 ### Earlier progressive-validation checkpoints
 

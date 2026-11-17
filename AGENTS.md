@@ -148,3 +148,12 @@ production budget or rental runtime envelope was supplied. Prepare the full
 workflow, but obtain that missing financial scope before paid admission. Never
 reset/replay any of the seven consumed grants. The older one-attempt rules remain
 historical facts for those scopes; they do not negate the new retry direction.
+
+John then set the B07 production ceiling to $20 total and approved four hours
+of GPU usage, with continuous queued rendering and corrective retries. These
+numeric approvals are now present; do not request them again. Use a fresh
+production scope, one GPU at a time, up to $18 GPU at <=$4.50/hour and $2 storage/
+cleanup reserve, with at most four cumulative GPU hours including startup and
+retries. Two hours remains the optimization target. Never reset the limits on
+retry. See docs/B07_BUDGET_AND_QUEUE_PLAN.md. This authorizes the bounded work;
+it does not establish audio-driven worker, resident queue or release readiness.

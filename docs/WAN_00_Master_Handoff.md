@@ -1,10 +1,23 @@
 # Wan Video Generation · Master handoff
-Version 1.47 | November 17, 2026 | Owner: John Hoyos
+Version 1.48 | November 17, 2026 | Owner: John Hoyos
 
 ## Approved direction
 Build a shot-based platform for music videos up to 6 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
+**B07 now has John’s authorization for $20 additional total and up to four cumulative GPU hours, including startup and retries. The full 5:40.126 concert video remains the acceptance goal.**
+
+Two hours remains the optimization target; four hours is the authorized ceiling, not four hours per retry. Plan up to $18 GPU at <=$4.50/hour plus $2 for storage and cleanup, with one GPU at a time. The current H100 SXM Secure quote is $4.39/hour, so four hours is $17.56 compute. This is not a completion guarantee or invoice. No further numeric approval is needed within these limits. Preserve all seven historical consumed grants and reservations; create a fresh B07 production scope rather than reusing one.
+
+Use one verified model download, one initialization and a durable sequential queue across compatible shots. Existing code starts a separate inference process and re-verifies/reloads weights per shot; keeping a Pod alive alone does not fix that. A crash may require reload inside the same allowance. Keep successful takes, record each failure/correction/retry, preserve exact vocal timing, and stop paid work when no executable work remains or either limit is reached.
+
+Measured ordinary-video generation alone projects to about 3h22 for the song; generation plus decode/encode is about 3h35 before startup/other overhead/retries. Loading once saves roughly an hour of repeated initialization. Four hours is a tight but useful execution envelope; synchronized-singing throughput is still unmeasured. Do not promise two-hour completion or apply TI2V timing as a proven S2V benchmark. First useful production shots must update the full-queue quality/time/cost forecast.
+
+Detailed plan: `docs/B07_BUDGET_AND_QUEUE_PLAN.md`. Issue #8 and open PR #89 track the direction. Six-minute support remains prepared/tested, not deployed. Remaining work includes the lyric/beat and shot map, audio-driven performance adapter, resident model process, resumable budgeted production retries and final real-video review. No runtime code was changed in this planning update, so passing checks were retained without repetition.
+
+No GPU was started or new generation charge incurred by this update. Installed host remains last verified at `af3b013`; no fresh inventory claim is made. Numeric authority is recorded, but live admission remains unprepared until the required worker, accounting, pinned inputs and independent cleanup guard are ready.
+
+## Previous checkpoint — full-song goal and duration support
 **John has made the complete 5:40.126 music video the B07 acceptance goal and authorized fixing problems and retrying until completion. Preparation is in progress; no new GPU has been started.**
 
 The full-video production retains the ten-city concert treatment, five daytime and five nighttime settings, his reference appearance, handheld microphone and synchronized lead singing. The first usable shots belong to the full production. A short demo alone does not satisfy the goal. Preserve accepted takes, diagnose failed shots, record the correction and retry only affected work. The existing B06 15-second comparison remains historically incomplete; it is not the new deliverable.

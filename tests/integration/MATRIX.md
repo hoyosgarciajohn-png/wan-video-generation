@@ -49,7 +49,7 @@ All R cases are initially BLOCKED pending the merged application and staging set
 | Batch | Evidence required | Present status |
 |---|---|---|
 | B06 | Approved dollar/runtime envelope, pinned image/model, six-shot manifest, cold/warm timings, failures, peak VRAM, billed GPU/storage/transfer amounts, approved seconds, teardown latency and provider-confirmed absence. Re-read durable outputs after deletion and account for billing lag | BLOCKED pending B05 and approved spend |
-| B07 | Complete 5:40.126 music video under six-minute policy, source-song checksum/alignment, selective replacement and corrective retries. John's recorded creative evaluation | Preparation in progress; real singing, continuous production queue, new numeric budget and owner evaluation pending |
+| B07 | Complete 5:40.126 music video under six-minute policy, source-song checksum/alignment, selective replacement and corrective retries. John's recorded creative evaluation | Preparation in progress; real singing, continuous production queue, budgeted admission and owner evaluation pending |
 | B08 | Thirty-minute fixture export and representative generated continuity/dialogue/cartoon sequences. Explicit record of whether a full generated thirty-minute project was rendered and reviewed | BLOCKED pending B07 |
 | B09 | Exact deployed commit, owner release authorization, rollback rehearsal, verified database/asset restore, billing monitor, shutdown alerts and operational owner | BLOCKED pending B08 and release approval |
 

@@ -1,6 +1,6 @@
 # B07 — Complete the full music video and learn from production
 
-Version 1.0 · November 17, 2026 · Owner: John Hoyos
+Version 1.1 · November 17, 2026 · Owner: John Hoyos
 
 ## Goal and authorization
 
@@ -106,17 +106,18 @@ does not alter historical signed GPU scopes or permit new paid dispatch.
 
 ## Funding and execution boundary
 
-Permission to retry is granted. The new total production budget and runtime
-envelope are **not yet specified**. The previous $5 duration-comparison grant
-was consumed and cannot be reused. The earlier ordinary-video estimate is not
-a quote for identity-preserving audio-driven performance or revisions.
+John has supplied the new financial scope: **$20 additional total and up to
+four cumulative GPU hours**, including startup and retries. Two hours remains
+an optimization target. Allocate up to $18 to one H100-class GPU at no more than
+$4.50/hour and hold $2 for storage/cleanup. Do not ask for these approvals again.
+The previous consumed $5 comparison grant remains immutable.
 
-Prepare one new production scope covering planned shots and corrective retries,
-with a cumulative USD ceiling, storage/cleanup reserve, allowed hardware/rate,
-bounded rental windows, durable attempt accounting and an independent teardown
-guard. Derive those bounds from the owner's numeric cap and fresh quotes before
-admission. Do not invent a dollar amount on the owner's behalf. Pause new paid
-work if the authorized allowance is exhausted; keep progress recoverable.
+Follow [the budget and queue plan](B07_BUDGET_AND_QUEUE_PLAN.md). Prepare a fresh
+signed production scope, immutable deadline, cumulative attempt/cost ledger and
+independent cleanup guard. Budget approval does not mean the performance worker
+or resident queue is implemented. Measure the first useful production shots and
+forecast remaining coverage; optimize within the allowance, preserve good takes,
+and stop paid work at the time or money boundary without claiming completion.
 
 This turn incurs no GPU generation cost and starts no Pod. The previously
 installed controller remains `af3b013`; branch preparation is not deployment.
