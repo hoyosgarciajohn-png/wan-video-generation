@@ -38,7 +38,8 @@ class InferenceAdapterTests(unittest.TestCase):
         self.spec_path.write_text(json.dumps(self.spec))
         gpu = SimpleNamespace(is_available=lambda:cuda, is_bf16_supported=lambda:bf16,
                               reset_peak_memory_stats=Mock(), synchronize=Mock(),
-                              get_device_name=lambda _: 'mock device', max_memory_allocated=lambda:1,
+                              get_device_name=lambda _: 'mock device', memory_reserved=lambda:1,
+                              get_device_properties=lambda _:SimpleNamespace(total_memory=80*1024**3), max_memory_allocated=lambda:1,
                               max_memory_reserved=lambda:2)
         torch = SimpleNamespace(cuda=gpu, bfloat16='mock-bf16', __version__='2.8.0+cu128',
                                 version=SimpleNamespace(cuda='12.8'))
@@ -49,7 +50,7 @@ class InferenceAdapterTests(unittest.TestCase):
                    'wan.configs':SimpleNamespace(WAN_CONFIGS={'ti2v-5B':'mock config'}),
                    'wan.utils.utils':SimpleNamespace(save_video=saver)}
         with patch.dict(sys.modules, modules), patch.dict(os.environ, {'WAN_SOURCE':str(self.root)}), \
-             patch('workers.gpu.inference.verify') as verify, patch.object(sys, 'path', list(sys.path)):
+             patch('workers.gpu.inference.verify') as verify, patch('workers.gpu.inference.subprocess.check_output',return_value='570.0'), patch.object(sys, 'path', list(sys.path)):
             if not cuda:
                 with self.assertRaisesRegex(ValueError, 'CUDA GPU required'):
                     main(self.spec_path)

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "as_of": "2026-11-16",
-  "status": "PREPARED_PENDING_NEW_BUDGET_APPROVAL",
+  "status": "OWNER_APPROVED_RUNTIME_PREPARATION",
   "execution_enabled": false,
   "owner_request": "Let's do the 5 seconds and the 15 seconds test. generate to different test to be able to compare results. organize and improve idea",
   "purpose": "Compare two independent continuous Wan clips with duration as the primary changed variable",
   "approval": {
     "test_intent": "REQUESTED_BY_OWNER",
-    "new_spending_envelope": "PENDING",
+    "new_spending_envelope": "APPROVED",
     "existing_consumed_grants_reusable": false
   },
   "baseline": {
@@ -136,5 +136,7 @@
     "One pair is an exploratory comparison, not a statistical benchmark",
     "Final one-second billing remains pending; do not equate empty billing records with zero cost",
     "The proposed application limits are not a provider-side hard account cap"
-  ]
+  ],
+  "image": null,
+  "approval_reference": "John: yes I approve, in direct response to PR #86 proposal: $5 additional total / $4.50 hourly / 45 minutes / one H100 / two ordered renders. Implementation, deployment and bounded execution authorized."
 }

@@ -27,7 +27,8 @@ HOST_DOMAIN = 'wan-live-host-acceptance-v1'
 GRANT_FIELDS = {'id','owner','project','currency','approved_cents','max_runtime_seconds',
                 'valid_until','profile','launch_profile','source_sha256'}
 GRANT_SHAPES = (GRANT_FIELDS, GRANT_FIELDS | {'capacity_retry'},
-                GRANT_FIELDS | {'capacity_retry', 'allocation_plan'})
+                GRANT_FIELDS | {'capacity_retry', 'allocation_plan'},
+                GRANT_FIELDS | {'capacity_retry', 'duration_comparison'})
 
 
 def _sources():
@@ -41,12 +42,16 @@ def _build(directory, image_ref):
     return verify_build(directory, image_ref)
 
 
-def configuration_hash(profile, launch_profile, allocation_plan=None):
+def configuration_hash(profile, launch_profile, allocation_plan=None, duration_comparison=None):
     RealJobBridge.configuration_hash(profile)
     launch = validate_launch_profile(launch_profile)
     value = dict(profile=profile, launch_profile=launch, model_lock=LOCK)
     if allocation_plan is not None:
         value['allocation_plan'] = validate_plan(allocation_plan, launch)
+    if duration_comparison is not None:
+        from workers.gpu.comparison import validate_policy, GPU
+        value['duration_comparison'] = validate_policy(duration_comparison)
+        require(profile['gpu_type']==GPU and duration_comparison['image_ref']==profile['image_ref'], 'Comparison configuration mismatch')
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
@@ -137,7 +142,7 @@ class LiveAdmission:
         if current:
             require(expiry > self.control.clock(), 'Approval expired')
             require(grant['source_sha256'] == _sources(), 'Approved source inventory changed')
-        return grant, configuration_hash(profile, launch, grant.get('allocation_plan'))
+        return grant, configuration_hash(profile, launch, grant.get('allocation_plan'), grant.get('duration_comparison'))
 
     def _approval(self, db, owner, project, approval_id, *, current=True):
         row = db.execute('SELECT envelope,revoked FROM live_approvals WHERE id=? AND owner=? AND project=?',
@@ -182,7 +187,7 @@ class LiveAdmission:
         require(type(request['runtime_seconds']) is int and 1 <= request['runtime_seconds'] <= 3600 and
                 type(request['expected_revision']) is int and request['expected_revision'] >= 0, 'Invalid runtime or revision')
         ids = request['shot_ids']
-        require(isinstance(ids, list) and len(ids) == 1 and isinstance(ids[0], str), 'First live admission is one saved shot only')
+        require(isinstance(ids,list) and 1<=len(ids)<=2 and all(isinstance(x,str) for x in ids) and len(set(ids))==len(ids), 'Distinct saved shots required')
         with self.control.transaction() as db:
             bundle = self.control._load(db, owner, project)
             prior = db.execute('SELECT batch,request FROM live_reservations WHERE owner=? AND project=? AND idem=?',
@@ -196,6 +201,11 @@ class LiveAdmission:
                 if any(b['idempotency_key'] == request['idempotency_key'] for b in bundle['batches']):
                     raise StudioConflict('Canonical idempotency key already used')
                 grant, config_hash = self._approval(db, owner, project, request['approval_id'])
+                experiment=grant.get('duration_comparison')
+                require(ids==(experiment['shot_ids'] if experiment else ids[:1]), 'Shot selection exceeds signed scope')
+                if experiment:
+                    require(request['runtime_seconds']<=2700 and grant['max_runtime_seconds']==2700 and
+                            grant['approved_cents']==400 and request['reservation_cents']==400, 'Comparison budget or runtime changed')
                 # Each latest installed grant is a total project cap, never additive.
                 latest = db.execute('SELECT id FROM live_approvals WHERE owner=? AND project=? ORDER BY rowid DESC LIMIT 1',
                                     (owner, project)).fetchone()[0]
@@ -207,19 +217,20 @@ class LiveAdmission:
                 require(request['runtime_seconds'] <= grant['max_runtime_seconds'] and deadline <= timestamp(grant['valid_until']).timestamp(),
                         'Runtime exceeds signed approval')
                 shots = {s['id']: s for s in bundle['shots']}
-                if ids[0] not in shots:
+                if any(identity not in shots for identity in ids):
                     raise KeyError('Shot unavailable')
-                shot = shots[ids[0]]
-                snapshot = dict(shot_id=shot['id'], **{k: deepcopy(v) for k, v in shot.items() if k not in ('id','project_id','scene_id')})
+                snapshots=[dict(shot_id=identity, **{k:deepcopy(v) for k,v in shots[identity].items()
+                           if k not in ('id','project_id','scene_id')}) for identity in ids]
                 batch_id = uuid4().hex
                 batch = dict(id=batch_id, project_id=project, idempotency_key=request['idempotency_key'], execution_mode='runpod',
-                             model_profile=deepcopy(LOCK['profile']), shot_snapshots=[snapshot],
+                             model_profile=deepcopy(LOCK['profile']), shot_snapshots=snapshots,
                              budget=dict(currency='USD', approved_cents=grant['approved_cents'], reserved_cents=request['reservation_cents'], spent_cents=0),
                              approved_at=stamp(now), deadline_at=stamp(datetime.fromtimestamp(deadline, timezone.utc)),
                              state='queued', cleanup_state='pending', provider_resource_id=None)
                 probe = dict(batch, state='rendering')
-                attempt = self.control._attempt(probe, snapshot, 'live-admission-check', now)
-                validate_claim(self.control._envelope(bundle, probe, attempt, snapshot))
+                for snapshot in snapshots:
+                    attempt = self.control._attempt(probe, snapshot, 'live-admission-check', now)
+                    validate_claim(self.control._envelope(bundle, probe, attempt, snapshot, experiment))
                 bundle['batches'].append(batch)
                 self.control._save(db, bundle)
                 db.execute('INSERT INTO live_reservations (batch,owner,project,approval,idem,request,reserved_cents,created) VALUES (?,?,?,?,?,?,?,?)',

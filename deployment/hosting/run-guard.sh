@@ -10,6 +10,7 @@ case "${WAN_TRIAL:-first}" in
     validation) trial_dir=/var/lib/wan/validation-trial-20261116 ;;
         fallback) trial_dir=/var/lib/wan/fallback-trial-20261116 ;;
         allocation) trial_dir=/var/lib/wan/allocation-trial-20261116 ;;
+        comparison) trial_dir=/var/lib/wan/comparison-trial-20261116 ;;
     *) exit 1 ;;
 esac
 task_dir=$(mktemp -d)

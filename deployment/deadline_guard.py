@@ -13,14 +13,14 @@ from services.controller.runpod import https_transport
 from deployment.validation_policy import OLD_BATCH, OLD_SCOPE
 
 
-def validate(scope, batch, deadline, now):
+def validate(scope, batch, deadline, now, *, trial=None):
     binding = json.loads(scope)
     if (not isinstance(binding, list) or len(binding) != 2 or
             any(not isinstance(v, str) or not 1 <= len(v) <= 200 for v in binding) or
             not re.fullmatch(r'[A-Za-z0-9_-]{1,200}', batch)):
         raise ValueError('Exact owner/project and batch binding required')
-    if type(deadline) is not int or not now < deadline <= now + 1800:
-        raise ValueError('Deadline must be within the approved 30-minute envelope')
+    if type(deadline) is not int or not now < deadline <= now + (2700 if trial=='comparison' else 1800):
+        raise ValueError('Deadline must be within the approved scope runtime')
     return json.dumps(binding, sort_keys=True, separators=(',', ':'))
 
 
@@ -67,11 +67,11 @@ def main():
     start = time.time()
     batch = os.environ['WAN_GUARD_BATCH']
     deadline = int(os.environ['WAN_GUARD_DEADLINE'])
-    scope = validate(os.environ['WAN_GUARD_SCOPE'], batch, deadline, start)
+    scope = validate(os.environ['WAN_GUARD_SCOPE'], batch, deadline, start, trial=os.environ.get('WAN_TRIAL'))
     provider = CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=scope, transport=https_transport())
     observed = set()
     previous = (CleanupOnlyProvider(os.environ['RUNPOD_CLEANUP_TOKEN'], scope=OLD_SCOPE, transport=https_transport())
-                if os.environ.get('WAN_TRIAL') in ('validation','fallback','allocation') else None)
+                if os.environ.get('WAN_TRIAL') in ('validation','fallback','allocation','comparison') else None)
     previous_observed = set()
     def current_ready():
         value = readiness(provider, scope, batch, deadline, observed)

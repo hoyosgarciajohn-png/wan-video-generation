@@ -2,7 +2,7 @@
 
 Prepared November 16, 2026 for John Hoyos. Owner requested two tests and an
 improved comparison plan. This document defines the tests; it does not claim that
-either has run. The new spending envelope below is proposed, not approved.
+either has run. John approved the new $5 / 45-minute envelope with "yes I approve".
 
 ## Objective
 
@@ -45,7 +45,7 @@ common first five seconds and then examine the long clip's final ten seconds.
 The fifteen-second test must be a fresh continuous generation, not three short
 clips, a loop, slow motion or an extension made by copying the five-second take.
 
-## Proposed execution and cost envelope
+## Approved execution and cost envelope
 
 - One fresh comparison scope and one allocated H100 Pod for both ordered renders.
 - Additional total ceiling: **$5 for the pair**, split into $4 Pod reservation and
@@ -63,8 +63,8 @@ clips, a loop, slow motion or an extension made by copying the five-second take.
   volume and no new paid service. Preserve all historical liabilities and the
   exact old unknown repair-request exception and cleanup monitoring.
 
-The previous $5 authority covered the completed one-second trial. This pair and
-the longer runtime need their own explicit spending authority. The limits are
+The previous $5 authority covered the completed one-second trial. John separately
+approved this pair and its longer runtime. The limits are
 enforced by admission, deadlines and cleanup; they are not a provider account cap.
 
 ## Implementation and execution sequence
@@ -128,7 +128,17 @@ measurements explicitly. No result is prefilled as PASS.
 - Exact upstream [frame-count implementation](https://github.com/Wan-Video/Wan2.2/blob/e5058c08fada388b04bb3d1a4734bddbd2fdeac5/wan/textimage2video.py).
 - Machine-readable terms: deployment/duration-comparison-proposal.json.
 
-The two definitions and cost proposal are prepared. No runtime code has changed,
-no new authority has been installed, and no new Pod or paid render was started.
-Implementation and live execution remain the next phase after this plan's new
-spending/runtime envelope is approved.
+The owner-approved implementation adds a private protocol named
+`wan-duration-comparison-v1`, shared by B01 worker and B02 controller, with B05
+fictional lifecycle/transport checks. Canonical bundle records remain at 0.1.0.
+The signed grant and host configuration hash bind the ordered shots and experiment.
+Ordinary scopes retain the five-second ceiling. `POST /v1/worker/attempts/{id}/telemetry`
+accepts strict bounded metrics and returns their hash before completion; replay
+must match. Controller backup retains and checks these records. No telemetry is
+accepted for other scopes. The fifteen-second claim additionally requires the
+first take, its measurements, remaining-time allowance and projected memory headroom.
+The projection uses 9x measured generation time and 3x variable reserved VRAM plus
+10% device headroom. These are cautious feasibility estimates, not guarantees.
+
+Implementation and fictional verification are in progress. No new Pod is admitted
+until the reviewed image is published, installed and bound into a fresh scope.

@@ -121,8 +121,13 @@ def validate_claim(claim):
         require(b['budget']['approved_cents'] > 0, 'Missing approved budget')
         require((settings['width'], settings['height']) in ((1280,704), (704,1280)),
                 'Wan profile supports 1280x704 or 704x1280')
-        require(1 <= s['target_duration_ms'] <= 5000 and settings['steps'] == 50,
-                'Wan profile supports up to five seconds and 50 steps')
+        ceiling = 5000
+        if 'duration_comparison' in claim:
+            from .comparison import validate_snapshots
+            validate_snapshots(claim['duration_comparison'], b['shot_snapshots'])
+            ceiling = 15000
+        require(1 <= s['target_duration_ms'] <= ceiling and settings['steps'] == 50,
+                'Wan profile supports up to five seconds unless comparison-authorized')
         require(len(s['reference_asset_ids']) <= 1, 'One reference image supported')
     assets = claim['input_assets']
     require(len({x['id'] for x in assets}) == len(assets), 'Duplicate input asset')

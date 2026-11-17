@@ -45,8 +45,8 @@ class FirstTrialGates(unittest.TestCase):
         self.assertEqual(first_trial.DURATION_MS,1000)
         self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),2)
         with tempfile.TemporaryDirectory() as t:
-            result=first_trial.materialize_build(Path(t)/'build')
-            self.assertEqual(result['image_ref'],first_trial.IMAGE)
+            # Historical immutable image is intentionally incompatible with the new worker.
+            with self.assertRaises(AssertionError):first_trial.materialize_build(Path(t)/'build')
         proposal=first_trial.read(first_trial.ROOT/'deployment/repair-trial-proposal.json')
         proposal['proposed_additional_terms']['render_attempts']=2
         with patch.object(first_trial,'read',return_value=proposal), self.assertRaises(AssertionError):
@@ -293,3 +293,21 @@ class BootstrapExecutionTests(LiveExecutionTests):
         self.host=self.signed(dict(self.host['payload'],config_hash=configuration_hash(self.profile,self.payload['launch_profile'])),HOST_DOMAIN)
         with self.assertRaises(ValueError): self.provision()
         self.assertEqual(self.http.posts,0)
+
+class ComparisonScopeGates(unittest.TestCase):
+    def test_pair_scope_is_fresh_and_all_six_historical_grants_remain_closed(self):
+        importlib.reload(first_trial)
+        self.addCleanup(importlib.reload,first_trial)
+        original=first_trial.read
+        def approved(path):
+            value=original(path)
+            if str(path).endswith('duration-comparison-proposal.json'):
+                value['image']='ghcr.io/fictional/worker@sha256:'+'a'*64
+            return value
+        with patch.object(first_trial,'read',side_effect=approved):first_trial.select_trial('comparison')
+        self.assertEqual(first_trial.RUNTIME_SECONDS,2700)
+        self.assertEqual(len(first_trial.EXPECTED_PRIOR_BATCHES),6)
+        self.assertEqual(first_trial.GPU,'NVIDIA H100 80GB HBM3')
+        self.assertEqual(str(first_trial.HOURLY_CEILING),'4.50')
+        self.assertTrue(first_trial.ALLOW_KNOWN_UNKNOWN)
+        self.assertNotIn('allocation-trial',str(first_trial.TRIAL))

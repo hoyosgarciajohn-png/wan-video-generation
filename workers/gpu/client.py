@@ -81,6 +81,10 @@ class WorkerClient:
         return self.post(f"attempts/{quote(attempt['id'], safe='')}/heartbeat",
                          {'lease_id': attempt['lease_id'], 'progress': progress})
 
+    def telemetry(self, attempt, metrics):
+        return self.post(f"attempts/{quote(attempt['id'], safe='')}/telemetry",
+                         {'lease_id': attempt['lease_id'], 'metrics': metrics})
+
     def complete(self, attempt, manifest):
         return self.post(f"attempts/{quote(attempt['id'], safe='')}/complete",
                          {'lease_id': attempt['lease_id'], 'output_asset_manifest': manifest})

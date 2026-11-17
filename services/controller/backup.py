@@ -19,7 +19,7 @@ from scripts.validate_contract import validate_bundle
 from services.controller.service import canonical
 from workers.gpu.common import digest, sync_dir, timestamp
 
-TABLES = {'projects','admissions','completions','studio_owners','studio_projects',
+TABLES = {'worker_telemetry','comparison_gates','projects','admissions','completions','studio_owners','studio_projects',
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
           'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings'}
@@ -220,7 +220,7 @@ def _inspect_live_admission(db, names, projects):
         timestamp(grant['valid_until'])
         require(isinstance(grant['source_sha256'], dict) and bool(grant['source_sha256']) and
                 all(isinstance(k,str) and hex_hash(v) for k,v in grant['source_sha256'].items()), 'Invalid signed source inventory')
-        config_hash = configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'))
+        config_hash = configuration_hash(grant['profile'], grant['launch_profile'], grant.get('allocation_plan'), grant.get('duration_comparison'))
         launch = validate_launch_profile(grant['launch_profile'])
         require(launch['env'] == {} and launch['image'] == grant['profile']['image_ref'] and
                 launch['gpu']['id'] == grant['profile']['gpu_type'] and launch['gpu']['count'] == 1 and
@@ -398,6 +398,28 @@ def _inspect(db):
                     isinstance(worker, str) and bool(worker) and revoked in (0, 1),
                     'Invalid worker credential')
             timestamp(expires)
+    from services.controller import comparison
+    from workers.gpu.comparison import validate_metrics, receipt
+    if 'worker_telemetry' in names:
+        for attempt_id,batch_id,project_id,raw,checksum in db.execute('SELECT attempt,batch,project,payload,receipt FROM worker_telemetry'):
+            require(project_id in projects, 'Orphan telemetry project')
+            bundle=projects[project_id]
+            batch=next((b for b in bundle['batches'] if b['id']==batch_id),None)
+            attempt=next((a for a in bundle['attempts'] if a['id']==attempt_id and a['batch_id']==batch_id),None)
+            require(batch is not None and attempt is not None, 'Orphan telemetry attempt')
+            experiment=comparison.experiment(db,batch)
+            require(experiment is not None, 'Telemetry lacks approved experiment')
+            snapshot=next(s for s in batch['shot_snapshots'] if s['shot_id']==attempt['shot_id'])
+            metrics=json.loads(raw)
+            validate_metrics(metrics,experiment,attempt,snapshot)
+            require(receipt(metrics)==checksum, 'Telemetry checksum changed')
+            take=next((t for t in bundle['takes'] if t['attempt_id']==attempt_id),None)
+            if take:
+                asset=next(a for a in bundle['assets'] if a['id']==take['asset_id'])
+                comparison.require_metrics(db,batch,attempt,asset)
+    if 'comparison_gates' in names:
+        known={b['id'] for p in projects.values() for b in p['batches']}
+        require({r[0] for r in db.execute('SELECT batch FROM comparison_gates')}<=known, 'Orphan comparison gate')
     _inspect_budget(db, names, projects)
     return assets
 

@@ -5,7 +5,7 @@ on:
       trial:
         description: Exact approved trial scope for readiness receipt
         type: choice
-        options: [first, diagnostic, repair, validation, fallback, allocation]
+        options: [first, diagnostic, repair, validation, fallback, allocation, comparison]
         default: first
         required: true
       scope:
@@ -17,7 +17,7 @@ on:
         required: true
         type: string
       deadline:
-        description: Original absolute Unix deadline, within 1800 seconds
+        description: Original absolute Unix deadline, within the approved scope runtime
         required: true
         type: string
 permissions:
@@ -26,7 +26,7 @@ jobs:
   cleanup:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 37
+    timeout-minutes: 52
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
