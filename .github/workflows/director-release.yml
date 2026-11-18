@@ -1,0 +1,31 @@
+name: Deploy approved Music Video Director
+on:
+  push:
+    branches: [main]
+    paths: [deployment/director_release.py, deployment/director_install.py]
+permissions:
+  contents: read
+concurrency:
+  group: wan-controller-install
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Build approved interface
+        run: |
+          npm ci --prefix apps/studio --no-audit --no-fund
+          npm run build --prefix apps/studio
+      - name: Install bounded approved overlay
+        env:
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: python deployment/director_release.py
