@@ -2,6 +2,7 @@ import io
 import unittest
 import zipfile
 from deployment.longcat_session import budget, safe_members, PRIOR_PODS
+from deployment.longcat_session_http import authorized
 
 
 class ProductionSessionTests(unittest.TestCase):
@@ -36,6 +37,12 @@ class ProductionSessionTests(unittest.TestCase):
         with zipfile.ZipFile(io.BytesIO(),mode='w') as archive:
             archive.writestr('inputs/manifest.json','{}');archive.writestr('master/master.wav',b'x')
             self.assertEqual(len(safe_members(archive)),2)
+
+    def test_http_requires_exact_bearer_and_refuses_browser_origin(self):
+        self.assertTrue(authorized({'Authorization':'Bearer fictional-token'},'fictional-token'))
+        self.assertFalse(authorized({},'fictional-token'))
+        self.assertFalse(authorized({'Authorization':'Bearer changed'},'fictional-token'))
+        self.assertFalse(authorized({'Authorization':'Bearer fictional-token','Origin':'https://example.com'},'fictional-token'))
 
 
 if __name__=='__main__':unittest.main()

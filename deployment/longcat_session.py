@@ -1,4 +1,4 @@
-"""One expiring, forced-command operator session for the approved full song.
+"""One expiring, narrowly scoped operator session for the approved full song.
 
 No shell, provider creation, arbitrary paths, or reusable SSH authority. GPU
 creation stays with the connected Runpod account after a durable create fence.
@@ -126,9 +126,7 @@ def main():
             'Unsupported production operation')
     require(time.time() < read(SESSION/'authority.json')['expires_at'], 'Operator session expired')
     if op == 'close':
-        p=Path('/root/.ssh/authorized_keys')
-        p.write_text(''.join(l for l in p.read_text().splitlines(True) if 'wan-longcat-production-20261118' not in l))
-        print(json.dumps(dict(status='OPERATOR_ACCESS_REMOVED'))); return
+        print(json.dumps(dict(status='OPERATOR_SESSION_CLOSING'))); return
     if op in {'prepare','admit','fence-create','cleanup'}: host_gate()
     guard = read(SESSION/'guard-ready.json') if op=='admit' else None
     if op=='admit':
