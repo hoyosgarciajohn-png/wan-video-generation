@@ -1,0 +1,26 @@
+name: LongCat full-song deadline guard
+run-name: LongCat production shutdown guard
+on:
+  workflow_dispatch:
+    inputs:
+      pod_name: {description: Exact new production Pod name, type: string, required: true}
+      admitted_at: {description: Fixed admission Unix time, type: string, required: true}
+      deadline: {description: Fixed shutdown Unix time, type: string, required: true}
+permissions:
+  contents: read
+jobs:
+  guard:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Watch exact production Pod and enforce original deadline
+        env:
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          LONGCAT_POD_NAME: ${{ inputs.pod_name }}
+          LONGCAT_ADMITTED_AT: ${{ inputs.admitted_at }}
+          LONGCAT_DEADLINE: ${{ inputs.deadline }}
+        run: python3 -u -m deployment.longcat_guard_runner
