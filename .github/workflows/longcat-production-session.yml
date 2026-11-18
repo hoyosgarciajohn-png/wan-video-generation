@@ -1,0 +1,32 @@
+name: LongCat production session
+on:
+  push:
+    branches: [main]
+    paths: [deployment/longcat_session.py, deployment/longcat_session_install.sh, .github/workflows/longcat-production-session.yml]
+  pull_request:
+    paths: [deployment/longcat_session.py, deployment/longcat_session_install.sh, deployment/longcat_guard_runner.py, tests/test_longcat_session.py, .github/workflows/longcat-production-session.yml, .github/workflows/longcat-production-guard.yml]
+permissions:
+  contents: read
+jobs:
+  boundaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - run: |
+          python3 -m unittest discover -s tests -p test_longcat_session.py -v
+          python3 -m py_compile deployment/longcat_session.py deployment/longcat_guard_runner.py
+          bash -n deployment/longcat_session_install.sh
+  install:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Install expiring forced-command production session
+        env:
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: bash deployment/longcat_session_install.sh
