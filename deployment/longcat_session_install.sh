@@ -20,7 +20,14 @@ p=json.loads((root/'publication.json').read_text())
 assert p['source_commit']=='9277e14a7d21a4f8bb142c50943fd3f8a1bfce4b' and p['offline_import']=='PASS' and p['registry_status']=='PASS'
 assert p['image'].endswith('@sha256:7ba22cca295fd8290b1df14a349b0e5ee9a2bb46b22af424dc17ade69f23dcf7')
 authority=root/'authority.json'
-assert not authority.exists(), 'A consumed session cannot be reset'
+if authority.exists():
+    saved=json.loads(authority.read_text())
+    assert time.time()<saved['expires_at'], 'Expired session cannot be extended'
+    assert not Path('/var/lib/wan/longcat-production-20261118/credential.json').exists(), 'Admitted scope cannot be changed'
+    assert not (root/'guard-ready.json').exists(), 'Active guard cannot be replaced'
+    saved['ops_sha']=os.environ['OPS_SHA'];authority.write_text(json.dumps(saved))
+    print(json.dumps(dict(status='UNADMITTED_CONTROL_UPDATED',expires_at=saved['expires_at'],gpu_started=False)))
+    raise SystemExit(0)
 expires=int(time.time())+14400
 authority.write_text(json.dumps(dict(expires_at=expires,ops_sha=os.environ['OPS_SHA'])))
 work=Path('/var/lib/wan/longcat-production-20261118');work.mkdir(mode=0o700)

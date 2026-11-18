@@ -1,6 +1,9 @@
 name: LongCat full-song deadline guard
 run-name: LongCat production shutdown guard
 on:
+  push:
+    branches: [main]
+    paths: [deployment/longcat-production-request.json]
   workflow_dispatch:
     inputs:
       pod_name: {description: Exact new production Pod name, type: string, required: true}
