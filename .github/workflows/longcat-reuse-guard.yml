@@ -1,0 +1,34 @@
+name: Same-Pod authorized extension guard
+on:
+  push:
+    branches: [main]
+    paths: [deployment/reuse-guard-request.json]
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Start and attest replacement guard before handoff
+        env:
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: |
+          export EXTENSION_READY_PATH="$RUNNER_TEMP/extension-ready.json"
+          python3 -u -m deployment.reuse_guard > "$RUNNER_TEMP/extension-guard.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/extension-guard.pid"
+          for attempt in $(seq 1 90); do
+            if test -f "$EXTENSION_READY_PATH"; then cat "$EXTENSION_READY_PATH"; exit 0; fi
+            kill -0 "$(cat "$RUNNER_TEMP/extension-guard.pid")" || { cat "$RUNNER_TEMP/extension-guard.log"; exit 1; }
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/extension-guard.log"
+          exit 1
+      - name: Enforce extended deadline on the same physical Pod
+        run: |
+          while kill -0 "$(cat "$RUNNER_TEMP/extension-guard.pid")" 2>/dev/null; do sleep 5; done
+          cat "$RUNNER_TEMP/extension-guard.log"
+          grep -q ABSENCE_CONFIRMED "$RUNNER_TEMP/extension-guard.log"
