@@ -96,3 +96,11 @@ its three capacity-only requests: all returned explicit HTTP 400 no-capacity
 rejections. No Pod, render or take resulted; cleanup is confirmed and the billing
 reservation remains retained. The fallback scope is consumed. See the linked
 fallback evidence for request IDs and next-step constraints.
+
+### Hosted Music Video Director (interface foundation)
+
+The optional `/#director` view adds song/character uploads, saved creative briefs,
+an editable concert storyboard and an explicit hosted-model selector. See
+[implementation and API status](docs/HOSTED_MUSIC_DIRECTOR.md). The fal adapters
+are implemented but live credentials and paid-render integration are not activated.
+The classic workspace remains the default view.

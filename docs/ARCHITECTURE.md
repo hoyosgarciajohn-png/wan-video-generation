@@ -26,3 +26,15 @@ Deletion is confirmed by a successful inventory/get response establishing absenc
 Derive identity from authenticated server context. Resolve project membership before processing IDs. Keep signed asset URLs short-lived, write paths scoped, credentials server-side and logs redacted. Backend validates approved storage locations before workers read remote assets. Test ownership boundaries with fictional owners.
 
 Model cache retention trades idle storage cost against cold-start download time. Keep it optional and decide from measured use. Back up database and assets and verify recovery before production. A finished 30-minute timeline built from fixtures verifies duration support. Creative continuity needs live-owner acceptance on generated footage.
+
+## Hosted API direction — November 18, 2026
+
+John approved a hosted-model selection interface and API connections. The new
+Director (`/#director`) shares the existing authenticated project and upload
+services, with separately revisioned `director_briefs` included in backup/restore.
+A shared model catalog names the exact endpoint and provider. Server-only fal
+adapters map model-specific inputs and poll provider-returned queue URLs. No
+automatic model substitution or POST retries are permitted. The first interface
+release has no paid-dispatch route; follow HOSTED_MUSIC_DIRECTOR.md before adding
+cost-reserved jobs, media transfer, retained outputs and assembly. The classic
+studio and its contract 0.1.0 remain available without migrating existing films.

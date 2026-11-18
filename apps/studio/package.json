@@ -14,7 +14,7 @@
     "test:browser": "playwright test",
     "types": "python scripts/generate_types.py && prettier --write src/contract.ts",
     "format:check": "prettier --check src tests vite.config.ts playwright.config.ts",
-    "test:ui": "node --import tsx --import ./tests/dom-setup.ts --test tests/ui.test.tsx tests/connected.test.tsx"
+    "test:ui": "node --import tsx --import ./tests/dom-setup.ts --test tests/ui.test.tsx tests/connected.test.tsx tests/director.test.tsx"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

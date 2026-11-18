@@ -147,6 +147,15 @@ export function ConnectedStudio({
     <>
       <section className="panel" aria-label="Server connection">
         <h1>WAN Studio · Server workspace</h1>
+        <a
+          href="/#director"
+          onClick={() => {
+            if (!dirty && !editing) location.assign("/#director");
+            if (!dirty && !editing) location.reload();
+          }}
+        >
+          Open Music Video Director ↗
+        </a>
         <p>
           Server fixture rendering produces silent synthetic test clips up to
           five seconds (320×180, 24 fps), with no reference images or GPU
