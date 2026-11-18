@@ -1,33 +1,16 @@
-# LongCat review and release checkpoint
+# LongCat deployment review
 
-November 17, 2026, owner-local. John authorized continuing final image/timing review and deployment. This does not enlarge the retained GPU allowance.
+GitHub Actions runs again. Read-only host verification run 44238678234 attempt 2 passed and freshly observed the expected d0543ae baseline. The prior billing failure is historical, not the current blocker.
 
-## Review result
+PR #98 was marked ready and merged after current-head run 44239805091 attempt 2 passed at f23cf48be02bf7a2be9757417524d435dd4e6cf9. Evidence: 227 root tests (one expected non-root skip), 15 queue/media tests, 4 publication boundary tests, 18 Studio tests, contract/compilation checks and an actual production Dockerfile build with offline bootstrap/client imports. The service-account permission test then passed on the real root-run deployment host. Slow dependency downloads accounted for most CI elapsed time; this was not video-generation latency.
 
-All 18 original PNG anchors were visually inspected. Head covering is present in each. The 110-shot / 11-location plan remains intact. The stills establish identity, costume and setting; alternate angles, sports physics, singing synchronization and crowd choreography remain unproven in generated motion. Small apparel emblems remain visible in some sports images. No still pixels were changed.
+Merged and installed source: `9277e14a7d21a4f8bb142c50943fd3f8a1bfce4b`. Controller upgrade [run 44242624619](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44242624619) passed. The server reports this exact installed SHA; controller, cleanup and proxy services are active and enabled; SQLite integrity and quiescence/provider-absence gates passed; external HTTPS is ready with paid_dispatch=false. The historical unresolved request 249c50635ec84ac38cef0eb66232efed and all financial liabilities were preserved. Cleanup service activity is not a claim that this old uncertain ledger entry is resolved.
 
-An onset-based timing pass moved 102 internal cuts by at most 0.40 seconds, retaining 110 shots and the full 9,072-frame / 362.88-second master. Median distance to a detected spectral onset changed from 80 ms to 10 ms. These are computational accent candidates, not verified lyric/beat/downbeat annotations or owner creative acceptance. Every conditioning WAV was rebuilt at its exact frame/sample offset, with 4.72 seconds of mono16k context and only missing tail context padded. All actual inputs passed the pinned manifest/image preflight. A labeled full-song still-image MP4 passes full decode and has exactly 9,072 video frames and 362.88 seconds of stereo audio.
+Private runtime publication [run 44243001014](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44243001014) passed at the same merged source. The actual build/import, private package visibility, authenticated registry manifest/config binding and anonymous-access denial passed. Immutable image: `ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:7ba22cca295fd8290b1df14a349b0e5ee9a2bb46b22af424dc17ade69f23dcf7`. A Runpod pull and GPU execution of this production batch image remain UNVERIFIED; no GPU was allocated here. Runtime policy 1.2.0 (new music project cap 363000 ms) is included in the exact deployed source; existing lower project limits stay binding. Contract remains 0.1.0.
 
-Private timing-v2 manifest fingerprint: `fdc40bdca1da7e4fd8b45d52bcd3de2a8fc3d620f9469d1a1f4c6cb4c11f29a7`. It still uses a preparation project identifier. Bind a real new 363000ms project and recompute before admission. Personal media remain outside Git.
+The approved 362.880-second original master, 18 head-covered scene images, all 110 timing-v2 conditioning WAVs and complete labeled still-image preview are unchanged. Preparation fingerprint remains fdc40bdca1da7e4fd8b45d52bcd3de2a8fc3d620f9469d1a1f4c6cb4c11f29a7. Owner playback acceptance and verified lyric phrasing remain open. This deployment is not full-video rendering or proof of 110 distinct camera angles, lip sync, sports physics or crowd choreography.
 
-## Deployment attempt and exact blocker
+Next: bind the reviewed package to a real new production project and recompute its fingerprint; reconcile the retained cumulative budget, install/attest the independent exact-name guard and bind current capped private admission to the actual source/image/input identities. Preserve the existing $20/four-hour cumulative envelope and all consumed scopes; historical posted $8.156768710002916 is not a refreshed balance. No new allowance, Pod, payment or model inference was started by this recheck. Full-video rendering has not started.
 
-Read-only verification [run 44238678234](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44238678234), source `311ce5930e54413f4b990fdbbe307cc9c845de65`, failed before any job step started. GitHub reported failed recent account payments or an Actions spending limit requiring attention. No SSH connection, host verification or mutation occurred. Do not describe this as a host or code failure, and do not blindly rerun while the account remains blocked.
+Live controller: https://wan-64-225-114-46.sslip.io
 
-External HTTPS health returned `ready=true`, `paid_dispatch=false`. That does not identify the installed source. Last verified host source remains `d0543ae556588de3ef77a17e75dd4e734309e147`, not a fresh source observation. Production upgrade and private image publication remain incomplete. No GPU was allocated or model inference run.
-
-## Release preparation
-
-The upgrade script now expects the last verified installed `d0543ae` baseline rather than the obsolete `2a28f36`. It retains the exact-match refusal, quiescence/provider absence gates, cleanup continuity, maintenance checkpoint and old-source rollback. Run verify before upgrade and investigate any different live baseline.
-
-The manual `Publish private LongCat production` workflow builds the actual production Dockerfile from exact main, imports it offline, checks package privacy, publishes the exact tested image, verifies authenticated registry manifest/config binding and denies anonymous access. It does not load weights or allocate GPUs. Source-bound tags, immutable digest and bounded evidence are retained. Publication is not yet executed; no new registry digest exists.
-
-Four focused fictional publication-boundary checks passed locally, covering wrong source/missing import evidence, non-main refusal, retagged local image refusal before registry/push, and wrong remote config binding. Python compilation, workflow YAML and shell syntax passed. The previous complete integration/container checks remain the passing evidence at `b99d088` / run 44219918985; no hosted pass is claimed for subsequent release-preparation changes.
-
-## Resume after account recovery
-
-1. Resolve GitHub account billing or the Actions spending limit, then rerun the previously blocked read-only verification. Read the installed SHA, fresh cleanup status and absence result; preserve every old liability.
-2. Complete checks for the current PR head, merge reviewed PR #98, and run `Publish private LongCat production` on that exact main. Retain its actual registry digest and evidence.
-3. Run controller `upgrade` with the already pinned host fingerprint. Verify exact installed source, policy 1.2.0, ready HTTPS and existing cleanup service; public paid dispatch remains false.
-4. Bind the timing-v2 inputs to a real project. Review the complete still preview and any lyric phrase concerns. Install a current capped admission and independent exact-name guard before paid allocation; retain all cumulative costs and reservations.
-5. Start actual production only within that admission. Evaluate representative difficult motion first, preserve useful takes and continue toward the complete film. A still preview is not full-video rendering.
