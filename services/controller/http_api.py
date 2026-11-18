@@ -25,6 +25,7 @@ from services.controller.export_runner import ExportRunner
 from services.controller.uploads import ResumableUploads, CHUNK_SIZE
 from services.controller.worker_transport import WorkerTransport, MAX_ARTIFACT_BYTES, IDENTIFIER
 from services.controller.longcat import LongCatTransport
+from services.controller.director import Director
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -75,6 +76,7 @@ class StudioAPI:
         self.uploads = ResumableUploads(studio)
         self.workers = WorkerTransport(studio.control, real_jobs=real_jobs)
         self.longcat = LongCatTransport(studio.control)
+        self.director = Director(studio)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -224,6 +226,21 @@ class StudioAPI:
                     return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
                 raise HTTPError(405)
             owner = self.owner(headers)
+            if path == '/v1/studio/director/models' and method == 'GET':
+                return Reply(200, self.director.catalog())
+            director_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/director(?:/(review))?', path)
+            if director_match:
+                try:
+                    project_id, action = director_match.groups()
+                    if method == 'GET' and action is None:
+                        return Reply(200, self.director.get(owner, project_id))
+                    if method == 'PUT' and action is None:
+                        return Reply(200, self.director.save(owner, project_id, value))
+                    if method == 'POST' and action == 'review' and value == {}:
+                        return Reply(200, self.director.review(owner, project_id))
+                except KeyError:
+                    raise HTTPError(404)
+                raise HTTPError(405)
             live_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/live/(approvals|batches)(?:/([A-Za-z0-9_-]+)(?:/(revoke|cancel))?)?', path)
             if live_match:
                 if self.live_admission is None:

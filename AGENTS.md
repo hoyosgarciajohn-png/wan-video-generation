@@ -188,3 +188,15 @@ B07 costs are retained. No new rental or paid experiment follows automatically.
 Read docs/WAN_00_Master_Handoff.md version 1.67 and
 docs/B07_FULL_VIDEO_DELIVERY.md. Full-film creative acceptance is pending, camera
 variety/sports motion remain limited, and customer-speed goals are not yet met.
+
+## Hosted Music Video Director — November 18, 2026
+
+John now instructed building the song/character/direction/model-selection interface
+and connections to hosted video-model APIs. This supersedes the earlier prohibition
+on paid generation APIs for this new flow. Preserve historical Runpod assets,
+liabilities and grants; do not replay those grants. The initial Director release
+adds saved creative briefs and explicit fal endpoint adapters. It does not expose
+paid dispatch. API credentials remain server-side; configuration is not verified
+model access. See docs/HOSTED_MUSIC_DIRECTOR.md for implementation and activation
+limits. Specific-release production approval and fictional automated checks remain
+in effect.

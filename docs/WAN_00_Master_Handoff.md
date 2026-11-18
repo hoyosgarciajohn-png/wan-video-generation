@@ -1684,3 +1684,20 @@ decode passed. The actual image reference and manifest hashes are in the current
 checkpoint and deployment/evidence/2026-11-16-memory-repair-build/. This continuation
 created no Runpod Pod, no new runtime grant and no controller deployment. Both paid
 attempts remain consumed; actual GPU validation of the repair is still pending.
+
+## November 18 — Hosted Music Video Director foundation
+
+John changed direction to the upload/character/description/model-selection
+interface and hosted model APIs. See [HOSTED_MUSIC_DIRECTOR.md](HOSTED_MUSIC_DIRECTOR.md).
+The isolated `work/hosted-music-director` branch adds `/#director`, persisted
+owner-scoped briefs, a timing/camera/choreography editor, source-backed capability
+selection and explicit fal adapters for LTX 2.5 Audio Fast, Wan 3.0 Reference,
+Kling 4 Image and Seedance 2.5 Reference. No paid API call, GPU allocation,
+production deployment or migration of historical media occurred.
+
+Validation: contract validation passed; Python 249 tests (one skip); UI/model 18;
+component 19; TypeScript/Vite build passed. Browser QA verified fictional draft
+save, validation and reopen. An initial backup-table rejection was fixed and the
+full backend suite passed afterward. Provider activation, durable paid-job
+admission, audio preparation, approved scene images, output retention and assembly
+remain pending. Production requires this specific release's approval.

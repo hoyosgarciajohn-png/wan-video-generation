@@ -1,0 +1,80 @@
+[
+  {
+    "id": "ltx-fast",
+    "name": "LTX 2.5 \u00b7 Audio Fast",
+    "provider": "fal",
+    "endpoint": "lightricks/ltx-2.5/audio-to-video/fast",
+    "role": "Audio-driven singing performance",
+    "audio": "Supplied song drives video timing; lip-sync needs a sample review.",
+    "accepts_audio": true,
+    "min_seconds": 2,
+    "max_seconds": 20,
+    "resolutions": [
+      "1080p"
+    ],
+    "cents_per_second": {
+      "1080p": 13
+    },
+    "source": "https://fal.ai/models/lightricks/ltx-2.5/audio-to-video/fast/api"
+  },
+  {
+    "id": "wan-reference",
+    "name": "Wan 3.0 \u00b7 Reference to Video",
+    "provider": "fal",
+    "endpoint": "alibaba/wan-3.0/reference-to-video",
+    "role": "Character and audio references",
+    "audio": "Accepts audio references; exact lyric synchronization is not guaranteed.",
+    "accepts_audio": true,
+    "min_seconds": 2,
+    "max_seconds": 15,
+    "resolutions": [
+      "720p",
+      "1080p"
+    ],
+    "cents_per_second": {
+      "720p": 10,
+      "1080p": 20
+    },
+    "source": "https://fal.ai/models/alibaba/wan-3.0/reference-to-video/api"
+  },
+  {
+    "id": "kling-image",
+    "name": "Kling 4 \u00b7 Image to Video",
+    "provider": "fal",
+    "endpoint": "kling/v4/image-to-video",
+    "role": "Camera movement and concert coverage",
+    "audio": "This endpoint does not accept your song. Use for non-singing coverage.",
+    "accepts_audio": false,
+    "min_seconds": 3,
+    "max_seconds": 30,
+    "resolutions": [
+      "720p",
+      "1080p"
+    ],
+    "cents_per_second": {
+      "720p": 15.7,
+      "1080p": 23.5
+    },
+    "source": "https://fal.ai/models/kling/v4/image-to-video/api"
+  },
+  {
+    "id": "seedance-reference",
+    "name": "Seedance 2.5 \u00b7 Reference to Video",
+    "provider": "fal",
+    "endpoint": "bytedance/seedance-2.5/reference-to-video",
+    "role": "Multimodal character and performance references",
+    "audio": "Accepts audio references; original-song lip-sync requires a sample review.",
+    "accepts_audio": true,
+    "min_seconds": 4,
+    "max_seconds": 30,
+    "resolutions": [
+      "720p",
+      "1080p"
+    ],
+    "cents_per_second": {
+      "720p": null,
+      "1080p": null
+    },
+    "source": "https://fal.ai/models/bytedance/seedance-2.5/reference-to-video/api"
+  }
+]

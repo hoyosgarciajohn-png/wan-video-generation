@@ -23,6 +23,7 @@ TABLES = {'worker_telemetry','comparison_gates','projects','admissions','complet
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
           'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings','live_recovery_caps'}
+TABLES.add('director_briefs')
 TABLES.update({'longcat_budgets','longcat_scopes','longcat_shots','longcat_cleanup'})
 DB_NAME = 'database.sqlite'
 
@@ -441,6 +442,20 @@ def _inspect(db,asset_root=None):
             require(source is not None and current is not None and state == current['state'] and
                     all(source[k] == current[k] for k in ('id','project_id','timeline_id','timeline_revision','profile')),
                     'Export job state or frozen identity mismatch')
+    if 'director_briefs' in names:
+        for project_id, revision, raw in db.execute('SELECT project,revision,body FROM director_briefs'):
+            require(project_id in projects and type(revision) is int and revision > 0,
+                    'Invalid Director project or revision')
+            brief = json.loads(raw)
+            require(isinstance(brief, dict) and isinstance(brief.get('reference_ids'), list),
+                    'Invalid Director brief')
+            local_assets = {a['id']: a for a in projects[project_id]['assets']}
+            require(all(isinstance(ref, str) and ref in local_assets and local_assets[ref]['mime_type'].startswith('image/') for ref in brief['reference_ids']),
+                    'Director references must belong to project')
+            require(brief.get('primary_id') is None or brief['primary_id'] in brief['reference_ids'],
+                    'Director primary reference missing')
+            require(brief.get('song_id') is None or (brief['song_id'] in local_assets and local_assets[brief['song_id']]['mime_type'].startswith('audio/')),
+                    'Director song must belong to project')
     if 'studio_projects' in names:
         for project_id, raw in db.execute('SELECT project,metadata FROM studio_projects'):
             require(project_id in projects, 'Studio project unavailable')
