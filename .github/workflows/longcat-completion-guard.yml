@@ -1,0 +1,50 @@
+name: Same-Pod final completion guard
+on:
+  push:
+    branches: [main]
+    paths: [deployment/completion-guard-request.json]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  guard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Start and attest replacement guard before handoff
+        env:
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: |
+          export EXTENSION_READY_PATH="$RUNNER_TEMP/completion-ready.json"
+          python3 -u -m deployment.completion_guard > "$RUNNER_TEMP/completion-guard.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/completion-guard.pid"
+          for attempt in $(seq 1 90); do
+            if test -f "$EXTENSION_READY_PATH"; then cat "$EXTENSION_READY_PATH"; exit 0; fi
+            kill -0 "$(cat "$RUNNER_TEMP/completion-guard.pid")" || { cat "$RUNNER_TEMP/completion-guard.log"; exit 1; }
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/completion-guard.log"
+          exit 1
+      - name: Retire the previous guard only after replacement is ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYGUARD'
+          import json,os
+          from urllib.request import Request,urlopen
+          root='https://api.github.com/repos/hoyosgarciajohn-png/wan-video-generation/actions/runs/44255340774'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          with urlopen(Request(root,headers=headers),timeout=20) as r:run=json.load(r)
+          assert run['path']=='.github/workflows/longcat-reuse-guard.yml'
+          if run['status']!='completed':
+              with urlopen(Request(root+'/cancel',method='POST',data=b'',headers=headers),timeout=20) as r:assert r.status==202
+          print('PREVIOUS_GUARD_RETIREMENT_REQUESTED_AFTER_REPLACEMENT_READY')
+          PYGUARD
+      - name: Enforce extended deadline on the same physical Pod
+        run: |
+          while kill -0 "$(cat "$RUNNER_TEMP/completion-guard.pid")" 2>/dev/null; do sleep 5; done
+          cat "$RUNNER_TEMP/completion-guard.log"
+          grep -q ABSENCE_CONFIRMED "$RUNNER_TEMP/completion-guard.log"
