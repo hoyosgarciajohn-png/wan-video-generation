@@ -167,3 +167,24 @@ remaining project GPU budget and the original 1794919601 absolute deadline.
 Never replay the first grant or renew four hours/$20 on retry. CPU verification
 must prove service-account readability before another GPU starts. See the B07
 budget plan for evidence and the precise recovery constraints.
+
+
+LongCat full-song closeout, November 18, 2026: John selected LongCat-Video-Avatar
+1.6 and the complete 362.880-second master, then requested extending the same
+rental to finish every shot. The final production now contains all 110 generated
+shots (67 + 36 + 7) and a verified 6:03 full MP4. Physical two-H100 Pod
+gn1lmaun88v7w8 was deleted after local collection/hash verification; complete
+provider inventory is empty and all three scoped credentials are revoked.
+The temporary private operator endpoint is closed. Preserve original grants,
+successful takes and unsettled liabilities; never replay the consumed production,
+extension or completion admissions. The runtime source/image remain pinned to
+9277e14 / sha256:7ba22cca295fd8290b1df14a349b0e5ee9a2bb46b22af424dc17ade69f23dcf7.
+
+The owner requested the runtime extension; the operator announced a maximum extra
+hour/$8.78 compute, rather than receiving a new numeric dollar quote from John.
+Actual extension was about 46.06 minutes / $6.74 estimated compute. Total rental
+estimate is $15.89 compute plus storage; posted billing is still partial. Original
+B07 costs are retained. No new rental or paid experiment follows automatically.
+Read docs/WAN_00_Master_Handoff.md version 1.67 and
+docs/B07_FULL_VIDEO_DELIVERY.md. Full-film creative acceptance is pending, camera
+variety/sports motion remain limited, and customer-speed goals are not yet met.

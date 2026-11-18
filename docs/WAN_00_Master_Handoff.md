@@ -1,7 +1,51 @@
 # Wan Video Generation · Master handoff
-Version 1.64 | November 18, 2026 | Owner: John Hoyos
+Version 1.67 | November 18, 2026 | Owner: John Hoyos
 
-## Current checkpoint — production rendering, incomplete coverage forecast
+## Current checkpoint — complete full-song video delivered; GPU deleted
+
+All 110 original shots were generated and collected: 67 in the original scope, 36 in extension, and the final seven in completion. Both surviving resident-process result files report exit_code=0. Each clip matches its durable authenticated receipt, exact byte size and SHA-256. The offline multi-scope assembler verified original inputs/timing, rejected gaps/duplicates and used the unchanged full stereo WAV. No completed take was rerendered and no still/frozen/filler clip was used.
+
+Final file: Busca_Adentro_de_Ti_Full_Music_Video.mp4, 206504295 bytes, 9072 frames at 25 fps, 362.880 seconds (6:03 displayed), native 864×448 H.264 with the original complete song encoded as stereo48k AAC320k. Full-file video/audio decoding, frame count and duration checks passed. SHA-256 49482094312a9204f86613cfeb92fdd52c6278adb3087b62f1cdf682a634b3f2. Master WAV SHA-256 remains 10c59dfb5aa01eeb629c9a6ef228dab271686f22a9e42d581aca4aafd9920b0d. Status is FULL_SONG_REVIEW_ASSEMBLED_NOT_CREATIVE_APPROVAL; owner creative acceptance is still pending.
+
+Download: https://chatgpt.com/library?file_id=libfile_fde3_f-8888ec07e2c481919c081c65ca311694_eea2ba6c535c8191b29d94a651cc633c&account_id=personal
+
+All 110 raw clips are saved in Busca_Adentro_All_110_Rendered_Shots.tar (308613120 bytes; SHA-256 4f536bd8aebfee1cf80aaf0ae24892aa38318346892db378d1c9a9ca2526d1d9), Library libfile_fde3_f-a2e83db6b5388191bb72e0f597f4987d_eea2ba6c535c8191b29d94a651cc633c. Final report Library ID: libfile_fde3_f-0e02cb238ad08191a109526315fd87de_eea2ba6c535c8191b29d94a651cc633c. Evidence bundle Library ID: libfile_fde3_f-e6c2bc3420ac81919396457c695bb79d_eea2ba6c535c8191b29d94a651cc633c. Final report and evidence bundle preserve the three manifests/receipt journals, GPU telemetry available for scopes 2/3, collection verification, cleanup, absence and provisional billing. Secrets/model weights are excluded.
+
+### Teardown and cost
+
+Same physical two-H100 Pod gn1lmaun88v7w8 was deleted with provider HTTP 204 after all 110 clips were locally downloaded/hash-verified; complete includeClusterPods inventory returned empty with no pagination remainder. Absence observed 2026-11-18T07:48:58.733672Z / 2:48:58 a.m. Eastern. An earlier deletion was held by automatic approval review pending local collection; after that verification the subsequent deletion succeeded. All three execution credentials are revoked through confirmed cleanup; reservations remain retained. The private operator bridge closed, its authenticated route returns 404, and ordinary HTTPS health remains ready=true/paid_dispatch=false. Final guard 44257991264 remains active only to watch the already-absent Pod through 07:58 UTC; do not report its workflow as completed yet.
+
+Maximum observed rental duration 108.603 minutes. Compute estimate at $8.78/pair-hour: $15.89 for this rental, excluding storage. Extension beyond original deadline 46.062 minutes, approximately $6.74 compute, inside the announced extra-hour/$8.78 bound. Earlier retained B07/benchmark posted costs $8.1568 plus this rental's estimated compute total approximately $24.05 before this rental's storage and final reconciliation. The immediate provider snapshot only posted $7.2378; it is partial and must not be reported as a settled total. All original grants, liabilities and financial reservations remain preserved.
+
+### Outcome and remaining quality work
+
+The full-song capability is demonstrated, but the fast customer-delivery target is not: this run rented the GPU pair for about 1h49 including setup/handoffs/collection. Scope2/3 measured mean inference 34.04/34.11 seconds per shot. Sampled clips retain caps/helmets and show singer, crowd, surfing and other body motion. Framing stays close to 18 anchors despite 110 camera prompts; camera variety and extreme-sports action fall short of the cinematic brief. Exact lip sync and complete creative acceptance require John's playback review. Do not claim native 1080p/4K or perfect choreography.
+
+No further paid generation is active or needed for this delivery. Continue with John's feedback on the full film before any new model, Hugging Face hosting or native video-continuation experiment. Existing LongCat generation settings and operational source 9277e14 / image 7ba22cca remain historical production pins. PR #102 media checks and hosted run 44252635101 passed; later operator preparations were compiled and exercised as recorded in PRs #103–107. This final closeout is documentation/evidence only, not another worker deployment or paid run.
+
+## Previous checkpoint — last seven shots started on cached same rental
+
+Scope2 finished cleanly with exit_code=0, 36 durably published shots S068–S103, observed at 07:38:39 UTC. Together with the original 67 shots, 103/110 are saved. Local GPU evidence: production-review/scope2-final-gpu-evidence.json; measured mean warm inference 34.036 seconds across those 36 shots, versus 1602.042 seconds for that resident process including load/publication. No started shot remains unresolved.
+
+Only the same physical Pod's name changed to wan-longcat-song-47ec12d1dab502a7. The weights verification marker, previous successful result and keepalive PID1 remained intact; no disk reset or weight download occurred during this handoff. Final missing-only scope john-longcat-world-tour-20261118-completion-v1 was admitted once for exactly S104–S110, deadline 1794988500, compute reservation 231 cents inside the separate $3 final accounting cap. Prior 103 takes were not rerendered.
+
+The final resident process started successfully as supervisor PID5405, using the unchanged pinned model and cached weights. Prior scope2 directories were renamed inputs-extension/output-extension, preserving their journal and video files. Final guard 44257991264 is still active and targets physical Pod gn1lmaun88v7w8 through every name change. Final cutoff remains 07:55 UTC / 2:55 a.m. Eastern; delete earlier once complete footage is safely collected. The GPU is STILL BILLING. Do not end work or leave it unmonitored.
+
+Next: observe seven receipts and full 110 coverage; capture final GPU evidence; run production-private/collect_complete.py to collect and hash-check all takes, then remove the Pod and verify complete provider inventory absence. All-scope private cleanup must revoke credentials without releasing unsettled billing reservations. The collector invokes the verified multi-scope offline assembler with the untouched 362.880-second WAV. Save the final video, raw takes archive and execution evidence durably; update this handoff and GitHub evidence; deliver the actual full video and download link. Original image-only preview is not the deliverable. Creative camera variety/lip sync/sports acceptance remain limitations for owner review.
+
+## Previous checkpoint — authorized same-rental extension rendering
+
+John requested extending runtime without interrupting the queue to finish every shot and avoid a new cold start. The same physical two-H100 Pod gn1lmaun88v7w8 remains active at $8.78/pair-hour. No new Pod was created. At 2026-11-18T07:25:45 UTC, 84/110 original shots were durably published, with S085 rendering. Scope1 finished S001–S067. Scope2 is rendering the missing S068–S110 suffix, preserving completed footage and all original grants.
+
+The initial additional compute estimate of $5.86 was too low after handoff delays. The operator disclosed this and bounded the requested extension to one additional hour, at most $8.78 compute beyond the original deadline; the owner did not separately supply a new dollar amount. Absolute final cutoff is 1794988500 / 07:55 UTC / 2:55 a.m. Eastern, earlier than that full hour. Final guard run 44257991264, job 134644209840, has attested READY and retired former extension guard 44255340774. It targets the physical Pod ID regardless of name, deletes at 07:54:30 UTC and verifies absence through 07:58. Never exceed this bound or allocate another Pod.
+
+Scope2 john-longcat-world-tour-20261118-extension-v1 was admitted once at 07:06:10 UTC with deadline 1794987625 / 07:40:25 UTC, separate $6 accounting cap. Admission succeeded although the final SSH control switch timed out; PR105 repaired only that switch, without replaying admission. Current name wan-longcat-song-9c7189e1dd853012. Changing the entrypoint during handoff cleared temporary files, requiring pinned weights to reload; the container image remained cached. Now PID1 is sleep infinity and a bounded resident worker runs directly, reusing verified weights and unchanged pinned model settings.
+
+PR107 merged bb782c4e747887216b5588c3bc3a557fd89d9902. Install run 44258355481 passed and prepared final control without changing the running worker. If scope2 leaves a suffix, its queue must naturally finish all started work first. After 07:38 UTC, rename only this same Pod for final scope john-longcat-world-tour-20261118-completion-v1, admit only the verified missing suffix, and preserve the prior output/input directories before launching against cached weights. Final admission has a separate $3 cap within the revised $9 extension accounting plan. No completed take may be repeated. Current controller/image remain pinned to 9277e14 / sha256:7ba22cca295fd8290b1df14a349b0e5ee9a2bb46b22af424dc17ade69f23dcf7.
+
+PR #102's offline full-song assembler verifies all three execution receipts and original inputs, then uses the untouched 362.880-second stereo master and original 110 edits. Hosted CPU, media, publication, Studio and actual container-import checks passed in run 44252635101. Final assembly requires all 110 valid takes; no filler or still animatic. Collection, physical teardown, all-scope credential cleanup, full export and durable delivery remain pending. Samples show motion and head covering, with limited camera variation versus reference anchors. Full lip sync, sports physics and owner creative acceptance remain unverified.
+
+## Previous checkpoint — production rendering, incomplete coverage forecast
 
 As of 2026-11-18T06:35:52.547493+00:00, 30/110 shots are published outside the GPU, covering 101.24 seconds of the original 362.880-second song. Pod gn1lmaun88v7w8 remains active; its original fixed deadline is 1794985375 / 07:02:55 UTC, with guard deletion beginning 30 seconds earlier. Do not leave the active rental unmonitored or extend/reset its consumed grant. Independent guard run 44247754799 attempt 2 remains in progress.
 
