@@ -35,14 +35,18 @@ requires all 110 durable receipts in the execution it validates.
 
 After the current run ends, record the exact missing suffix and provider cleanup.
 A continuation must use new bounded authority within genuinely available funds
-and runtime; the consumed scope and its reservation remain immutable. A future
-cross-execution assembly must validate each original shot/input and its own
-authenticated receipt explicitly. Never change old receipt bindings or make a
-second execution masquerade as the first. Additional rental is not authorized
-by this document. The complete 6:03 video, varied camera angles, sports physics
+and runtime; the consumed scope and its reservation remain immutable. `prepare_missing_suffix` prepares only missing shots and preserves all generation
+inputs. It rebases editorial offsets for the existing worker, retaining the
+first shot's audio look-behind and original trim for final assembly. Started but
+unpublished work blocks preparation until reconciled. `assemble_completed_runs`
+validates each execution against the original plan, retains every original receipt
+binding, rejects changed inputs, gaps and duplicate coverage, and uses the
+original full-song edits and untouched master. These offline helpers do not
+authorize or allocate another rental. The complete 6:03 video, varied camera angles, sports physics
 and owner creative acceptance remain open until observed.
 
-Validation: three fictional-media tests cover exact partial duration, unchanged
-master, missing coverage and refusal of altered receipts/inputs; the existing
+Validation: eight fictional-media tests cover partial duration, unchanged master,
+continuation audio look-behind, complete assembly across two scopes, missing
+coverage and refusal of altered receipts/inputs. The existing single-execution
 complete-assembly regression also passes. This offline addition changes no live
 worker, admission policy, controller deployment, GPU image or active queue.

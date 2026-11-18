@@ -46,26 +46,7 @@ def assemble_partial_review(manifest, journal, takes, master, master_sha256, des
         selected.append(shot); sources.append(source); cursor += shot['frames']
     require(0 < len(selected) < len(manifest['shots']), 'Partial export requires an incomplete prefix')
     require(cursor < manifest['duration_frames'], 'Prefix exceeds complete timeline')
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix='longcat-partial-', dir=destination.parent) as temporary:
-        root = Path(temporary)
-        for i, (shot, source) in enumerate(zip(selected, sources)):
-            start = shot['trim_in_frames']; end = start + shot['frames']
-            encode(root/f'{i:03}.mp4', ['-i', str(source), '-map', '0:v:0', '-an', '-vf',
-                f'trim=start_frame={start}:end_frame={end},setpts=PTS-STARTPTS',
-                '-r', '25', '-c:v', 'libx264', '-preset', 'fast', '-crf', '18', '-pix_fmt', 'yuv420p'])
-        listing = root/'concat.txt'
-        listing.write_text(''.join(f"file '{i:03}.mp4'\n" for i in range(len(selected))))
-        # The listening copy ends at the last covered frame; the full WAV is untouched.
-        encode(root/'partial.mp4', ['-f', 'concat', '-safe', '1', '-i', str(listing), '-i', str(master),
-            '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-af', f'atrim=end_sample={cursor*1920}',
-            '-c:a', 'aac', '-b:a', '320k', '-movflags', '+faststart'])
-        video = probe(root/'partial.mp4', 'v:0'); audio = probe(root/'partial.mp4', 'a:0')
-        require(int(video['nb_frames']) == cursor and video['avg_frame_rate'] == '25/1', 'Frame count changed')
-        require(abs(float(audio['duration'])-cursor/25) <= .04, 'Listening-copy duration changed')
-        subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-xerror', '-i', str(root/'partial.mp4'),
-                        '-f', 'null', '-'], check=True, capture_output=True)
-        (root/'partial.mp4').replace(destination)
+    encode_review(selected, sources, master, destination, cursor, partial=True)
     result = dict(status='INCOMPLETE_RENDERED_PREFIX_NOT_FINAL_VIDEO', manifest_sha256=binding,
         scope_id=journal['scope_id'], sha256=digest(destination), frames=cursor,
         duration_seconds=cursor/25, complete_song_seconds=manifest['duration_frames']/25,
@@ -73,6 +54,30 @@ def assemble_partial_review(manifest, journal, takes, master, master_sha256, des
         included_shots=[s['id'] for s in selected], missing_shots=[s['id'] for s in manifest['shots'][len(selected):]])
     atomic_json(destination.with_suffix('.json'), result)
     return result
+
+
+def encode_review(shots, sources, master, destination, frames, *, partial):
+    """Encode already verified sources; callers validate receipts and coverage."""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='longcat-partial-', dir=destination.parent) as temporary:
+        root = Path(temporary)
+        for i, (shot, source) in enumerate(zip(shots, sources)):
+            start = shot['trim_in_frames']; end = start + shot['frames']
+            encode(root/f'{i:03}.mp4', ['-i', str(source), '-map', '0:v:0', '-an', '-vf',
+                f'trim=start_frame={start}:end_frame={end},setpts=PTS-STARTPTS',
+                '-r', '25', '-c:v', 'libx264', '-preset', 'fast', '-crf', '18', '-pix_fmt', 'yuv420p'])
+        listing = root/'concat.txt'
+        listing.write_text(''.join(f"file '{i:03}.mp4'\n" for i in range(len(shots))))
+        # The listening copy ends at the last covered frame; the full WAV is untouched.
+        encode(root/'partial.mp4', ['-f', 'concat', '-safe', '1', '-i', str(listing), '-i', str(master),
+            '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy',
+            *(['-af', f'atrim=end_sample={frames*1920}'] if partial else []), '-c:a', 'aac', '-b:a', '320k', '-movflags', '+faststart'])
+        video = probe(root/'partial.mp4', 'v:0'); audio = probe(root/'partial.mp4', 'a:0')
+        require(int(video['nb_frames']) == frames and video['avg_frame_rate'] == '25/1', 'Frame count changed')
+        require(abs(float(audio['duration'])-frames/25) <= .04, 'Listening-copy duration changed')
+        subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-xerror', '-i', str(root/'partial.mp4'),
+                        '-f', 'null', '-'], check=True, capture_output=True)
+        (root/'partial.mp4').replace(destination)
 
 
 if __name__ == '__main__':

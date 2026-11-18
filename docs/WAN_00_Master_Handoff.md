@@ -1,7 +1,31 @@
 # Wan Video Generation · Master handoff
-Version 1.62 | November 17, 2026 | Owner: John Hoyos
+Version 1.64 | November 18, 2026 | Owner: John Hoyos
 
-## Current checkpoint — GitHub recovered; LongCat release deployed
+## Current checkpoint — production rendering, incomplete coverage forecast
+
+As of 2026-11-18T06:35:52.547493+00:00, 30/110 shots are published outside the GPU, covering 101.24 seconds of the original 362.880-second song. Pod gn1lmaun88v7w8 remains active; its original fixed deadline is 1794985375 / 07:02:55 UTC, with guard deletion beginning 30 seconds earlier. Do not leave the active rental unmonitored or extend/reset its consumed grant. Independent guard run 44247754799 attempt 2 remains in progress.
+
+The private runtime pull/unpack took about ten minutes, followed by inputs/weights/model startup. Warm inference averages about 33.8 seconds; observed durable-shot throughput is about 40–41 seconds. The remaining allowance is projected to produce roughly 65–70 shots, not the full 110. This is a forecast, not a final count. Continue collecting until the bounded stop, verify provider teardown, then deliver an explicitly incomplete rendered prefix if full coverage is absent. The earlier speed forecast omitted material cold-start/collection time; do not claim the full video is done.
+
+The real first 10.04-second opening preview is saved as Busca_Adentro_Opening_Rendered_Preview_10s.mp4, Library libfile_fde3_f-908d27a294108191917d43ef4a2be4d9_eea2ba6c535c8191b29d94a651cc633c. It is generated motion with a listening copy from the original master, not the prior still animatic and not full-film completion. Sampled Uyuni and Cappadocia shots retain John's cap and show performer/dancer motion; framing stays close to the image anchors despite angle prompts. Exact full-song lip sync, sports motion and creative acceptance remain unverified.
+
+PR #102 prepares offline partial export and missing-suffix recovery/complete assembly across independently verified execution receipts. Eight fictional-media checks pass, plus the existing complete-assembly regression. This code does not change or deploy to the live worker/controller, replace model settings, grant extra spending, or rewrite prior receipts. Final count/cost, missing-shot package, full-song completion, provider teardown and final delivery remain pending. Private operator access details from the prior checkpoint remain valid until explicit closure/expiration.
+
+## Previous checkpoint — full-song production GPU allocated
+
+John explicitly instructed continuing the current LongCat plan through the final 6:03 video before exploring other models or continuation. PR #100 merged as 70e5f44940458f191aca178bc2a00a4a7a632a1e; PR #101 merged as 2530d6e1072269fa72f0256b9b53fd1a8d5df5f6. CPU production operations are installed; the main controller and runtime remain pinned to 9277e14. No runtime rebuild or model change.
+
+The complete 144509707-byte production ZIP was transferred privately and hash-verified on the existing controller. Actual project: project-68aeb4983ebc49e9887188965b8d477d; scope: john-longcat-world-tour-20261118-v1; manifest fingerprint: 147c8a46cf107c066f83a8ab10ba3d2e10026d7c800f61216dfd5eb5017c9e2f. All 110 original timing-v2 shots and the untouched 362.880-second master are retained.
+
+Runpod Pod gn1lmaun88v7w8 was created at 2026-11-18T06:00:22.547Z in AP-IN-1 with two H100 SXM GPUs at $8.78 per pair-hour and a temporary 120GB container disk. The first observed state is image-layer downloading; no generated take is claimed yet. Exact name: wan-longcat-song-5a339ca02dcbfe49. The independent guard is run 44247754799 attempt 2, job 134611231831. Attempt 1 failed on SSH connectivity before admission/allocation. The running guard's actual READY event and current workflow identity were verified by admission.
+
+Fixed execution deadline: 1794985375 / 2026-11-18 07:02:55 UTC (2:02:55 a.m. Eastern). Guard deletion starts 30 seconds before that; it continues verifying absence through deadline+180 seconds. Do not extend, reset or replay this scope. The connected billing refresh totals $8.156768710003234 across the three retained B07/benchmark Pods. Rounded prior commitment 816 cents, new maximum compute reservation 943 cents, storage reserve 200 cents. Conservative cumulative GPU-equivalent runtime leaves 3864 seconds for this pair; earlier costs and all older liabilities remain preserved.
+
+Operations use a temporary authenticated HTTPS bridge on the existing controller, expiring automatically at 1794995365. It accepts only the fixed package and bounded operations, keeps the original proxy size cap through chunks, and does not expose an SSH shell or provider-create API. Private local continuation state is under production-private/; never publish its tokens or keys. The bridge removes its proxy route and token on closure/expiration. Preserve generated shots outside the Pod, inspect the first real takes, stop at the bound, verify provider teardown, and assemble only when all 110 valid receipts exist. Full-video completion and owner creative acceptance remain pending.
+
+Validation: five focused fictional operator boundary checks pass. Prior full integration run 44246777965 passed both CPU/Studio checks and production-container import. No claims of completed motion, lip sync, sports physics or final film yet.
+
+## Previous checkpoint — GitHub recovered; LongCat release deployed
 
 GitHub Actions runs again. Read-only host verification run 44238678234 attempt 2 passed and freshly observed the expected d0543ae baseline. The prior billing failure is historical, not the current blocker.
 
@@ -17,18 +41,272 @@ Next: bind the reviewed package to a real new production project and recompute i
 
 Live controller: https://wan-64-225-114-46.sslip.io
 
-## Previous checkpoint — complete preview; deployment blocked
+Documentation-only evidence PR #99 is merged as 0457c51e48d26484c4b76e8b38a9c53624758c51. This does not change the installed controller or published image source: keep 9277e14a7d21a4f8bb142c50943fd3f8a1bfce4b as the operational release pin.
 
-John authorized final image/timing review and deployment. All 18 scene anchors were inspected with head covering present. The 110-shot timing-v2 package and complete 6:03 still-image MP4 are prepared; actual input preflight and full preview decoding pass. Source images and the full stereo master are unchanged. Computational onset alignment does not establish lyric phrasing, generated motion, alternate camera angles or owner playback acceptance.
+## Previous checkpoint — full-song preview ready; deployment blocked
 
-Read-only host verification [44238678234](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44238678234) was stopped by GitHub account billing/spending limits before any job step or host connection. No deployment, registry publication or GPU render occurred. HTTPS remains ready/disarmed; installed source is only last known at d0543ae. PR #98 now includes the production image publication path and corrected exact upgrade baseline, with four passing focused local publication-boundary checks. Hosted release checks remain blocked.
+John explicitly authorized continuing final image/timing review and deployment. All 18 original scene PNGs were visually inspected again; all keep the crown covered. The 110-shot/11-location story and original stereo master remain unchanged. The new timing-v2 package moves 102 cuts toward detected spectral accents by at most 0.40 seconds; median nearest-onset distance improves from 80 ms to 10 ms. This is computational onset alignment, not verified lyric/beat/downbeat mapping or owner playback acceptance. The original 18 images do not establish 110 distinct angles or generated motion.
 
-[Current review and resume steps](B07_LONGCAT_RELEASE_REVIEW.md) supersede the older 5:40 production checkpoints below. The complete approved recording is 362.88 seconds / 6:03, 110 shots, 11 natural-location chapters. Preserve the existing $20/four-hour cumulative ceiling and all liabilities; no new budget grant is claimed. Finish account recovery, exact-head checks, private image publication and reviewed controller deployment before scoped paid execution.
+`WAN_LongCat_Full_Song_Preview.mp4` is a complete 362.88-second labeled still-image animatic, 20,986,372 bytes, SHA256 `75c802092839fff886aa5babb717e9fa12d48958527d0474073dc6775f7c4711`. Full video/audio decoding passed: 9,072 frames at 25 fps and 362.88 seconds of stereo48k AAC listening audio. The complete original stereo WAV master remains untouched at SHA256 `10c59dfb5aa01eeb629c9a6ef228dab271686f22a9e42d581aca4aafd9920b0d`. This animatic is not LongCat video generation or proof of lip sync.
 
-## Historical approved direction
-Build a shot-based platform for music videos up to 6 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
+All 110 mono16k/4.72-second conditioning windows were rebuilt for the revised integer-frame offsets and every PCM slice was checked against the conditioning source. All 18 original image hashes match, and actual manifest/image preflight passes using the unchanged b99d088 validator. New private preparation fingerprint: `fdc40bdca1da7e4fd8b45d52bcd3de2a8fc3d620f9469d1a1f4c6cb4c11f29a7`; batch `world-tour-timing-v2`. Project `busca-adentro-world-tour` remains a preparation identifier: rebind to a real new 363000ms project and recompute before admission. Keep the previous package version as history, not active input.
 
-## Current Command Center checkpoint
+### Release and blocker
+
+Read-only controller verification [run 44238678234](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44238678234) was refused before any job step or SSH connection. The visible GitHub annotation reports failed recent account payments or an Actions spending limit requiring attention. No source/host failure occurred and no host mutation was performed. Fresh external HTTPS health returned `ready=true`, `paid_dispatch=false`; this does not identify installed source. Last verified installed source remains `d0543ae556588de3ef77a17e75dd4e734309e147`.
+
+PR #98 remains draft/open, now at `f23cf48be02bf7a2be9757417524d435dd4e6cf9`. Added main-only private LongCat production publication, checked local-image/source binding, authenticated registry/config verification and anonymous refusal, plus corrected exact host upgrade baseline d0543ae. Existing quiescence, cleanup, maintenance checkpoint and rollback gates are preserved. Four focused fictional publication boundary checks, Python compilation and YAML/shell syntax pass locally. No image was published. Prior full integration/container CI remains passing only at b99d088 / 44219918985. New-head run 44239805091 ended failed with both jobs having zero steps; no hosted pass is claimed. GitHub Billing/Actions availability must be restored before retrying checks.
+
+Saved deliverables: updated `WAN_LongCat_Production_Package.zip`, the full-song MP4, `WAN_LongCat_Final_Review.md`, updated production plan/110-shot CSV/JSON, and `GitHub_Deployment_Block.jpg`. The ZIP contains original images, full master, updated conditioning, gallery, animatic, timing evidence and resume instructions. User-facing dates remain November 17 Eastern.
+
+### Exact next work
+
+1. Resolve [GitHub billing or Actions spending limits](https://github.com/settings/billing). Do not change limits or pay without an authorized amount. Retry only after the account can run jobs.
+2. Verify the live baseline through the existing read-only workflow; pass current-head checks, merge reviewed PR #98, publish the exact private production image, retain its real registry digest and upgrade the existing controller with the pinned host fingerprint. Do not claim deployment until observed.
+3. Review the complete still preview for lyric phrasing and creative pacing. First actual production takes must establish varied angles, realistic sports/equipment, dancers/crowds and lead lip sync. Small apparel emblems remain visible in some sports anchors.
+4. Bind actual project, immutable timing-v2 manifest, exact release/image, current financial ledger and independent cleanup guard before GPU admission. Keep the existing $20/four-hour cumulative allowance and all historical liabilities; no new grant, refreshed balance, fleet, extra payment or expanded budget is authorized by this checkpoint.
+
+No new Pod, paid inference, runtime deployment or full-film render occurred. No new generated stills were needed. The historical posted B07 $8.156768710002916 remains a historical figure, not a refreshed spendable balance.
+
+## Approved direction
+Build a shot-based platform for music videos up to 6:03 (policy 1.2.0 deployed for new projects) and short films and animated cartoons up to 30 minutes. Self-host open-weight video models. As of November 17, 2026, John selected LongCat-Video-Avatar 1.6 for the next complete music video after approving the real three-shot benchmark. The previous Wan2.2 TI2V-5B / RTX 4090 path remains historical baseline evidence. Rent GPU infrastructure by the batch and avoid per-generation model fees; use pinned runtime images and temporary Runpod Pods. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
+
+## Previous checkpoint — 18 individual frames and production integration prepared
+
+John instructed “Go Next are the individual scene images and remaining production integration.” All 18 scene anchors are now generated from the original face references and the corrected approved boards. John is visibly capped or helmeted in every frame. The images are individual widescreen PNGs without storyboard labels or phone controls. They are original image-generator outputs; no pixel cropping or rescaling was applied. Their actual ratios select the pinned 864×448 video bucket. Small incidental garment markings remain in some sports stills; do not claim every frame is entirely brand-free.
+
+The new package `WAN_LongCat_Production_Package.zip` contains `OPEN_PREVIEW.html`, 18 scene PNGs, `scenes.json`, the 110-shot CSV/JSON, the complete verified stereo master, 110 unchanged 4.72-second conditioning WAVs, and a hash-bound input manifest. The image index maps all 110 shots to the 18 scene anchors. This is **not 110 distinct framing-specific input images**, an animatic, or a rendered film. Alternate angles, sports motion, lip sync and crowd choreography remain to be demonstrated. Owner acceptance of these new individual frames and musical cut/lyric review remain pending. The full 362.880-second duration stays approved; do not ask it again.
+
+Input manifest fingerprint: `c4e2008b4c44953c9be925ae475cab97afb173077eeaed754b9ea91524177e65`. Preparation project ID `busca-adentro-world-tour` is only a local identifier. After the 363000 ms policy is deployed, bind inputs to a real new controller project and recompute the fingerprint before signing admission. The original master SHA remains `10c59dfb5aa01eeb629c9a6ef228dab271686f22a9e42d581aca4aafd9920b0d`.
+
+### Integrated source
+
+Draft PR #98: https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/98
+Latest head: `b99d08824c1b855613b76337eaa4a7c82c9cb31a`; prior integration commit `47b7a2667b051b1a59fa00a2eefa18f14495ace9`; baseline `e897b031299590d78c37398eceda1c896aa3d884`. No merge or deployment.
+
+- Private HMAC owner/host admission binds exact source, image digest, input manifest, fixed deadline, independently attested guard and retained $20 project budget. No public admission or provider-create endpoint is added.
+- Authenticated HTTP serves immutable inputs, records inference start outside the GPU, streams verified 93-frame/25fps/864×448 MP4s to controller storage and returns durable hash-bound receipts. Lost local state cannot silently repeat a started shot.
+- One bootstrap downloads pinned weights and starts the resident two-rank model. Parent timeout terminates the complete child process group; the independent read/delete-only provider guard targets the exact scope-derived rental name. Process exit never counts as billing cleanup.
+- A separately signed provider-absence record revokes the worker token while retaining the money reservation. Normal backup/restore preserves input assets, saved takes, receipts, consumed scopes and budget liabilities; restored credentials remain fenced.
+- The private assembly command verifies every saved receipt, trims exact video frames and muxes the complete stereo master into one native-size review MP4. It does not forge Studio approvals, hide missing shots, or declare creative acceptance.
+- The production Dockerfile extends the tested private benchmark image, copies the new adapter and import-checks the actual pinned upstream entrypoint without weights or GPU allocation. The workflow builds/imports only; it does not publish or deploy that image.
+
+### Validation and release status
+
+Local: 23 focused queue/transport/runtime-boundary checks passed; after backup integration, 14 transport/cleanup/backup/boundary checks passed. The actual 18-image/110-audio input bundle passed preflight, and the unchanged master checksum was verified. Compilation now includes all deployment, controller and worker modules. The preparer’s unmatched-parenthesis error was caught when building the real package and fixed before successful preparation.
+
+Hosted first attempt `44218929525` failed three root checks: two because the new LongCat tables were absent from backup handling, and one because an older test patched global `time.sleep`, interfering with subprocess/SQLite during source verification. The backup integration and isolated test clock fix are included in the latest head. **Hosted run 44219918985 PASSED at b99d08824c1b855613b76337eaa4a7c82c9cb31a: compilation and contract validation; 227 root tests (one expected skip); 15 queue/media tests; 18 Studio tests; production container build, pinned upstream import and offline bootstrap/client import. No GPU allocation or runtime publication. Evidence: https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44219918985 .**
+
+Still required before paid generation: individual-image/angle review and musical cut alignment; registry publication and exact controller/runtime deployment; independent guard installation and current financial reconciliation; signed admission bound to the real project and immutable package. First demanding motion results must establish quality; the full-film speed and success rate are still unmeasured. No new Pod, paid inference, payment, runtime deployment, full-video render or owner creative acceptance of the film occurred. The historical known posted B07 total remains $8.156768710002916, not a refreshed account balance. All earlier liabilities and consumed scopes remain intact.
+
+## Previous checkpoint — complete 6:03 approved; LongCat full-queue source prepared
+
+John explicitly replied “YEs 6:03 is ok.” **Use the entire verified 362.880-second recording without cutting, speeding, looping or extending it.** The earlier 5:59 edit preference is superseded and must not be asked again. Active source remains `Busca adentro ahí está .mp3.mpeg`, SHA-256 `63cccede6506f578169117d8af8c4abd851eaee6556b219fbef3a38c6f0edb14`, Library ID `libfile_fde3_f-cc6d7dc5230081919e37709a3a45ffff_eea2ba6c535c8191b29d94a651cc633c`.
+
+The 110-shot structure and 9,072-frame / 25-fps full-source timing remain unchanged: 65 singer, 30 sport/adventure and 15 crowd/location shots across eleven chapters. The approved visual style and John's mandatory head covering remain binding. The exact PCM master and 110 sample-verified conditioning WAVs are unchanged; each conditioning clip includes the one-second lookahead required by pinned LongCat (4.72 seconds of audio for 3.72 seconds of video). Musical cut/lyric review is still pending, so source duration is locked but editorial cuts are not falsely described as beat-aligned.
+
+### Implementation prepared
+
+Draft PR **#98**: https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/98
+Branch `work/b07-longcat-full-queue`, base `311ce5930e54413f4b990fdbbe307cc9c845de65`. Initial commit `1b89815515ee677245cfe911516b7ece0d5f63fd`; latest CI dependency correction commit **`e897b031299590d78c37398eceda1c896aa3d884`**. Issue #8 is updated to the complete 6:03 LongCat direction and names affected B01–B05 consumers. No merge or runtime deployment occurred.
+
+- Runtime policy **1.2.0** raises the cap for new music projects to 363000 ms. Existing smaller project limits remain binding; canonical bundle contract remains **0.1.0**. A new project can receive the complete approved song after deployment.
+- Private `longcat-song-batch-v1` validates project/batch identity, contiguous frames, exact audio offsets, trims, mandatory headwear, input hashes, seeds and 4.72-second conditioning. It allows up to 200 independently conditioned shots.
+- The queue initializes one adapter, verifies outputs and requires a matching external-save receipt before continuing. Published takes are retained on resume; ambiguous publication reuses the same output bytes. Interrupted inference requires explicit recovery, never an automatic blind rerender.
+- The pinned two-rank LongCat source transformation initializes the model once and changes image/audio/prompt/seed per case. Rank-zero decisions are broadcast; native outputs are checked for 93 frames at 25 fps and full decode. Default negative prompting now permits close-ups and crowds; this changed creative behavior is not GPU-tested.
+- Execution candidate limits remain separate from authority: 80 minutes, two H100s, $8.78/hour and at most $11.71 compute plus separately budgeted disk/recovery. Source validation is not a new grant. All consumed Wan/benchmark scopes remain immutable.
+
+### Checks and remaining work
+
+Local checks passed: shared contract validator; 10 fictional LongCat queue checks including 110 jobs with one initialization; 5 CPU media/export checks, including a synthetic 362.88-second soundtrack and preservation of 300/360-second legacy limits; 18 Studio checks; 10 integration preparation checks; actual pinned upstream AST compilation. Root suite ran 213 tests with one expected skip. Snapshot omissions (src, hosting files, Dockerfiles and git metadata) were restored, and affected failed checks passed in focused reruns. One pre-existing cancellation/backoff check hit a global sleep-mock/subprocess/SQLite interaction and passed in isolation; retain this evidence rather than claiming a pristine first run.
+
+Hosted check runs `44192971623` and `44193258615` exposed missing FFmpeg and Pillow dependencies in the new CPU runner. Both dependencies are now explicit. Replacement run **44194162284 passed** at `e897b031299590d78c37398eceda1c896aa3d884`: contract validator; 213 root tests (one expected skip); 15 queue/media tests; 18 Studio tests. The hosted full root suite passed in one run. Evidence: https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44194162284. The earlier local/runner failures are retained above; no GPU inference is implied.
+
+Still needed: clean individual reference images from approved concepts, musical cut review, authenticated durable collector/controller admission, build/import verification of the production image, separately bounded execution scope and independent cleanup, then actual full-song rendering and creative review. The prepared source is not a live full-batch integration. Production controller/runtime policy remain at their previous deployed versions.
+
+Updated persistent files: production plan, shot CSV/JSON, audio preparation ZIP and this handoff. No new Pod, paid inference, payment or controller deployment occurred. The last provider check showed no active Pods; this code-only update did not allocate one. Known posted B07 costs remain $8.156768710002916 with all other historical liabilities preserved.
+
+## Previous checkpoint — complete audio verified; full-source inputs prepared
+
+John supplied `Busca adentro ahí está .mp3.mpeg`, identified it as the complete version, and said “We are ready.” The immediately preceding preference was “better to 5:59.” The new source decodes without reported errors to **362.880 seconds (6:02.88)**: 17,418,240 stereo sample frames at 48,000 Hz. Its 362.904-second metadata differs only by MP3 framing/skip. Source SHA-256 `63cccede6506f578169117d8af8c4abd851eaee6556b219fbef3a38c6f0edb14`; Library ID `libfile_fde3_f-cc6d7dc5230081919e37709a3a45ffff_eea2ba6c535c8191b29d94a651cc633c`. This is the active soundtrack, superseding the prior incomplete upload. Do not reuse old-song conditioning audio.
+
+The full ending contains signal beyond 5:59. The complete original is preserved unchanged; no trimming, fade, looping, inserted silence or tempo adjustment has been applied to it. **Final duration/edit remains open: keep the whole 6:02.88 recording, or edit to the prior 5:59 preference.** Current published runtime policy 1.1.0 permits music projects up to 360 seconds. The full source exceeds that by 2.88 seconds and must not bypass admission. If John chooses full length, prepare a reviewed policy/project-limit change and consumer checks; if he chooses 5:59, prepare a deliberate musical edit and rebuild all windows. The prior preference is not silently withdrawn.
+
+### Completed CPU preparation
+
+The same approved 110-shot story is retimed provisionally to the full complete source: 9,072 contiguous frames at 25 fps, exactly 362.88 seconds; 65 singer, 30 sport/adventure and 15 crowd/location shots. Eleven location chapters, John's likeness and mandatory cap/hat/helmet remain unchanged. The independent-clip minimum is 98; planned render count remains 110. Beat, lyric and verse/chorus alignment remains pending; the edit allocations are not claimed to be musically locked.
+
+A 48 kHz stereo PCM WAV master preserves all decoded source samples exactly. **110 mono 16 kHz conditioning WAVs** are prepared, each 4.72 seconds / 75,520 samples. Inspection of the pinned upstream `run_demo_avatar_single_audio_to_video.py` confirmed it requests 3.72 seconds of output plus one second of audio lookahead. This corrects the earlier draft's incomplete conditioning specification; output remains 93 frames / 25 fps. Every chunk uses integer sample offsets, records its hash and trim, and is verified byte-for-byte against the resampled full source. Only unavailable tail lookahead is zero-padded, never the master soundtrack. If timing changes, regenerate all affected chunks.
+
+Files: updated `WAN_LongCat_World_Tour_Production_Plan.md`, `WAN_LongCat_110_Shot_List.csv`, `WAN_LongCat_110_Shot_Plan.json`; new `WAN_Complete_Audio_Preparation.zip` contains the exact decoded WAV master, 110 conditioning chunks, full-source draft plan/list, checksums, offsets and verification. Local package is `/workspace/scratch/5fc49df0314a/wan-complete-audio/WAN_Complete_Audio_Preparation.zip`. This package contains audio preparation only, not a rendered music video or a live-ready input bundle. The 18 approved concept panels still need clean individual video-reference frames.
+
+### Queue/readiness check
+
+Read current repository AGENTS.md, README.md, docs/WAN_00_Master_Handoff.md, docs/CONTRACT.md, docs/WORKSTREAMS.md and issue #8. Repository handoff remains older than this Library master; preserve the new creative/audio direction here. The benchmark `probe.py` still requires exactly three cases and a 900-second fixed deadline; it must not be replayed or simply pointed at 110 jobs. The production resident queue, durable recovery, scope/guard and clean input images still require implementation/validation. No repository source, runtime policy, deployed controller or benchmark grant was changed in this turn. Direct unauthenticated git clone was unavailable; repository inspection succeeded through the connected GitHub tool.
+
+Fresh read-only Runpod observations: complete Pod inventory is empty. Secure two-H100 availability now LOW in CA-MTL-1, US-MO-1 and US-NE-1 at the same $8.78/pair-hour; availability is not a reservation. Prior 110-shot estimates remain roughly 69.6 minutes / $10.21 base infrastructure on one pair before recovery, editing and retries. Known cumulative posted B07 remains $8.156768710002916, subject to all other preserved liabilities. No account-balance refresh, new GPU charge, allocation, payment or deployment occurred.
+
+Next: obtain the final complete-versus-5:59 edit choice, then lock the source and musical timing; finish clean reference frames and the resident production queue; prepare the concrete capped two-GPU execution with independent cleanup. John's “ready” expresses intent to proceed; do not misreport the incomplete technical preparation as an active render or renew any consumed scope.
+
+## Previous checkpoint — revised previews approved; 110-shot draft prepared
+
+John approved the expanded cinematic concept and revised images. The new music video centers John as both the lead singer and an adventure participant, celebrating accomplishment and internal transformation with dancers, crowds, concert lighting, fireworks and an uplifting street-concert atmosphere. The new natural-location chapters are Uyuni, Cappadocia, Chile's mountain observatory, Plitvice, Banff, Victoria Falls/Zambezi, Giant’s Causeway, Deadvlei/Namib Desert, Serengeti, Finnish Lapland and Hawaiʻi. Preserve the street-concert concept; the old song's ten-city timing is historical.
+
+**Appearance requirement:** John's head must be covered in every shot. Use the backward black cap for the main singing identity, appropriate black helmets for sports, and warm covered-head clothing for winter. Do not generate extra hair or use a bareheaded frame. Board 3's surfing panel was corrected to a black watersports helmet and John approved the revision. Corrected Board 3 is `generated_images/exec-3ed4be2b-2e57-4377-a9ef-1ead28df21c1.png`; superseded Board 3 `exec-b4c7b9a7-993b-4dd4-af51-87a9d1b48c18.png` must not be used. Boards 1 and 2 are `exec-f135843a-384b-4d9e-bfb0-f1c4c122120f.png` and `exec-065d3538-06f1-4a84-b97c-dcb2c1fffced.png`. Eighteen approved concept frames establish the visual direction; they are not 110 clean inference input images. Generated images are saved automatically through their generating turns.
+
+### New soundtrack and duration discrepancy
+
+The uploaded `Busca adentro.mp3.mpeg` has SHA-256 `0eb3f350a9f7ea87f4d9145fc0318e4b4862689e769a2da1cefa0e391062ece8` and Library ID `libfile_fde3_f-93cac9dc39688191852ef7b93d5794c1_eea2ba6c535c8191b29d94a651cc633c`. Its MP3 metadata says 358.632 seconds, but full native-rate decoding produces 16,939,055 stereo sample frames at 48,000 Hz: **352.896979 seconds (5:52.897)**, with no reported decoder errors. Available encoded packets total 352.920 seconds before the start skip. The header discrepancy is about 5.735 seconds. Do not fill it with silence or claim this proves the intended song ending. Review the actual ending before final timeline lock; use the entire available decoded audio for the current draft. This replaces the earlier metadata-only 5:58.6 planning assumption, and neither value is the older 340.125896-second soundtrack.
+
+Four uploaded screenshot references establish John's likeness, black open-neck suit and backward cap. Their Library IDs and the audio identity are included in `WAN_LongCat_110_Shot_Plan.json`. Exclude screenshot UI, captions and logos from generated frames.
+
+### Prepared draft
+
+- 110 shots: 65 lead-singer performance, 30 sport/adventure, 15 crowd/location. Each has a setting, action, framing, single camera movement, lighting, wardrobe and mandatory head covering.
+- Frame-contiguous draft at 25 fps: 8,823 frames / 352.920 seconds, covering all decoded audio with approximately 23 ms of final frame completion. The mathematical independent-clip minimum is now 95, not the 97 calculated from the longer header duration.
+- Timings are editorial allocations, **not beat, lyric, verse or chorus alignment**. Per-shot audio windows describe 93-frame generation with small handles; final audio chunks have not been prepared. Source windows extending beyond available audio require conditioning padding only.
+- Sports: balloon basket adventure, alpine cycling, rafting, parachute canopy descent, surfing, kitesurfing and snowboarding. These motions and ambitious camera moves remain unmeasured in LongCat; approved still frames do not prove animation feasibility.
+- Deliverables: `WAN_LongCat_World_Tour_Production_Plan.md`, `WAN_LongCat_110_Shot_List.csv`, `WAN_LongCat_110_Shot_Plan.json`, local directory `/workspace/scratch/5fc49df0314a/wan-world-tour-plan`.
+
+### Reconciled benchmark charge and fresh planning quote
+
+Runpod now returns one posted billing record for deleted benchmark Pod `xqbg5j9dqo4dd4`, November 17, 2026, 17:00–18:00 UTC: GPU $1.7320183515548706 + disk $0.0017361111240461469 = **$1.7337544626789168**. This supersedes the benchmark's provisional infrastructure estimate and “invoice pending” state for this Pod. Previous B07 posted $6.423014247324 + this charge = **$8.156768710002916 known cumulative posted**, leaving **$11.843231289997084 against the historical $20 envelope before any other outstanding liabilities**. This is not a new account-balance verification, new funds or a reset of cumulative limits.
+
+Fresh authenticated Secure catalog query still quotes H100 SXM 80 GB at $4.39/GPU-hour, $8.78 per worker pair-hour, but reports **NONE** availability for a two-GPU Pod. No capacity has been reserved. Based on 110 independent 3.72-second shots, warm mean 33.40987365 seconds (two samples), cold model readiness 488.093 seconds and first-case overhead ~12.016 seconds per pair:
+
+| H100 GPUs | Pairs | Estimated cold first pass | Base compute + provisional disk |
+|---:|---:|---:|---:|
+| 2 | 1 | 69.6 min | $10.21 |
+| 4 | 2 | 39.0 min | $11.43 |
+| 8 | 4 | 23.9 min | $14.04 |
+| 16 | 8 | 16.1 min | $18.93 |
+
+These are arithmetic projections, not measured fleet performance. They exclude output recovery, assembly, retries, clean source-frame generation and idle capacity. Sports and large crowds may change throughput or success rates. Startup/download contention across workers is unmeasured. Even a large cold fleet does not demonstrate a few-minute complete customer delivery. An 80-minute single-pair allocation would cost about $11.73 including provisional temporary disk, but leaves only a narrow revision/recovery margin; this is an unexecuted capped proposal, not a guarantee or fresh authorization.
+
+### Next steps and authority
+
+Finish the unpaid preparation: review the uploaded audio ending, align lyric/beat timings, create clean individual input frames, build an animatic and complete the LongCat production adapter/continuous queue. The previously accepted model selection remains in force. Production integration, private input access, durable results, bounded retries, cost guard and enforced teardown are still needed; the installed controller remains unchanged. Start a future funded batch with representative difficult motion cases and keep accepted results for the full film. New spend must use a concrete remaining budget and valid execution scope; the consumed 15-minute benchmark grant must not be replayed. Latest approval records creative acceptance of revised previews/headwear, not an unspecified new GPU fleet. **No new rental, payment, deployment or full-video render occurred in this preparation turn.**
+
+## Previous checkpoint — LongCat selected; new song and story requested
+
+John explicitly approved the LongCat sample's quality, synchronization, dancing, location, lighting and lip sync, and instructed: use this model, plan the entire music video, and change both the song and the video story. This records creative acceptance of the reviewed three-shot sample. It does not establish that every future shot or an untested choreography/camera setup will work, nor does it erase measured speed limits. LongCat-Video-Avatar 1.6 is the selected generation model for the next full-video plan; the prior recommendation to choose another model for most coverage is not the current owner direction.
+
+The next production uses a new soundtrack and new treatment. Do not assume the former 340.125896-second song or ten-city concert story remains the new production scope. The new audio, lyrics/structure and creative brief have not yet been supplied. Existing singer references can be proposed for reuse, but singer/character appearance for the new story must be resolved in the brief. Prior clips, inputs, budgets and consumed execution scopes remain historical evidence.
+
+### Full-video planning workflow
+
+1. Receive the final new song (WAV or MP3) and the desired story, or the emotion/message from which a story can be proposed. Confirm duration, lyrics, singer/characters, mood, locations, aspect ratio and intended delivery format. Do not invent the new song or impose the old story.
+2. Prepare a coherent treatment with a beginning, development and ending. Map verses, choruses, instrumental breaks and key lyric moments to scenes. Use singer performance and story action where appropriate; keep new choreography and camera ambitions within demonstrated capability until reviewed.
+3. Build a timed storyboard covering the complete audio timeline. Each shot specifies song in/out, setting, character/reference, action, framing, light and prompt. Generate consistent reference images and review a lightweight animatic with the actual soundtrack before substantial video rendering. Reference-image generation remains a later step after the brief exists; no new generation occurred here.
+4. Keep the accepted benchmark configuration as the reproducible starting point: Avatar 1.6 INT8, eight steps, FA2, two context-parallel H100 ranks, native 864×448/25fps for the tested aspect ratio. Measure any changed resolution, model settings, longer shot mode or demanding new scene before applying it across the whole song. Preserve identity and original-song timing across shot boundaries; short native shots can be trimmed to editorial cuts, while continuations require their own validation.
+5. Extend the isolated benchmark adapter into an actual production worker: private input access, per-shot audio context and accurate time offsets, one resident model per GPU pair, independent tasks, durable results, progress reporting, failed-shot retries, budget accounting and enforced cleanup. The benchmark alone is not a deployed LongCat production integration. Correct the known ONNX vocal-separator dependency without claiming an unmeasured speed gain. Existing controller remains unchanged.
+6. Queue independent shots across a chosen number of worker pairs. Each pair loads the model once; keep assets ready before the paid render window, save completed clips immediately and stop workers when their assigned work ends. Schedule fairly and retry only failed/rejected shots. Parallel scaling, availability and end-to-end delivery remain unmeasured.
+7. Assemble against the single untouched master soundtrack, preserving song length, lyric sync and beat-aligned cuts. Verify coverage, no gaps/duplicated audio, duration, frame rate, decode, transitions and a working downloadable MP4. Review the complete video for identity, lip sync, dancing, scene continuity, lighting and owner acceptance. Produce native and any explicitly selected delivery version; upscaling must not be described as native HD generation.
+
+### Speed, cost and authority
+
+Measured warm processing is 33.410 seconds per 3.72-second independent shot on two H100s (two warm samples). For new song duration D seconds, provisional independent-shot count is ceil(D / 3.72); warm rendering with P worker pairs is approximately ceil(shot_count / P) × 33.410 seconds. The two GPUs cooperate on each shot. This estimate excludes cold setup, retrieval, final editing, retries and any extra renders required for better cuts.
+
+For orientation only, the previous 5:40 song projected to 51.2 minutes on one loaded pair, 12.8 minutes on four loaded pairs, 6.7 minutes on eight loaded pairs, or 4.5 minutes on twelve loaded pairs. These are arithmetic projections, not fleet results. The measured first-clip cold elapsed time was 8m54s, so an already-loaded service and a newly rented fleet have different latency. Fast customer delivery remains a requirement; creative approval does not waive it.
+
+Prepare an exact capped quote and expected complete delivery time only after the new song and storyboard establish scope. Use the benchmark's $8.78/pair-hour as historical evidence and refresh actual prices/capacity before future allocation. Include per-worker startup, storage, output recovery and a bounded revision reserve. Keep cumulative B07 accounting and liabilities intact. This message authorizes model selection and planning; it does not authorize an unspecified large fleet, unlimited retries, another consumed 15-minute benchmark or a new paid allocation. No GPU rental, model generation, payment or deployment occurred during this planning update.
+
+Next inputs from John: the new audio and new story direction (a few sentences, or the emotion/message). Next deliverable: a song-specific treatment, timed storyboard and concrete production options. Owner acceptance of the benchmark is now recorded; the new complete music video still requires production and review.
+
+## Previous checkpoint — LongCat benchmark completed and deleted
+
+The approved two-H100 benchmark completed all three independent singing cases with one model initialization. Native outputs are 93 frames at 25fps, 864×448, 3.72 seconds each. Case times: Miami 45.425s first, New York 34.213s warm, Giza 32.607s warm. Warm average 33.410s; only two warm samples. Combined review file `LongCat_Three_Shot_Benchmark.mp4` is 11.160s/279 frames with equal-duration audio, full decoding and source hashes verified. It joins separate song excerpts, not a continuous full-song performance. All clips and logs were recovered before deletion.
+
+Pod `xqbg5j9dqo4dd4`, Secure US-MO-1, two H100 SXM80GB, $8.78 combined/hour, created 17:21:14.554 UTC / 12:21:14.554 Eastern and deleted 17:33:04.953 UTC / 12:33:04.953 Eastern. Rental 710.399s (11m50s), compute estimate $1.732584 plus approximately $0.004111 temporary storage. No persistent volume. Delete returned 204, full Pod inventory empty, direct lookup 404. Independent guard 44135887683 completed successfully, confirming absence through 17:37:50 UTC. The fixed 17:34:50 cutoff was respected. This benchmark authority is consumed; no repeat rental or fleet authorized.
+
+Provider billing still returned no records for the benchmark when checked; invoice pending, not a zero-cost run. Keep prior B07 posted $6.423014247324 and all historical liabilities/reservations. Prior posted plus this test's infrastructure estimate is approximately $8.16, not a reconciled account balance. Do not reset the cumulative $20 accounting. Authenticated balance was $19.86 before rental and auto-pay disabled; current balance not reverified.
+
+Cold startup: 176.465s to container, 186.905s download/verify, 123.100s model initialization. First clip completed 534.100s after paid creation; all three by 600.931s. Fresh Pod per request fails a five-minute service target under these conditions. A 340.126s full song at the independent warm rate projects to approximately 92 shots, 51.2 minutes and $7.50 compute on one loaded pair before startup/retrieval/assembly/retries. Multiple pairs could reduce wall time, but fleet throughput has not been measured. Two GPUs here cooperate on one shot; they are not independent shot workers.
+
+Configuration: LongCat Avatar 1.6 INT8, eight steps, FA2, two ranks, no explicit DiT/VAE compilation flags (upstream compiler helpers may still run). ONNX vocal separation fell back to CPU because `libcudnn_adv.so.9` could not load; main inference ran on both H100s. Record this optimization candidate without claiming a speedup. Sampled frames show changing mouth poses and hands with coherent overall appearance, but largely fixed camera/background. Precise Spanish lyric sync, natural playback motion, crowd quality and creative acceptance remain pending. No finished full song or production adoption is claimed.
+
+Merged implementation/correction PRs #94–#97; source `311ce5930e54413f4b990fdbbe307cc9c845de65`. Successful build 44134147293 produced immutable image `ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:a0f9dbfa1f49d21e6bb2cc30fc8411f4278bfdb9133cff76dea6615a6f43f46a`. Three focused fictional checks and CPU imports passed; real GPU process exited 0. Installed production controller remains `d0543ae556588de3ef77a17e75dd4e734309e147`; contract 0.1.0 / policy 1.1.0 unchanged. No production deployment, payment or extra rental occurred.
+
+Decision: this baseline is unsuitable as the sole fast full-video engine on one pair. Keep it as a candidate for selected singing shots, subject to owner review, and propose a bounded faster-model coverage comparison before any fleet. The complete 5:40 video remains unfinished. Next recipient: owner for creative review, GPU benchmark workstream for the next proposal; posted-cost reconciliation still pending. Results and evidence: `WAN_LongCat_Benchmark_Results_2026-11-17.md`, `WAN_LongCat_Benchmark_Evidence.zip`. Build: https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44134147293 ; cleanup: https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44135887683 .
+
+## Previous checkpoint — funded LongCat runtime preparation
+
+John reported new balance. Authenticated Runpod Billing now shows $19.86, $0/hour current spend and auto-pay disabled. Complete Pod inventory is empty. A fresh Secure catalog query found LOW two-H100 SXM availability in AP-JP-1, CA-MTL-1 and EU-FR-1 at $4.39/GPU-hour. Refresh availability before allocation. No Pod create or GPU charge has occurred in this continuation.
+
+PR #94 implemented the isolated pinned LongCat runtime, three-case resident measurement harness, private input recovery and independent exact-name 900-second cleanup guard. Source merged as `1b6c9fbb29b1c94276e55f2e3177a0cab4cff991`. Three fictional regression checks passed. The existing controller remains `d0543ae556588de3ef77a17e75dd4e734309e147`; bundle 0.1.0 / runtime policy 1.1.0 unchanged.
+
+Prepare run 44129923083 recovered all three original scene anchors and 4.72-second song excerpts successfully; source checksums verified. It then failed before model import because the disposable GitHub build runner ran out of disk extracting the existing pinned base image. PR #95 added the existing 40-GiB runner capacity preflight, merged as `6ccd8a98ee827fc624fe0d0585edb360d179d4b9`. Corrected prepare run 44131169491 is in progress; capacity preflight and input preparation have passed. No ready runtime digest or GPU result is claimed yet.
+
+Benchmark preset: Avatar 1.6 INT8, eight steps, FA2, no compilation, 480p, two context-parallel ranks. Three independent native shots, each 93 frames/25fps = 3.72 seconds, use Miami, New York and Giza inputs. Keep initialization resident and distinguish first/later case latency. The 47.34-GB weights still download inside the approved paid clock. Two H100s for at most 900 seconds remain authorized, approximately $2.20 compute plus small temporary storage. Preserve B07 cumulative accounting and every old grant; no fleet or repeat rental.
+
+Next: finish real image build/import, obtain immutable private image digest, refresh capacity, start and observe READY from the exact-name independent guard, then create one benchmark Pod. Retrieve results and logs before deletion, verify absence and reconcile billing. Model quality, time and viability remain unmeasured. No new confirmation is required for this already approved scope.
+
+## Previous checkpoint — LongCat benchmark authorized, launch blocked
+
+John accepted the proposed two-H100 LongCat benchmark: up to 15 minutes including setup/warm-up, approximately $2.20 compute excluding storage. This fresh bounded authorization supersedes the one-GPU restriction only for this test. Do not request it again, launch a large fleet, reset old grants or extend the 15-minute clock. Preserve the cumulative B07 $20 accounting and earlier liabilities; 15 minutes on two GPUs is 30 GPU-minutes.
+
+Current read-only preflight: complete Runpod Pod inventory empty; authenticated Billing balance −$0.14, spend rate $0/hour and auto-pay disabled; Secure two-H100 SXM catalog availability NONE at $4.39/GPU-hour. No Pod create, payment, model generation, new cost or application deployment occurred. Funding and matching capacity block execution. Test clock has not started.
+
+Official LongCat source is pinned to `58eb336edc5c8c63389838727e40b8c18434e54e`. A filtered 38-file INT8 model manifest totals 47,337,796,874 bytes; weights have not been downloaded. Native output is 93 frames/25fps = 3.72s initially, then 80 new frames/3.2s per continuation. Never present those as five-second measurements. Source/model revisions, scope and resume procedure are in `WAN_LongCat_Benchmark_Preparation_2026-11-17.md` and its companion ZIP.
+
+Runtime image, measurement harness, original-reference retrieval and independent cleanup binding still need completion before allocation. Use existing build facilities where possible to reduce paid cold setup. Independent-shot throughput cannot be inferred directly from continuation speed. Record the true model-load, generation, encode/upload and cleanup times plus creative limitations. No benchmark result or ready-to-launch implementation is claimed.
+
+User's overriding product priority is short customer waiting time; 30–60 minutes is not viable. The previous model shortlist is research, not an adopted production choice. A sub-five-minute full video remains a proposed target, not a measured promise. Resume necessary preparation, verify replenished credit and refreshed capacity, run only this bounded test and return actual media/measurements before proposing a fleet.
+
+## Previous checkpoint — quality rejection and strategy research
+
+John reviewed the combined 40-second preview and explicitly found the video quality insufficient and the process too expensive in time and money. He requested research into better, faster open-source models. The eight retained takes remain evidence, not creatively accepted final footage.
+
+Research on November 17 identifies LongCat-Video-Avatar 1.6 (released November 15, MIT weights, eight-step path) as the first singing replacement candidate. Proposed MIT/Apache pipeline: LongCat for singer close/medium shots plus Wan2.2-I2V-A14B with LightX2V four-step 720p checkpoints for concert coverage. LTX-2.5 Distilled is the main cinematic challenger under a separate community model license; its Apache code license does not cover its weights. No candidate has yet been measured on John's song or adopted in production. Spanish lip sync, single-GPU fit and complete throughput are still open.
+
+Proposed next evidence: a varied approximately 30-second trailer, original soundtrack, six source shots, maximum $3 additional pilot cost inside the existing cumulative envelope. This is a research proposal, not a launched rental or new spending allowance. Compare accepted seconds per dollar, including startup, compilation and retries. Do not rerun the slow baseline merely for comparison. Full current-settings projection remains approximately 8.96 GPU hours/$39.33 before overhead. Resident loading was already working.
+
+See `WAN_Open_Source_Video_Strategy_2026-11-17.md` for primary sources, licensing distinctions, model limitations, creative workflow and cumulative budget scenarios. Preserve the $20/four-hour total limits, prior charges, expired execution scopes and operational corrections below. No GPU, payment, model generation, application code change or deployment occurred during research. The recommended pipeline and revised shot allocation await measured creative acceptance before full production.
+
+## Previous checkpoint — B07 retained footage, provider credit exhausted
+
+**Eight singing takes were saved before Runpod terminated the GPU for depleted credit. The complete music video remains unfinished.** Observation run 44083363322 at November 17, 2026, 12:28 UTC / 07:28 Eastern confirmed eight durable takes and telemetry. The first loaded the model; the next seven reused it with zero model-load time. Installed source remains `d0543ae556588de3ef77a17e75dd4e734309e147`; no code changed in this continuation.
+
+Recovery Pod `o2e7tsgrhdn3wd` was created at 09:23:20 UTC and terminated by Runpod at 10:44:43 UTC / 05:44:43 Eastern. The account notification received 10:44:48 UTC explicitly confirms depleted credit and irreversible termination of the Pod without a network volume. Provider inventory is empty, direct lookup returns 404, and its logs are no longer available. Account balance observed in the authenticated billing page is −$0.14, spend rate $0/hour, auto-pay disabled; the prior recharge was $10. No new payment or GPU was initiated.
+
+Posted provider charges for B07: first production Pod $0.448425248964, recovery Pod $5.974588998361, total $6.423014247324. Billing may lag and these records have not been ingested into the signed application ledger. Retain existing holds/reservations and historical grants. $20 authorization is not deposited credit. The $20/four-cumulative-GPU-hour envelope and original deadlines remain unchanged.
+
+At 12:28 UTC the controller incorrectly remained `rendering` with cleanup `pending` after provider loss. Project-wide attempts numbered 11: eight successful takes, two historical pre-inference `render_failed` attempts and one `lease_expired`. Do not report those two historical failures as new failures in the recovery. Recovery deadline 12:38:15 UTC / 07:38:15 Eastern; original deadline 12:46:41 UTC. Preserve the independent guard and historical unknown-request cleanup.
+
+Measured warm average is 474.352 seconds per five-second clip including render/verify/upload. The 68-shot scope extrapolates to roughly 8.96 GPU hours and $39.33 compute before startup or revisions; the 60 remaining clips project to 7.91 hours/$34.71. These are estimates, not approval requests. Current settings cannot meet four hours. Model residency worked; faster compatible inference and reviewed quality are needed.
+
+Before another run: recover/review retained footage; fix stale status after provider disappearance; verify provider credit separately from internal budget; implement selective continuation with partial takes and cumulative accounting; retain detailed failure logs outside the Pod; benchmark a faster singing configuration. Current one-off recovery rejects a second recovery or accepted takes; never replay it. Full lyric/beat editing, ten-location coverage, singing/identity review and owner acceptance remain pending.
+
+References: https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44083363322 ; https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/8 . See `WAN_Command_Center_Video_2_Recovery.md`.
+
+
+### Recovered partial preview — 12:39 UTC / 07:39 Eastern
+
+Export 44085065019 / job 134045233234 passed after the fixed cutoff. State is now failed/incomplete, cleanup confirmed. Artifact 14329665504 (56,510,756 bytes), archive SHA-256 fb8465917b1a27b367197ebc30a484fd4b20604be768440123be788208c9018b, was recovered with matching hash. Native shots song-000…song-007 cover exactly 40 seconds, first 35s Miami day and last 5s Times Square night. All eight original hashes, full decoding, 80 frames/16 fps/832×448 and original-song checksum passed. Sixty of 68 shots remain.
+
+A soundtrack-backed 40.000s partial preview was created and validated: 640 frames, video and audio streams both 40.000s, clean decode; SHA-256 a3ca1e893fa67baf6015cf12b6ad4004974d367a0760afed67033abef4810e79. First local concatenation shortened video by 437.5ms; rebuilding presentation timestamps/CFR fixed it. Preserve this regression requirement for eventual full export. No creative approval is implied. Current artifacts: Busca_Adentro_de_Ti_40s_Partial_Preview.mp4, WAN_B07_Recovered_Clips.zip, WAN_Command_Center_Video_2_Recovery.md. No new code deployment, GPU, or payment.
+
+## Previous checkpoint — B07 corrected singing run
+
+**Singing integration and the resident queue are deployed. The first live run failed before inference; its diagnosed audio-file access problem is fixed. A bounded corrective run is now starting. No completed singing clip exists yet.** Checkpoint: November 17, 2026, 09:24 UTC / 04:24 Eastern.
+
+PRs #89–#93 are merged. Installed controller: `d0543ae556588de3ef77a17e75dd4e734309e147`, verified by upgrade run 44053784609. Private worker remains `ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu@sha256:08095101e28e595be00d5244277f91d2aa60585212c0e03eae4278dd91541fb5`. The S2V-14B profile uses 832×448, 16 fps, 40 steps; the planned HD draft is an upscale. Contract 0.1.0 and runtime policy 1.1.0 are unchanged.
+
+Project `project-c4c19d66d1ab45c5a255ad5455e56716` retains the original 340.125896-second song, ten city anchors, and 68 frozen audio-conditioned shots covering 340126 ms. The first batch `7e89330141794b85827d48341def92fe` and Pod `22hk9nt6u1t76z` are consumed. Weights downloaded, but two first-shot attempts failed before inference. Zero takes. Cleanup confirmed and complete provider inventory was empty. Billing has not yet reported the charge; missing records are not a zero bill. Old guard 44049787174 was canceled after confirmed deletion, while persistent cleanup stayed active.
+
+Root cause confirmed: all 68 conditioning WAVs were owned by root with private modes, so the web service could not read them. PR #93 verifies checksums and transfers only those WAVs to the existing asset service identity, keeping 0600. Prepare run 44053943868 corrected 68 files and verified all 79 inputs as the service user. Independent authenticated HTTP downloads of all 79 files returned 200, with exact checksums and sizes (30,909,113 bytes). No media was made public. The OS ownership regression that was skipped locally passed on the host before deployment.
+
+Corrective scope `singing-recovery`: batch `a69f7b2734624c5ea4a2486d89eabeae`; admission 44054203145. Original reservation and attempts remain immutable. A separate audited $2.95 conservative liability hold plus $15.05 new GPU reservation stays within the original $18 GPU cap; $2 remains the total storage/cleanup/brief-operations reserve. The hold is not a provider invoice. The recovery cutoff is `1794919095` = **12:38:15 UTC / 07:38:15 Eastern**, earlier than original ceiling `1794919601` = 12:46:41 UTC. Never reset either budget or time on retry.
+
+Independent guard 44054672515 is running and was verified by launch 44055083432. New H100 SXM Pod `o2e7tsgrhdn3wd`, US-MO-1, created 09:23:20 UTC at $4.39/hour. Immutable image identity matches. Controller monitor unit `wan-singing-recovery-launch-20261117`; durable private log `/var/lib/wan/singing-recovery-20261117/launch.log`. One GPU at a time. No inference or successful take verified yet; startup is in progress.
+
+Validation: root suite 213 checks (212 passed, one root-only case skipped locally then passed on host), 65 affected admission/cleanup/backup checks passed, 14 final backup checks passed, contract and shell syntax passed. Previous 18 Studio tests and production build passed; the deployment rebuilt Studio successfully. GPU source/build context is unchanged. Recovery rejects reset deadlines, overspending, uncertain cleanup, changed shot/model scope, accepted takes and replay. This narrowly implemented repair does not yet support a second recovery or selective continuation after partial success; any further corrective implementation must preserve all existing takes, costs and deadlines.
+
+Next: monitor actual model initialization and the first native singing result, capture retained telemetry and usable throughput, diagnose concrete failures before another paid retry, recover footage, and finish the full video if the allowance supports it. Beat/lyric-aware editing, cross-city finale, singing quality and owner creative acceptance remain pending. Never call a partial result a completed music video. Preserve all seven pre-B07 historical scopes and the exact older unresolved repair request.
+
+References: https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/8 ; https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/93 ; https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44055083432 .
+
+## Previous checkpoint — budget and resident-queue plan
 **B07 now has John’s authorization for $20 additional total and up to four cumulative GPU hours, including startup and retries. The full 5:40.126 concert video remains the acceptance goal.**
 
 Two hours remains the optimization target; four hours is the authorized ceiling, not four hours per retry. Plan up to $18 GPU at <=$4.50/hour plus $2 for storage and cleanup, with one GPU at a time. The current H100 SXM Secure quote is $4.39/hour, so four hours is $17.56 compute. This is not a completion guarantee or invoice. No further numeric approval is needed within these limits. Preserve all seven historical consumed grants and reservations; create a fresh B07 production scope rather than reusing one.
@@ -45,6 +323,8 @@ No GPU was started or new generation charge incurred by this update. Installed h
 **John has made the complete 5:40.126 music video the B07 acceptance goal and authorized fixing problems and retrying until completion. Preparation is in progress; no new GPU has been started.**
 
 The full-video production retains the ten-city concert treatment, five daytime and five nighttime settings, his reference appearance, handheld microphone and synchronized lead singing. The first usable shots belong to the full production. A short demo alone does not satisfy the goal. Preserve accepted takes, diagnose failed shots, record the correction and retry only affected work. The existing B06 15-second comparison remains historically incomplete; it is not the new deliverable.
+
+Prepared PR #89: https://github.com/hoyosgarciajohn-png/wan-video-generation/pull/89. Remote commit `da833cf727558431aaa5e9d57cc9d428d549bf90`, tree `ec3b5b299d42d7d58207b76572bd1fb2d6bea245` (matches the tested local index). PR is open; no deployment.
 
 Issue #8 coordinates the work: https://github.com/hoyosgarciajohn-png/wan-video-generation/issues/8. Branch `work/b07-full-song-production` starts from the source tree of main `0bbe24deea2e2536b50e8cb88327c2732f27b469`. Shared runtime policy 1.1.0 expands new music-video projects to six minutes across Studio, controller, validator and exporter. Smaller existing limits remain binding through edit, reload and export. Bundle wire contract remains 0.1.0. This is source preparation, not a deployed capability.
 
