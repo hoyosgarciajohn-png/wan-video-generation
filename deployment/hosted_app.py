@@ -16,6 +16,7 @@ import threading
 
 from deployment.local_stage import CSP
 from services.controller.http_api import StudioAPI, Reply, body_limit
+from services.controller.accounts import Accounts, smtp_sender
 from services.controller.preflight import _origin
 from services.controller.service import ControlService
 from services.controller.studio import StudioWorkspace
@@ -144,7 +145,14 @@ def main():
         from services.controller.live_admission import LiveAdmission
         from services.controller.live_execution import LiveExecution
         execution = LiveExecution(LiveAdmission(studio))
-    api = StudioAPI(studio, tokens, origin, real_jobs=execution)
+    accounts = Accounts(control, origin, send=smtp_sender(os.environ))
+    account_file = os.environ.get('WAN_STUDIO_ACCOUNT_FILE')
+    if account_file:
+        for email, owner in json.loads(Path(account_file).read_text()).items():
+            if owner not in tokens.values():
+                raise ValueError('Account owner must already be provisioned')
+            accounts.provision(email, owner)
+    api = StudioAPI(studio, tokens, origin, real_jobs=execution, accounts=accounts)
     stop = threading.Event()
     threads = [threading.Thread(target=runner.serve, args=(stop,), daemon=True)
                for runner in (FixtureRunner(control), ExportRunner(control))]

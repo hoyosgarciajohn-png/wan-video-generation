@@ -23,7 +23,7 @@ TABLES = {'worker_telemetry','comparison_gates','projects','admissions','complet
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
           'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings','live_recovery_caps'}
-TABLES.add('director_briefs')
+TABLES.update({'director_briefs', 'studio_accounts', 'studio_recovery'})
 TABLES.update({'longcat_budgets','longcat_scopes','longcat_shots','longcat_cleanup'})
 DB_NAME = 'database.sqlite'
 
@@ -689,8 +689,10 @@ def restore_backup(backup_dir, destination):
     (target / 'assets').mkdir(mode=0o700)
     for entry in manifest['files']:
         _copy(source / entry['path'], target / entry['path'], entry['bytes'], entry['sha256'])
-    with _connect(target / DB_NAME, readonly=True) as db:
+    with _connect(target / DB_NAME) as db:
         _inspect(db,target/'assets')
+        if 'studio_recovery' in _tables(db):
+            db.execute('DELETE FROM studio_recovery')
     recovery = dict(database=str(target / DB_NAME), assets=str(target / 'assets'),
                     restored_at=datetime.now(timezone.utc).isoformat(), recovery=manifest['recovery'])
     _sync_directories(target)

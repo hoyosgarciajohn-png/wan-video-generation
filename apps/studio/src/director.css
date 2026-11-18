@@ -587,3 +587,10 @@
   margin: 0;
   min-width: 0;
 }
+
+.d-login .d-auth-form { display: grid; gap: 18px; }
+.d-auth-form label { display: grid; gap: 8px; }
+.d-auth-form .d-auth-show { display: flex; align-items: center; gap: 8px; }
+.d-auth-show input { width: auto; }
+.d-auth-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.d-login [role="alert"] { color: #ffb8b8; }

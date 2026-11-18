@@ -109,6 +109,9 @@ export class StudioClient {
   session() {
     return this.call<{ owner_id: string }>("session");
   }
+  emailLogin(email: string, password: string) {
+    return this.call<{ owner_id: string }>("session", "POST", { email, password });
+  }
   login(token: string) {
     return this.call<{ owner_id: string }>("session", "POST", { token });
   }

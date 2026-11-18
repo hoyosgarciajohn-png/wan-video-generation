@@ -1712,3 +1712,7 @@ passed; unauthenticated API returned 401; browser displayed Director sign-in.
 Existing credentials unchanged, sessions require sign-in after restart. No paid
 render or GPU started. Owner authenticated acceptance and hosted generation remain
 pending; follow docs/HOSTED_MUSIC_DIRECTOR.md. Do not rerun the one-time installer.
+
+### November 18 — Studio email login follow-up
+
+John approved email/password login and recovery to replace the confusing token screen, including deployment. Prepared native SQLite-backed account mapping, scrypt password hashes, one-use expiring password links, session invalidation, shared Director/classic login UI and a guarded auth overlay installer. Preserve all original owners/projects/media. Probe run 44343693588 found no mail relay configured. Activation and live acceptance remain blocked on private SMTP credentials and sender selection. No emails sent, API key created, unrelated Auth project changed or GPU invoked. See `docs/STUDIO_EMAIL_LOGIN.md` and branch `work/studio-email-login`; no repeat deployment approval is required.

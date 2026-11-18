@@ -206,3 +206,11 @@ is now installed as a hash-recorded overlay; see the live-deployment section in
 docs/HOSTED_MUSIC_DIRECTOR.md. Do not request that deployment approval again or
 rerun its one-time installer. Preserve the existing model-credential and paid
 rendering boundaries; this deployment incurred no video-generation charge.
+
+John approved replacing Studio token-entry UI with email/password login and recovery,
+including deployment. See docs/STUDIO_EMAIL_LOGIN.md. Preserve the existing owner
+IDs and project/media records; public requests must never assign an existing owner.
+The implementation is prepared but not deployed: no mail relay is configured.
+This is a credential/sender setup blocker, not a need to repeat release approval.
+Do not deploy an unusable first-password flow or claim recovery works before
+actual delivery is verified. No rendering or provider charge is authorized here.
