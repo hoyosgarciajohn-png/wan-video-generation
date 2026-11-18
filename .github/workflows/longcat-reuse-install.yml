@@ -1,0 +1,18 @@
+name: Admit authorized missing shots on the same Pod
+on:
+  push:
+    branches: [main]
+    paths: [deployment/reuse_control.py, deployment/reuse_install.sh, .github/workflows/longcat-reuse-install.yml]
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Prepare only the missing suffix and preserve original scope
+        env:
+          WAN_HOST_SSH_KEY: ${{ secrets.WAN_HOST_SSH_KEY }}
+        run: bash deployment/reuse_install.sh
