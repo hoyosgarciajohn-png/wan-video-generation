@@ -1,0 +1,21 @@
+name: Beach comparison deadline guard
+on:
+  push:
+    branches: [work/beach-three-comparison-20261118]
+    paths: [.github/workflows/beach-comparison-guard.yml]
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with: {persist-credentials: false}
+      - name: Bound only new beach comparison workers
+        env:
+          RUNPOD_CLEANUP_TOKEN: ${{ secrets.RUNPOD_CLEANUP_TOKEN }}
+          LONGCAT_POD_NAME: 'wan-longcat-song-000000006afd6b6c'
+          LONGCAT_ADMITTED_AT: '1794993004'
+          LONGCAT_DEADLINE: '1794996604'
+        run: python3 -u -m deployment.longcat_guard
