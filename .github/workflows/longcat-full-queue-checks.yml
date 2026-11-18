@@ -11,6 +11,8 @@ on:
       - 'deployment/hosted_app.py'
       - 'deployment/longcat_*.py'
       - 'tests/test_longcat*.py'
+      - 'deployment/test_longcat_publish.py'
+      - '.github/workflows/publish-longcat-production.yml'
       - 'contracts/runtime-policy.json'
       - 'workers/media/test_export.py'
       - 'workers/media/longcat_assemble.py'
@@ -37,6 +39,7 @@ jobs:
           python3 scripts/validate_contract.py --media-root fixtures
           python3 -m unittest discover -s tests -v
           python3 -m unittest workers.gpu.tests.test_longcat_batch workers.media.test_export -v
+          python3 -m unittest deployment.test_longcat_publish -v
       - name: Studio shared policy checks
         working-directory: apps/studio
         env:
@@ -73,3 +76,4 @@ jobs:
           path: ${{ runner.temp }}/longcat-production
           retention-days: 3
           if-no-files-found: error
+

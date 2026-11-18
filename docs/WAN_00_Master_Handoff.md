@@ -1,7 +1,15 @@
 # Wan Video Generation · Master handoff
-Version 1.48 | November 17, 2026 | Owner: John Hoyos
+Version 1.61 | November 17, 2026 | Owner: John Hoyos
 
-## Approved direction
+## Current checkpoint — complete preview; deployment blocked
+
+John authorized final image/timing review and deployment. All 18 scene anchors were inspected with head covering present. The 110-shot timing-v2 package and complete 6:03 still-image MP4 are prepared; actual input preflight and full preview decoding pass. Source images and the full stereo master are unchanged. Computational onset alignment does not establish lyric phrasing, generated motion, alternate camera angles or owner playback acceptance.
+
+Read-only host verification [44238678234](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44238678234) was stopped by GitHub account billing/spending limits before any job step or host connection. No deployment, registry publication or GPU render occurred. HTTPS remains ready/disarmed; installed source is only last known at d0543ae. PR #98 now includes the production image publication path and corrected exact upgrade baseline, with four passing focused local publication-boundary checks. Hosted release checks remain blocked.
+
+[Current review and resume steps](B07_LONGCAT_RELEASE_REVIEW.md) supersede the older 5:40 production checkpoints below. The complete approved recording is 362.88 seconds / 6:03, 110 shots, 11 natural-location chapters. Preserve the existing $20/four-hour cumulative ceiling and all liabilities; no new budget grant is claimed. Finish account recovery, exact-head checks, private image publication and reviewed controller deployment before scoped paid execution.
+
+## Historical approved direction
 Build a shot-based platform for music videos up to 6 minutes and short films and animated cartoons up to 30 minutes. Self-host open-weight Wan. Rent GPU infrastructure by the batch and avoid per-generation model fees. Baseline: Wan2.2 TI2V-5B, RTX 4090 24 GB, pinned Docker image, temporary Runpod Pod. Keep project state and outputs outside the GPU. Confirm teardown after every batch. Larger Wan checkpoints, custom Runpod Flex, and other GPU rental providers are benchmark alternatives. Repository is https://github.com/hoyosgarciajohn-png/wan-video-generation. The first-trial $5 / 30-minute / one-attempt envelope was consumed; its render failed and cleanup was confirmed. Hosting is installed; release dates remain pending. B00 is complete. PR #11 merged with 14 passing local tests and verified synthetic media. GPU benchmarking is scheduled for B06.
 
 ## Current Command Center checkpoint
