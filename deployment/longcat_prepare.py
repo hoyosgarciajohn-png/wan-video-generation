@@ -57,7 +57,7 @@ def prepare(plan, scenes, scene_root, audio_zip, destination, *, project_id, bat
         duration_seconds=362.88,source_audio_zip_sha256=digest(audio_zip),
         master_wav_sha256=plan['audio']['master_wav_sha256'],
         creative_status='Individual frames ready for review; musical cut alignment pending',
-        render_status='No execution grant or provider allocation created')))
+        render_status='No execution grant or provider allocation created'))
     return manifest
 
 

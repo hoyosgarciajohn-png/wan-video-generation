@@ -31,6 +31,11 @@ Git. Still-image approval does not validate demanding sports motion.
   It has no public admission endpoint and cannot sign authority or rent a GPU.
   Durable inference-start records prevent a lost GPU journal from silently
   repeating a shot. Revocation retains the original compute reservation.
+- The guard's exact rental name is derived from the scope ID and bound by the
+  host attestation. A separate signed provider-absence record revokes the worker
+  token after cleanup. Backups require that record and retain the input images,
+  audio, saved takes, receipts and budget reservations. Restoring cannot revive
+  an old credential or erase the prior spend envelope.
 - The production bootstrap downloads hash-bound inputs and pinned weights, then
   starts one two-rank resident model. A process-group timeout stops the child and
   both ranks; a separate exact-name provider guard handles rental termination.
@@ -80,6 +85,12 @@ assemble-review --inputs INPUTS --database STATE --assets ASSETS --owner OWNER
 builds one private review video. It works from the retained controller records
 after GPU teardown and does not need a still-valid GPU credential. An incomplete
 scope is refused; do not substitute stills or duplicate clips for missing takes.
+
+After observed provider teardown, `record-cleanup` consumes a signed host absence
+attestation using the `wan-longcat-cleanup-host-v1` domain. It records the exact
+scope/grant/guard/name and confirmation time, revokes the worker credential, and
+retains its money reservation. It does not perform deletion or reconcile billing
+by itself. Normal controller backup/restore then preserves all LongCat media.
 
 The complete project budget remains capped at $20 with prior posted and retained
 liabilities included. The known $8.156768710002916 in earlier posted use is not a

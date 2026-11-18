@@ -12,7 +12,7 @@ from workers.gpu.longcat_batch import fingerprint, validate_manifest, validate_r
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('operation',choices=['preflight','admit','assemble-review'])
+    p.add_argument('operation',choices=['preflight','admit','assemble-review','record-cleanup'])
     p.add_argument('--inputs',type=Path,required=True)
     p.add_argument('--database',type=Path)
     p.add_argument('--assets',type=Path)
@@ -25,9 +25,18 @@ def main():
     p.add_argument('--master',type=Path)
     p.add_argument('--master-sha256')
     p.add_argument('--review-output',type=Path)
+    p.add_argument('--cleanup-envelope',type=Path)
     a=p.parse_args()
     manifest=validate_manifest(json.loads((a.inputs/'manifest.json').read_text()),a.inputs)
     validate_reference_images(manifest,a.inputs)
+    if a.operation=='record-cleanup':
+        if not all((a.database,a.assets,a.owner,a.scope_id,a.keys,a.cleanup_envelope)):
+            p.error('Cleanup needs durable controller paths, owner, scope and signed host absence attestation')
+        config=json.loads(a.keys.read_text())
+        keys={k:(v['owner'],bytes.fromhex(v['key_hex'])) for k,v in config['host'].items()}
+        service=LongCatTransport(ControlService(a.database,a.assets))
+        print(json.dumps(service.confirm_cleanup(a.owner,a.scope_id,json.loads(a.cleanup_envelope.read_text()),host_keys=keys)))
+        return
     if a.operation=='preflight':
         print(json.dumps(dict(status='INPUTS_VALIDATED_NO_GPU',shots=len(manifest['shots']),
               duration_ms=manifest['duration_frames']*40,manifest_sha256=fingerprint(manifest),source_sha256=source_digest())))

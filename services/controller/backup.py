@@ -23,6 +23,7 @@ TABLES = {'worker_telemetry','comparison_gates','projects','admissions','complet
           'command_receipts','upload_sessions','upload_chunks','export_jobs','pod_batches',
           'budget_approvals','budget_reservations','budget_events','worker_credentials','real_job_links',
           'live_approvals','live_reservations','live_job_links','live_billing_events','live_execution_bindings','live_recovery_caps'}
+TABLES.update({'longcat_budgets','longcat_scopes','longcat_shots','longcat_cleanup'})
 DB_NAME = 'database.sqlite'
 
 
@@ -341,7 +342,68 @@ def _inspect_live_admission(db, names, projects):
     return seen
 
 
-def _inspect(db):
+def _inspect_longcat(db,names,projects,assets,asset_root):
+    tables={'longcat_budgets','longcat_scopes','longcat_shots','longcat_cleanup'}
+    if not names & tables:return
+    require(tables<=names,'Incomplete LongCat recovery schema')
+    from services.controller.longcat import pod_name
+    from workers.gpu.longcat_batch import fingerprint
+    budgets={};reserved={};scopes={}
+    for identity,owner,raw in db.execute('SELECT id,owner,terms FROM longcat_budgets'):
+        terms=json.loads(raw)
+        require(set(terms)=={'budget_total_cents','prior_committed_cents','storage_reserve_cents'} and
+                all(type(v) is int and v>=0 for v in terms.values()) and
+                0<terms['budget_total_cents']<=2000 and terms['storage_reserve_cents']>0,'Invalid retained LongCat budget')
+        budgets[identity]=(owner,terms);reserved[identity]=0
+    for scope,owner,project,batch,budget,held,raw,host_raw,manifest_raw,token,revoked in db.execute('SELECT * FROM longcat_scopes'):
+        require(project in projects and projects[project]['project']['owner_id']==owner and
+                budget in budgets and budgets[budget][0]==owner,'Orphan LongCat ownership/budget')
+        grant=json.loads(raw)['payload'];host=json.loads(host_raw)['payload'];manifest=json.loads(manifest_raw)
+        execution=grant['execution'];binding=fingerprint(manifest)
+        require(grant['owner']==owner and grant['project']==project and grant['budget_id']==budget and
+                execution['scope_id']==scope and execution['manifest_sha256']==binding and
+                manifest['project_id']==project and manifest['batch_id']==batch and
+                all(grant[k]==v for k,v in budgets[budget][1].items()) and
+                type(held) is int and held==execution['compute_cap_cents'] and 0<held<=1171 and
+                isinstance(token,str) and len(token)==64 and all(c in '0123456789abcdef' for c in token),
+                'LongCat scope binding changed')
+        require(host['grant_sha256']==fingerprint(grant) and host['pod_name']==pod_name(scope),
+                'LongCat host binding changed')
+        cleanup=db.execute('SELECT envelope FROM longcat_cleanup WHERE scope=?',(scope,)).fetchone()
+        require(cleanup is not None and revoked==1,'Provider absence must be attested before LongCat backup')
+        proof=json.loads(cleanup[0])['payload']
+        require(proof==dict(owner=owner,scope_id=scope,grant_sha256=fingerprint(grant),
+                guard_run_id=execution['guard_run_id'],pod_name=pod_name(scope),absence_confirmed=True,
+                confirmed_at=proof.get('confirmed_at')) and type(proof['confirmed_at']) is int and
+                proof['confirmed_at']>=execution['admitted_at'],'Invalid LongCat cleanup history')
+        reserved[budget]+=held;scopes[scope]=(manifest,binding,project,batch)
+        require(asset_root is not None,'LongCat backup requires its immutable media root')
+        for shot in manifest['shots']:
+            for kind in ('image','audio'):
+                value=shot[kind];key=_key(f"longcat/{project}/{batch}/inputs/{_key(value['path'])}")
+                path=_file(Path(asset_root)/key,hardlinks=True)
+                record=dict(bytes=path.stat().st_size,sha256=value['sha256'])
+                require(key not in assets or assets[key]==record,'Conflicting LongCat input')
+                assets[key]=record
+    for scope,shot_id,state,raw in db.execute('SELECT scope,shot,state,receipt FROM longcat_shots'):
+        require(scope in scopes,'Orphan LongCat shot');manifest,binding,project,batch=scopes[scope]
+        require(any(s['id']==shot_id for s in manifest['shots']) and state in ('rendering','published'),
+                'Invalid LongCat shot state')
+        if state=='rendering':require(raw is None,'Uncommitted LongCat receipt');continue
+        receipt=json.loads(raw);key=_key(receipt['object_key'])
+        require(receipt['shot_id']==shot_id and receipt['scope_id']==scope and receipt['binding']==binding and
+                key==f"longcat/{project}/{batch}/takes/{shot_id}-{receipt['sha256']}.mp4" and
+                type(receipt['bytes']) is int and receipt['bytes']>0,'LongCat receipt binding changed')
+        record=dict(bytes=receipt['bytes'],sha256=receipt['sha256'])
+        require(key not in assets or assets[key]==record,'Conflicting LongCat take');assets[key]=record
+    require({r[0] for r in db.execute('SELECT scope FROM longcat_cleanup')}==set(scopes),
+            'Orphan LongCat cleanup history')
+    for identity,(_,terms) in budgets.items():
+        require(reserved[identity]+terms['prior_committed_cents']+terms['storage_reserve_cents']<=terms['budget_total_cents'],
+                'Retained LongCat budget exceeded')
+
+
+def _inspect(db,asset_root=None):
     require(db.execute('PRAGMA integrity_check').fetchall() == [('ok',)], 'Database integrity check failed')
     require(not db.execute('PRAGMA foreign_key_check').fetchall(), 'Database foreign key check failed')
     names = _tables(db)
@@ -431,6 +493,7 @@ def _inspect(db):
         known={b['id'] for p in projects.values() for b in p['batches']}
         require({r[0] for r in db.execute('SELECT batch FROM comparison_gates')}<=known, 'Orphan comparison gate')
     _inspect_budget(db, names, projects)
+    _inspect_longcat(db,names,projects,assets,asset_root)
     return assets
 
 
@@ -525,10 +588,10 @@ def create_backup(database, asset_root, destination):
     now = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     with _connect(snapshot) as db:
         db.execute('PRAGMA journal_mode=DELETE')
-        _inspect(db)  # Reject uncertain provider obligations before normalization.
+        _inspect(db,asset_root)  # Reject uncertain provider obligations before normalization.
         recovery = _normalize(db, now)
         db.commit()
-        assets = _inspect(db)
+        assets = _inspect(db,asset_root)
         db.execute('VACUUM')  # Do not retain discarded/free page contents.
     with snapshot.open('rb') as handle:
         os.fsync(handle.fileno())
@@ -587,7 +650,7 @@ def _verify_backup(directory):
         actual.update(str((Path(parent) / name).relative_to(directory)) for name in names)
     require(actual == set(entries) | {'manifest.json','COMPLETE'}, 'Unlisted backup files')
     with _connect(directory / DB_NAME, readonly=True) as db:
-        assets = _inspect(db)
+        assets = _inspect(db,directory/'assets')
         if 'live_approvals' in _tables(db):
             require(db.execute('SELECT count(*) FROM live_approvals WHERE revoked!=1').fetchone()[0] == 0,
                     'Backup live approvals must be revoked before restore')
@@ -612,7 +675,7 @@ def restore_backup(backup_dir, destination):
     for entry in manifest['files']:
         _copy(source / entry['path'], target / entry['path'], entry['bytes'], entry['sha256'])
     with _connect(target / DB_NAME, readonly=True) as db:
-        _inspect(db)
+        _inspect(db,target/'assets')
     recovery = dict(database=str(target / DB_NAME), assets=str(target / 'assets'),
                     restored_at=datetime.now(timezone.utc).isoformat(), recovery=manifest['recovery'])
     _sync_directories(target)

@@ -21,7 +21,12 @@ from workers.gpu.longcat_batch import fingerprint, validate_execution, validate_
 
 OWNER_DOMAIN = 'wan-longcat-owner-v1'
 HOST_DOMAIN = 'wan-longcat-host-v1'
+CLEANUP_DOMAIN = 'wan-longcat-cleanup-host-v1'
 IDENTIFIER = r'[A-Za-z0-9_-]{1,80}'
+
+
+def pod_name(scope_id):
+    return 'wan-longcat-song-'+hashlib.sha256(scope_id.encode()).hexdigest()[:16]
 
 
 def source_digest():
@@ -30,7 +35,9 @@ def source_digest():
              'deployment/hosted_app.py', 'workers/gpu/longcat_batch.py',
              'workers/gpu/longcat_client.py', 'workers/gpu/longcat_resident.py',
              'workers/gpu/longcat_bootstrap.py', 'workers/gpu/longcat.Dockerfile',
-             'benchmarks/longcat/model_manifest.json', 'contracts/runtime-policy.json']
+             'benchmarks/longcat/model_manifest.json', 'contracts/runtime-policy.json',
+             'services/controller/backup.py', 'deployment/longcat_guard.py',
+             'workers/media/longcat_assemble.py']
     return fingerprint({name: digest(root/name) for name in names})
 
 
@@ -48,6 +55,8 @@ class LongCatTransport:
             db.execute('''CREATE TABLE IF NOT EXISTS longcat_shots (
                 scope TEXT NOT NULL, shot TEXT NOT NULL, state TEXT NOT NULL,
                 receipt TEXT, PRIMARY KEY(scope,shot))''')
+            db.execute('''CREATE TABLE IF NOT EXISTS longcat_cleanup (
+                scope TEXT PRIMARY KEY, envelope TEXT NOT NULL)''')
 
     def now(self):
         return self.control.clock().timestamp()
@@ -76,6 +85,7 @@ class LongCatTransport:
         expected_host = dict(owner=owner, project=grant['project'], grant_sha256=fingerprint(grant),
                              source_sha256=grant['source_sha256'], image_ref=grant['image_ref'],
                              guard_run_id=execution['guard_run_id'], deadline=execution['deadline'],
+                             pod_name=pod_name(execution['scope_id']),
                              image_import_verified=True, guard_ready=True, storage_verified=True)
         require(host == expected_host, 'Signed image/storage/guard acceptance required')
         for key in ('budget_total_cents', 'prior_committed_cents', 'storage_reserve_cents'):
@@ -123,7 +133,7 @@ class LongCatTransport:
                 shutil.rmtree(destination)
                 raise
         return dict(token=token, scope_id=execution['scope_id'], deadline=execution['deadline'],
-                    binding=fingerprint(manifest), image_ref=grant['image_ref'])
+                    binding=fingerprint(manifest), image_ref=grant['image_ref'],pod_name=pod_name(execution['scope_id']))
 
     def _principal(self, db, authorization, *, recovery=False):
         if not isinstance(authorization, str) or not re.fullmatch(r'Bearer [A-Za-z0-9_-]{32,256}', authorization):
@@ -232,3 +242,21 @@ class LongCatTransport:
             require(db.execute('UPDATE longcat_scopes SET revoked=1 WHERE id=? AND owner=?',
                                (scope_id,owner)).rowcount == 1, 'Scope unavailable')
         # Reservations remain retained until explicit billing reconciliation.
+
+    def confirm_cleanup(self,owner,scope_id,envelope,*,host_keys):
+        """Trusted host attests provider absence; retains budget and fences token."""
+        payload=_verify(envelope,_keys(host_keys),CLEANUP_DOMAIN,owner)
+        with self.control.transaction() as db:
+            row=db.execute('SELECT grant FROM longcat_scopes WHERE id=? AND owner=?',(scope_id,owner)).fetchone()
+            require(row is not None,'Scope unavailable')
+            grant=json.loads(row[0])['payload'];execution=grant['execution']
+            expected=dict(owner=owner,scope_id=scope_id,grant_sha256=fingerprint(grant),
+                guard_run_id=execution['guard_run_id'],pod_name=pod_name(scope_id),absence_confirmed=True,
+                confirmed_at=payload.get('confirmed_at'))
+            require(payload==expected and type(payload['confirmed_at']) is int and
+                    execution['admitted_at']<=payload['confirmed_at']<=self.now(),'Invalid cleanup attestation')
+            previous=db.execute('SELECT envelope FROM longcat_cleanup WHERE scope=?',(scope_id,)).fetchone()
+            require(previous is None or previous[0]==canonical(envelope),'Cleanup attestation changed')
+            db.execute('INSERT OR IGNORE INTO longcat_cleanup VALUES (?,?)',(scope_id,canonical(envelope)))
+            db.execute('UPDATE longcat_scopes SET revoked=1 WHERE id=?',(scope_id,))
+        return dict(status='CLEANUP_RECORDED_RESERVATION_RETAINED',scope_id=scope_id)

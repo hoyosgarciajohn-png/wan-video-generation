@@ -14,7 +14,7 @@ import wave
 
 from PIL import Image
 from services.controller.http_api import StudioAPI, make_server, body_limit
-from services.controller.longcat import LongCatTransport, OWNER_DOMAIN, HOST_DOMAIN, source_digest
+from services.controller.longcat import LongCatTransport, OWNER_DOMAIN, HOST_DOMAIN, CLEANUP_DOMAIN, source_digest, pod_name
 from services.controller.service import ControlService, canonical
 from services.controller.studio import StudioWorkspace
 from services.controller.worker_transport import WorkerAccessError
@@ -74,6 +74,7 @@ class LongCatTransportTests(unittest.TestCase):
         host=dict(owner=self.owner,project=self.project,grant_sha256=fingerprint(grant),
                   source_sha256=grant['source_sha256'],image_ref=grant['image_ref'],
                   guard_run_id=grant['execution']['guard_run_id'],deadline=grant['execution']['deadline'],
+                  pod_name=pod_name(grant['execution']['scope_id']),
                   image_import_verified=True,guard_ready=True,storage_verified=True)
         if host_change: host.update(host_change)
         result=self.transport.admit(self.owner,self.manifest,self.inputs,
@@ -106,6 +107,29 @@ class LongCatTransportTests(unittest.TestCase):
         self.assertAlmostEqual(float(probe(output,'a:0')['duration']),246/25,places=2)
         self.assertEqual(digest(master),checksum)
         with self.assertRaises(ValueError):assemble_review(self.manifest,receipts,self.control.asset_root,master,checksum,output)
+
+    def test_backup_preserves_inputs_receipts_budget_and_fences_cleaned_scope(self):
+        from services.controller.backup import create_backup,restore_backup
+        self.admit();self.transport.start(self.auth,'S1');receipt=self.upload()
+        with self.assertRaises(ValueError):create_backup(self.control.db_path,self.control.asset_root,self.root/'unclosed')
+        proof=dict(owner=self.owner,scope_id=self.execution['scope_id'],grant_sha256=fingerprint(self.grant),
+                   guard_run_id=self.execution['guard_run_id'],pod_name=pod_name(self.execution['scope_id']),
+                   absence_confirmed=True,confirmed_at=self.now)
+        changed=dict(proof,pod_name='foreign')
+        with self.assertRaises(ValueError):self.transport.confirm_cleanup(self.owner,self.execution['scope_id'],
+            self.sign(changed,CLEANUP_DOMAIN,self.host_key),host_keys={'fixture':(self.owner,self.host_key)})
+        self.transport.confirm_cleanup(self.owner,self.execution['scope_id'],self.sign(proof,CLEANUP_DOMAIN,self.host_key),
+                                       host_keys={'fixture':(self.owner,self.host_key)})
+        create_backup(self.control.db_path,self.control.asset_root,self.root/'backup')
+        restored=restore_backup(self.root/'backup',self.root/'restored')
+        recovered=LongCatTransport(ControlService(restored['database'],restored['assets'],clock=self.control.clock))
+        with self.assertRaises(WorkerAccessError):recovered.configuration(self.auth)
+        with recovered.control.transaction() as db:
+            self.assertEqual(db.execute('SELECT reserved,revoked FROM longcat_scopes').fetchone(),(1171,1))
+            self.assertEqual(json.loads(db.execute('SELECT receipt FROM longcat_shots').fetchone()[0]),receipt)
+        self.assertEqual(digest(Path(restored['assets'])/receipt['object_key']),self.hash)
+        self.assertEqual(digest(Path(restored['assets'])/f'longcat/{self.project}/fictional-batch/inputs/scene.png'),
+                         digest(self.inputs/'scene.png'))
 
     def test_authentication_owner_scope_and_no_public_admission(self):
         self.admit()

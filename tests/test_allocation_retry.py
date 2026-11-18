@@ -4,7 +4,8 @@ import json
 from datetime import timedelta
 import sqlite3
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+from types import SimpleNamespace
 from urllib.error import HTTPError
 
 from tests import test_live_execution
@@ -25,8 +26,11 @@ class AllocationRetryTests(unittest.TestCase):
         f.job=f.live.submit(f.owner,f.project,f.request)['batch']['id']
         f.credential=f.workers.issue(f.owner,f.project,f.job,'worker',ttl_seconds=600)
         self.posts=0
-        self.sleep=patch('services.controller.allocation_retry.time.sleep')
-        self.sleep_mock=self.sleep.start();self.addCleanup(self.sleep.stop)
+        # Patch this module's clock facade, not Python's shared time module:
+        # subprocess also sleeps while reading the approved Git inventory.
+        self.sleep_mock=Mock()
+        self.sleep=patch('services.controller.allocation_retry.time',SimpleNamespace(sleep=self.sleep_mock))
+        self.sleep.start();self.addCleanup(self.sleep.stop)
 
     def transport(self, outcomes):
         f=self.f

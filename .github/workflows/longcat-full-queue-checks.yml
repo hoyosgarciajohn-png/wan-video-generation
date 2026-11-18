@@ -33,6 +33,7 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund --prefix apps/studio
       - name: Contract, controller, queue and full-duration export checks
         run: |
+          python3 -m compileall -q deployment services workers
           python3 scripts/validate_contract.py --media-root fixtures
           python3 -m unittest discover -s tests -v
           python3 -m unittest workers.gpu.tests.test_longcat_batch workers.media.test_export -v
