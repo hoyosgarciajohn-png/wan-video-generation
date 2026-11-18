@@ -1,3 +1,4 @@
+import { SignIn } from "./SignIn";
 import { useEffect, useRef, useState } from "react";
 import { App } from "./App";
 import { StudioClient, type StudioCommand, type UploadProgress } from "./api";
@@ -220,38 +221,13 @@ export function ConnectedStudio({
                 : "Saved on server."
               : "Disconnected. Sign in to load your projects."}
         </p>
-        {!owner && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
-              const token = String(new FormData(form).get("token") ?? "");
-              form.reset();
-              void action(async () => {
-                const session = await api.login(token);
-                const loaded = await api.load();
-                setOwner(session.owner_id);
-                accept(loaded);
-              });
-            }}
-          >
-            <label>
-              Server access token{" "}
-              <input
-                name="token"
-                type="password"
-                required
-                autoComplete="off"
-                disabled={busy}
-              />
-            </label>
-            <button disabled={busy}>Connect</button>
-            <p>
-              The token is exchanged for a session cookie and is not saved in
-              browser storage.
-            </p>
-          </form>
-        )}
+        {!owner && <SignIn authenticate={(email,password)=>api.emailLogin(email,password)} onSignedIn={async () => {
+          const session = await api.session();
+          const loaded = await api.load();
+          setOwner(session.owner_id);
+          accept(loaded);
+        }} />}
+
         {owner && (
           <div className="actions">
             <button

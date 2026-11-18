@@ -26,6 +26,7 @@ from services.controller.uploads import ResumableUploads, CHUNK_SIZE
 from services.controller.worker_transport import WorkerTransport, MAX_ARTIFACT_BYTES, IDENTIFIER
 from services.controller.longcat import LongCatTransport
 from services.controller.director import Director
+from services.controller.accounts import AuthUnavailable
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -56,7 +57,7 @@ class Reply:
 
 
 class StudioAPI:
-    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic, real_jobs=None, live_admission=None):
+    def __init__(self, studio, tokens, origin='http://127.0.0.1:5173', *, clock=time.monotonic, real_jobs=None, live_admission=None, accounts=None):
         parsed = urlsplit(origin)
         if (parsed.scheme not in ('http', 'https') or not parsed.netloc or
                 parsed.path or parsed.query or parsed.fragment or parsed.username or
@@ -78,6 +79,7 @@ class StudioAPI:
         self.longcat = LongCatTransport(studio.control)
         self.director = Director(studio)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
+        self.accounts = accounts
         self.sessions = {}
         self.failures = defaultdict(deque)
         self.lock = threading.Lock()
@@ -196,6 +198,31 @@ class StudioAPI:
             value = {} if raw_chunk else (json.loads(body) if body else {})
             if not isinstance(value, dict):
                 raise HTTPError(422)
+            if path == '/v1/studio/auth/config' and method == 'GET':
+                return Reply(200, {'email_login': self.accounts is not None,
+                                   'recovery_ready': bool(self.accounts and self.accounts.send)})
+            if path in ('/v1/studio/auth/recovery', '/v1/studio/auth/reset'):
+                if method != 'POST':
+                    raise HTTPError(405)
+                if not self.accounts:
+                    raise HTTPError(503)
+                now = self.clock()
+                with self.lock:
+                    attempts = self.failures['recovery:' + peer]
+                    while attempts and now-attempts[0] >= 3600:
+                        attempts.popleft()
+                    if len(attempts) >= 10:
+                        raise HTTPError(429)
+                    attempts.append(now)
+                    if path.endswith('/reset'):
+                        owner = self.accounts.reset(value.get('token'), value.get('password'))
+                        self.sessions = {k:v for k,v in self.sessions.items() if v[0] != owner}
+                        return Reply(200, {}, {'Set-Cookie': self.cookie('', True)})
+                try:
+                    self.accounts.recovery(value.get('email'))
+                except AuthUnavailable:
+                    raise HTTPError(503)
+                return Reply(200, {'message': 'If this email has access, a password link will arrive shortly.'})
             if path == '/v1/studio/session':
                 if method == 'POST':
                     now = self.clock()
@@ -209,7 +236,11 @@ class StudioAPI:
                         if len(attempts) >= 10 or len(self.sessions) >= 1000:
                             raise HTTPError(429)
                         supplied = value.get('token')
-                        owner = self.tokens.get(sha256(supplied.encode()).digest()) if isinstance(supplied, str) else None
+                        owner = (self.accounts.authenticate(value.get('email'), value.get('password'))
+                                 if self.accounts and 'email' in value else
+                                 self.tokens.get(sha256(supplied.encode()).digest()) if isinstance(supplied, str) else None)
+                        if owner and self.accounts and 'email' not in value and not self.accounts.legacy_allowed(owner):
+                            owner = None
                         if not owner:
                             attempts.append(now)
                             raise HTTPError(401)

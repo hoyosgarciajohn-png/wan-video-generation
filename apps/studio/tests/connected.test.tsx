@@ -66,7 +66,7 @@ test("connected edits stay in memory and server conflicts require explicit reloa
     true,
   );
 });
-test("disconnected login clears token input and creates first server project", async () => {
+test("disconnected login clears password input and creates first server project", async () => {
   let authenticated = false;
   let created = false;
   const state = initialWorkspace();
@@ -74,7 +74,7 @@ test("disconnected login clears token input and creates first server project", a
     if (String(url).endsWith("session")) {
       if (init?.method === "POST") {
         authenticated = true;
-        assert.equal(JSON.parse(String(init.body)).token, "fictional-token");
+        assert.equal(JSON.parse(String(init.body)).email, "alice@example.test");
       }
       return authenticated
         ? Response.json({ owner_id: "fictional-owner" })
@@ -88,10 +88,11 @@ test("disconnected login clears token input and creates first server project", a
   });
   render(<ConnectedStudio client={client} />);
   await screen.findByText("Disconnected. Sign in to load your projects.");
-  fireEvent.change(screen.getByLabelText("Server access token"), {
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "alice@example.test" } });
+  fireEvent.change(screen.getByLabelText("Password"), {
     target: { value: "fictional-token" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+  fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
   await screen.findByLabelText("New project title");
   fireEvent.change(screen.getByLabelText("New project title"), {
     target: { value: "Fictional story" },
@@ -152,10 +153,11 @@ test("expired session retains unsaved recovery through reauthentication", async 
   fireEvent.click(screen.getByRole("button", { name: "Save to server" }));
   await screen.findByRole("button", { name: "Download unsaved draft" });
   assert.equal(screen.queryByLabelText("Shot prompt"), null);
-  fireEvent.change(screen.getByLabelText("Server access token"), {
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "alice@example.test" } });
+  fireEvent.change(screen.getByLabelText("Password"), {
     target: { value: "fictional-token" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+  fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
   await screen.findByLabelText("Shot prompt");
   assert.ok(screen.getByRole("button", { name: "Download unsaved draft" }));
   assert.equal(localStorage.length, 0);
@@ -485,7 +487,7 @@ test("upload identity survives session expiry and reauthentication", async () =>
       files: [new window.File(["abc"], "song.wav", { type: "audio/wav" })],
     },
   });
-  await screen.findByLabelText("Server access token");
+  await screen.findByLabelText("Password");
   assert.ok(
     (
       screen.getByRole("button", {
@@ -493,10 +495,11 @@ test("upload identity survives session expiry and reauthentication", async () =>
       }) as HTMLButtonElement
     ).disabled,
   );
-  fireEvent.change(screen.getByLabelText("Server access token"), {
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "alice@example.test" } });
+  fireEvent.change(screen.getByLabelText("Password"), {
     target: { value: "fictional-token" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+  fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
   await screen.findByLabelText("Shot prompt");
   fireEvent.click(
     screen.getByRole("button", { name: "Retry pending command" }),

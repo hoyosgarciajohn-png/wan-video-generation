@@ -9,7 +9,7 @@ import "./director.css";
 createRoot(document.getElementById("root")!).render(
   new URLSearchParams(location.search).get("mode") === "fixture" ? (
     <App />
-  ) : location.hash === "#director" ? (
+  ) : location.hash.startsWith("#director") ? (
     <Director />
   ) : (
     <ConnectedStudio />

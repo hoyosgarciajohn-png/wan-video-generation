@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { SignIn } from "./SignIn";
 import { StudioClient } from "./api";
 import { type Workspace, errorMessage, StudioError } from "./model";
 import modelCatalog from "../../../services/providers/music_models.json";
@@ -122,7 +123,6 @@ export function Director() {
   const api = useRef(new StudioClient()).current;
   const [workspace, setWorkspace] = useState<Workspace>();
   const [owner, setOwner] = useState("");
-  const [token, setToken] = useState("");
   const [pid, setPid] = useState("");
   const [title, setTitle] = useState("Beach Concert · 60-second test");
   const [brief, setBrief] = useState<Brief>(emptyBrief);
@@ -162,7 +162,7 @@ export function Director() {
     setConfigured(c.configured);
   }
   useEffect(() => {
-    void act(load);
+    void load().catch(e => { if (!(e instanceof StudioError && e.code === 401)) setError(errorMessage(e)); });
   }, []);
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
@@ -321,37 +321,7 @@ export function Director() {
           </span>
         </div>
         {!owner ? (
-          <section className="d-card d-login">
-            <h2>Open your workspace</h2>
-            <p>
-              Use your existing Studio access token. Model API keys stay on the
-              server.
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void act(async () => {
-                  await api.login(token);
-                  setToken("");
-                  await load();
-                });
-              }}
-            >
-              <label>
-                Studio access token
-                <input
-                  type="password"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
-              </label>
-              <button className="d-primary" disabled={busy}>
-                Sign in
-              </button>
-            </form>
-          </section>
+          <SignIn onSignedIn={load} />
         ) : (
           <>
             <section className="d-project">

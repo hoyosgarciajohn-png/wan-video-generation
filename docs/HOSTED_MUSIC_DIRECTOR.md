@@ -133,3 +133,7 @@ paid-generation/assembly integration remain the next work, as described above.
 Do not rerun this one-time installer: its existing stage guard prevents blindly
 reapplying the release. Future releases must recognize this overlay and the
 additive Director database table, including during rollback and backup handling.
+
+## Email/password follow-up
+
+Owner approved replacing confusing access-token entry with email/password and recovery. The implementation is on `work/studio-email-login`; see `docs/STUDIO_EMAIL_LOGIN.md`. Live installation awaits a mail relay and private verified-email-to-existing-owner mapping. Read-only probe run 44343693588 confirmed no controller mail configuration. Existing live projects remain untouched. Do not tell John the new login is live until the guarded auth overlay and actual email delivery have passed.
