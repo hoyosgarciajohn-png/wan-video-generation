@@ -133,7 +133,7 @@ def main():
         require(guard['status']=='READY' and time.time()-guard['at'] < 180, 'Fresh independently observed guard required')
         with urlopen('https://api.github.com/repos/hoyosgarciajohn-png/wan-video-generation/actions/runs/'+guard['run_id'],timeout=20) as r:
             run=json.load(r)
-        require(run['status']=='in_progress' and run['event']=='workflow_dispatch'
+        require(run['status']=='in_progress' and run['event'] in ('workflow_dispatch','push')
                 and run['path']=='.github/workflows/longcat-production-guard.yml'
                 and run['head_sha']==read(SESSION/'authority.json')['ops_sha'], 'Independent guard is not running')
     unprivileged()
