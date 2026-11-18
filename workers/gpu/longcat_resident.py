@@ -84,6 +84,8 @@ def main():
     if execution['manifest_sha256'] != fingerprint(manifest):
         raise ValueError('Execution manifest mismatch')
     journal = BatchJournal(output, manifest, execution) if rank == 0 else None
+    from workers.gpu.longcat_client import LongCatClient
+    client = LongCatClient(os.environ['LONGCAT_ORIGIN'], os.environ['LONGCAT_TOKEN'], timeout=25) if rank == 0 else None
 
     def collective(call):
         box = [None]
@@ -104,14 +106,17 @@ def main():
             journal.rendered(case, metadata)
         collective(commit)
 
-    def receipt_publisher(shot_id, path, binding, metadata):
-        receipt = Path('/work/receipts') / (shot_id + '.json')
-        limit = min(time.time() + 30, execution['deadline'] - 35)
-        while not receipt.exists() and time.time() < limit:
-            time.sleep(.5)
-        if not receipt.is_file():
-            raise TimeoutError('Durable recovery receipt missing; no next render')
-        return json.loads(receipt.read_text())
+    def decision(case):
+        receipt = client.receipt(case['id'])
+        if receipt is not None:
+            journal.restore_published(case, receipt)
+            return 'skip'
+        action = journal.decision(case)
+        if action == 'render':
+            # Persist the inference start outside the GPU before generating it.
+            # An interrupted start cannot be replayed with a fresh local journal.
+            client.start(case['id'])
+        return action
 
     first = manifest['shots'][0]
     first_input = root / 'first-input.json'
@@ -137,9 +142,9 @@ def main():
         '--mix_alpha', '1.0', '--lora_path', 'loraB/lora.safetensors']
     namespace = dict(__name__='__main__', __file__=str(upstream), time=time,
         LONGCAT_MANIFEST=manifest, LONGCAT_INPUT_ROOT=root, LONGCAT_OUTPUT_ROOT=output,
-        longcat_decision=lambda case: collective(lambda: journal.decision(case)),
+        longcat_decision=lambda case: collective(lambda: decision(case)),
         longcat_rendered=rendered,
-        longcat_publish=lambda case: collective(lambda: journal.publish(case, receipt_publisher)))
+        longcat_publish=lambda case: collective(lambda: journal.publish(case, client.publish)))
     exec(resident_source(upstream.read_text()), namespace)
 
 

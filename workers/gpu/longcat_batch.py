@@ -21,6 +21,29 @@ MAX_DURATION_MS = 363000
 MAX_RENTAL_SECONDS = 4800
 
 
+def validate_reference_images(manifest, root):
+    """Check decoded inputs before GPU admission; no image pixels are edited."""
+    seen = set()
+    for shot in manifest['shots']:
+        asset = shot['image']
+        if asset['path'] in seen: continue
+        path = scoped(root, asset['path'])
+        require(path.stat().st_size <= 16*1024*1024, 'Reference image too large')
+        result = subprocess.run(['ffprobe','-v','error','-select_streams','v:0',
+            '-show_entries','stream=width,height,codec_name','-of','json',str(path)],
+            check=True,capture_output=True,text=True,timeout=10)
+        streams=json.loads(result.stdout)['streams']
+        require(len(streams)==1,'One reference image required')
+        width,height=streams[0]['width'],streams[0]['height']
+        require(streams[0]['codec_name'] in ('png','mjpeg') and
+                0<width<=4096 and 0<height<=4096,'Unsupported reference image')
+        # Pinned 480p / spatial-factor-32 upstream selects the 448x864 bucket.
+        require(.475 < height/width < .55, 'Reference does not select measured 864x448 bucket')
+        subprocess.run(['ffmpeg','-nostdin','-v','error','-xerror','-i',str(path),
+                        '-frames:v','1','-f','null','-'],check=True,capture_output=True,timeout=10)
+        seen.add(asset['path'])
+
+
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'),
                                      allow_nan=False).encode()).hexdigest()
@@ -96,7 +119,7 @@ def verify_output(path):
     video = streams[0]
     require(video['avg_frame_rate'] == '25/1' and int(video['nb_read_frames']) == 93,
             'Unexpected output frame count or rate')
-    require(video['width'] > 0 and video['height'] > 0, 'Empty output geometry')
+    require((video['width'], video['height']) == (864, 448), 'Unreviewed output geometry')
     subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-xerror', '-i', str(path),
                     '-map', '0:v:0', '-f', 'null', '-'], check=True, capture_output=True)
     return dict(sha256=digest(path), bytes=Path(path).stat().st_size, **video)
@@ -160,6 +183,18 @@ class BatchJournal:
                 and receipt.get('sha256') == row['output']['sha256']
                 and receipt.get('bytes') == row['output']['bytes'], 'Invalid durable receipt')
         row.update(status='published', receipt=receipt)
+        self.save()
+
+    def restore_published(self, shot, receipt):
+        """Only call with a receipt fetched from the authenticated controller."""
+        require(isinstance(receipt, dict) and receipt.get('binding') == self.binding
+                and receipt.get('shot_id') == shot['id'] and receipt.get('scope_id') == self.execution['scope_id']
+                and isinstance(receipt.get('sha256'), str) and re.fullmatch(r'[a-f0-9]{64}', receipt['sha256'])
+                and type(receipt.get('bytes')) is int and receipt['bytes'] > 0, 'Foreign recovery receipt')
+        old = self.state['shots'].get(shot['id'])
+        if old and 'output' in old:
+            require(old['output']['sha256'] == receipt['sha256'], 'Recovery output changed')
+        self.state['shots'][shot['id']] = dict(input_sha256=fingerprint(shot), status='published', receipt=receipt)
         self.save()
 
 

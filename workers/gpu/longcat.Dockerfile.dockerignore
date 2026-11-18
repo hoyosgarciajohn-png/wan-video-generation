@@ -1,0 +1,9 @@
+**
+!contracts
+!contracts/**
+!workers
+!workers/gpu
+!workers/gpu/**
+!benchmarks
+!benchmarks/longcat
+!benchmarks/longcat/model_manifest.json

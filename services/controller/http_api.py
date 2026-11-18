@@ -24,6 +24,7 @@ from services.controller.media_commands import MediaCommands
 from services.controller.export_runner import ExportRunner
 from services.controller.uploads import ResumableUploads, CHUNK_SIZE
 from services.controller.worker_transport import WorkerTransport, MAX_ARTIFACT_BYTES, IDENTIFIER
+from services.controller.longcat import LongCatTransport
 
 COOKIE = 'wan_studio_session'
 MAX_BODY = 2 * 1024 * 1024
@@ -31,7 +32,7 @@ MAX_UPLOAD_BODY = 6 * 1024 * 1024
 
 
 def body_limit(path):
-    if re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', path):
+    if re.fullmatch(rf'/v1/(?:worker/attempts|longcat/shots)/({IDENTIFIER})/artifact', path):
         return MAX_ARTIFACT_BYTES
     if re.fullmatch(r"/v1/studio/projects/[A-Za-z0-9_-]+/uploads/[a-f0-9]{32}/chunks/[0-9]+", path):
         return CHUNK_SIZE
@@ -73,6 +74,7 @@ class StudioAPI:
         self.media_commands = MediaCommands(studio)
         self.uploads = ResumableUploads(studio)
         self.workers = WorkerTransport(studio.control, real_jobs=real_jobs)
+        self.longcat = LongCatTransport(studio.control)
         self.tokens = {sha256(t.encode()).digest(): owner for t, owner in tokens.items()}
         self.sessions = {}
         self.failures = defaultdict(deque)
@@ -125,6 +127,12 @@ class StudioAPI:
     def worker_upload(self, method, path, headers, stream, length):
         try:
             self._worker_headers(headers)
+            longcat = re.fullmatch(r'/v1/longcat/shots/([A-Za-z0-9_-]{1,80})/artifact', path)
+            if longcat:
+                if method != 'PUT': raise HTTPError(405)
+                if headers.get('Content-Type', '').split(';')[0] != 'video/mp4': raise HTTPError(415)
+                return Reply(200, self.longcat.upload(headers.get('Authorization'), longcat[1],
+                    headers.get('X-WAN-SHA256'), length, stream))
             match = re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', path)
             if not match or method != 'PUT':
                 raise HTTPError(405)
@@ -141,6 +149,27 @@ class StudioAPI:
         except Exception:
             return Reply(503, {'error': 503})
 
+    def _longcat_dispatch(self, method, path, headers, body):
+        self._worker_headers(headers)
+        authorization = headers.get('Authorization')
+        if path == '/v1/longcat/configuration' and method == 'GET':
+            return Reply(200, self.longcat.configuration(authorization))
+        inputs = re.fullmatch(r'/v1/longcat/shots/([A-Za-z0-9_-]{1,80})/inputs/(image|audio)', path)
+        if inputs and method == 'GET':
+            file, asset = self.longcat.input_file(authorization, inputs[1], inputs[2])
+            return Reply(200, headers={'Content-Type': 'application/octet-stream',
+                         'X-WAN-SHA256': asset['sha256'], 'Content-Security-Policy': "default-src 'none'; sandbox"},
+                         file=file, length=asset['bytes'])
+        shot = re.fullmatch(r'/v1/longcat/shots/([A-Za-z0-9_-]{1,80})/(start|receipt)', path)
+        if shot and shot[2] == 'receipt' and method == 'GET':
+            receipt = self.longcat.receipt(authorization, shot[1])
+            return Reply(200 if receipt else 204, receipt)
+        if shot and shot[2] == 'start' and method == 'POST':
+            if headers.get('Content-Type', '').split(';')[0] != 'application/json': raise HTTPError(415)
+            if json.loads(body or b'{}') != {}: raise HTTPError(422)
+            return Reply(200, self.longcat.start(authorization, shot[1]))
+        raise HTTPError(404)
+
     def dispatch(self, method, path, headers, body=b'', peer='local'):
         try:
             if headers.get('Host') not in self.allowed_hosts:
@@ -149,6 +178,8 @@ class StudioAPI:
                 raise HTTPError(403)
             if len(body) > body_limit(path):
                 raise HTTPError(413)
+            if path.startswith('/v1/longcat/'):
+                return self._longcat_dispatch(method, path, headers, body)
             if path.startswith('/v1/worker/'):
                 return self._worker_dispatch(method, path, headers, body)
             chunk_match = re.fullmatch(r'/v1/studio/projects/([A-Za-z0-9_-]+)/uploads/([a-f0-9]{32})/chunks/([0-9]+)', path)
@@ -342,7 +373,7 @@ def make_server(api, address=('127.0.0.1', 8787)):
                     size = int(lengths[0]) if lengths else 0
                     if not 0 <= size <= body_limit(self.path):
                         raise ValueError()
-                    if re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', self.path):
+                    if re.fullmatch(rf'/v1/(?:worker/attempts|longcat/shots)/({IDENTIFIER})/artifact', self.path):
                         # Worker outputs stream to a bounded stage, never into one HTTP body allocation.
                         self.close_connection = True
                         reply = api.worker_upload(self.command, self.path, self.headers, self.rfile, size)
