@@ -200,3 +200,9 @@ paid dispatch. API credentials remain server-side; configuration is not verified
 model access. See docs/HOSTED_MUSIC_DIRECTOR.md for implementation and activation
 limits. Specific-release production approval and fictional automated checks remain
 in effect.
+
+John then answered "yes" to deploying PR #109. That specific interface release
+is now installed as a hash-recorded overlay; see the live-deployment section in
+docs/HOSTED_MUSIC_DIRECTOR.md. Do not request that deployment approval again or
+rerun its one-time installer. Preserve the existing model-credential and paid
+rendering boundaries; this deployment incurred no video-generation charge.

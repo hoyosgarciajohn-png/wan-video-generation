@@ -1701,3 +1701,14 @@ save, validation and reopen. An initial backup-table rejection was fixed and the
 full backend suite passed afterward. Provider activation, durable paid-job
 admission, audio preparation, approved scene images, output retention and assembly
 remain pending. Production requires this specific release's approval.
+
+## November 18 — Director interface deployed after approval
+
+Owner approved PR #109 deployment. Merged release d895752 is live at
+https://wan-64-225-114-46.sslip.io/#director. Workflow 44336172131 succeeded;
+installed overlay manifest retains exact hashes over host baseline 9277e14.
+All 12 previous projects were unchanged. Public HTTPS health and bundle checks
+passed; unauthenticated API returned 401; browser displayed Director sign-in.
+Existing credentials unchanged, sessions require sign-in after restart. No paid
+render or GPU started. Owner authenticated acceptance and hosted generation remain
+pending; follow docs/HOSTED_MUSIC_DIRECTOR.md. Do not rerun the one-time installer.

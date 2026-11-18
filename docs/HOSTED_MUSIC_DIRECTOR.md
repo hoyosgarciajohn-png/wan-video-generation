@@ -105,3 +105,31 @@ Screenshot: [implemented interface](evidence/director-2026-11-18/interface.jpg).
 Owner creative acceptance, mobile browser acceptance, live provider validation
 and production deployment remain pending. The repository requires John's approval
 for this specific production release; no production change has been made.
+
+## Live deployment — November 18, 2026
+
+John approved deploying this specific interface release. PR #109 was merged at
+`d8957527559ba1fe25c92cbed6598cf4b4b35047`. Deployment workflow
+[44336172131](https://github.com/hoyosgarciajohn-png/wan-video-generation/actions/runs/44336172131)
+succeeded. The public Director is https://wan-64-225-114-46.sslip.io/#director.
+
+The release is an explicitly recorded overlay on installed Git baseline
+`9277e14a7d21a4f8bb142c50943fd3f8a1bfce4b`, not a claim that the server's Git HEAD
+matches the new release. `/opt/wan/current/director-installed-release.json`
+records the approved source and all deployed file hashes. The installer checked
+exact predecessor hashes for both changed backend files before writing, saved a
+private database checkpoint and previous files, and preserved all 12 historical
+project records unchanged. Controller, cleanup and proxy services passed checks.
+
+External HTTPS health returned ready=true, paid_dispatch=false. The public page
+loads the verified Director bundle and all four catalog entries; unauthenticated
+catalog access correctly returns 401. The live browser shows the new Director
+sign-in screen. Existing owner access token is still required; restart invalidated
+in-memory sessions. No credential was rotated. Saving/restore passed fictional
+automated checks; authenticated owner acceptance on the live page remains pending.
+No GPU or paid generation was started. Model credentials, live validation and
+paid-generation/assembly integration remain the next work, as described above.
+
+Do not rerun this one-time installer: its existing stage guard prevents blindly
+reapplying the release. Future releases must recognize this overlay and the
+additive Director database table, including during rollback and backup handling.
