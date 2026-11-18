@@ -17,7 +17,7 @@ Next: bind the reviewed package to a real new production project and recompute i
 
 Live controller: https://wan-64-225-114-46.sslip.io
 
-## Current checkpoint — complete preview; deployment blocked
+## Previous checkpoint — complete preview; deployment blocked
 
 John authorized final image/timing review and deployment. All 18 scene anchors were inspected with head covering present. The 110-shot timing-v2 package and complete 6:03 still-image MP4 are prepared; actual input preflight and full preview decoding pass. Source images and the full stereo master are unchanged. Computational onset alignment does not establish lyric phrasing, generated motion, alternate camera angles or owner playback acceptance.
 
