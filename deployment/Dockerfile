@@ -21,8 +21,10 @@ COPY scripts/validate_contract.py /app/scripts/validate_contract.py
 COPY services/controller /app/services/controller
 COPY src/wan_platform/*.py /app/src/wan_platform/
 COPY workers/gpu/*.py workers/gpu/model.lock.json /app/workers/gpu/
+COPY workers/gpu/longcat.Dockerfile /app/workers/gpu/longcat.Dockerfile
+COPY benchmarks/longcat/model_manifest.json /app/benchmarks/longcat/model_manifest.json
 COPY workers/media/*.py /app/workers/media/
-COPY deployment/local_stage.py deployment/healthcheck.py /app/deployment/
+COPY deployment/local_stage.py deployment/healthcheck.py deployment/hosted_app.py deployment/longcat_*.py /app/deployment/
 COPY --from=studio /app/apps/studio/dist /app/apps/studio/dist
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 WAN_STUDIO_ORIGIN=http://127.0.0.1:8080
 USER 10001:10001

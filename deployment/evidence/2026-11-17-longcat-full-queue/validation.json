@@ -1,0 +1,47 @@
+{
+  "source_baseline": "311ce5930e54413f4b990fdbbe307cc9c845de65",
+  "branch": "work/b07-longcat-full-queue",
+  "contract_version": "0.1.0",
+  "runtime_policy_version": "1.2.0",
+  "music_cap_ms": 363000,
+  "tests": {
+    "contract_validator": "passed",
+    "new_queue_tests": {
+      "passed": 10,
+      "fictional": true
+    },
+    "root_suite": {
+      "total": 213,
+      "skipped": 1,
+      "result": "passed across initial successful tests and focused reruns after restoring omitted local snapshot files",
+      "notes": [
+        "Initial connector snapshot lacked src, hosting sources, Dockerfiles and git metadata; these were restored for local checks.",
+        "One existing cancellation/backoff test hit a global time.sleep mock versus subprocess wait/SQLite interaction; its isolated rerun passed."
+      ]
+    },
+    "media_export": {
+      "passed": 5,
+      "full_audio_ms": 362880,
+      "legacy_300000_and_360000_limits_checked": true
+    },
+    "studio": {
+      "passed": 18
+    },
+    "integration_preparation": {
+      "passed": 10
+    },
+    "actual_upstream_AST_compile": "passed"
+  },
+  "gpu_rented": false,
+  "gpu_inference": "not run",
+  "controller_deployed": false,
+  "image_built": "not yet",
+  "remaining": [
+    "clean individual visual references",
+    "musical edit alignment",
+    "authenticated durable collector and controller admission",
+    "production image build/import verification",
+    "scoped financial authority and independent guard",
+    "actual 110-shot GPU run and complete creative review"
+  ]
+}

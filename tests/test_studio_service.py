@@ -48,7 +48,7 @@ class StudioServiceTests(unittest.TestCase):
             restarted.get('')
         self.assertEqual(state['projects'][0]['bundle']['assets'], [])
         self.assertEqual(state['projects'][0]['bundle']['takes'], [])
-        self.assertEqual(state['projects'][0]['bundle']['project']['runtime_limit_ms'], 360000)
+        self.assertEqual(state['projects'][0]['bundle']['project']['runtime_limit_ms'], 363000)
 
     def test_creator_fields_history_and_canonical_project_shared(self):
         state = self.add_shot(self.create())

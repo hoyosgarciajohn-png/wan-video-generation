@@ -49,7 +49,7 @@ class Application:
                 length = int(env.get('CONTENT_LENGTH') or '0')
                 if not 0 <= length <= body_limit(path):
                     raise ValueError()
-                if re.fullmatch(rf'/v1/worker/attempts/({IDENTIFIER})/artifact', path):
+                if re.fullmatch(rf'/v1/(?:worker/attempts|longcat/shots)/({IDENTIFIER})/artifact', path):
                     return self.api.worker_upload(method, path, headers, env['wsgi.input'], length)
                 body = env['wsgi.input'].read(length)
                 if len(body) != length:

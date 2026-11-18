@@ -1,0 +1,53 @@
+name: Publish private LongCat production
+run-name: Publish LongCat production · ${{ github.sha }}
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wan-container-verification
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify disposable CPU runner capacity
+        run: python3 deployment/cloud_build.py preflight --target gpu --output "$RUNNER_TEMP/longcat-production"
+      - name: Build, import and publish the exact private runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$RUNNER_TEMP/longcat-production-auth"
+          mkdir -m 700 "$DOCKER_CONFIG"
+          trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+          python3 -c "import os; from deployment.publish_image import package_visibility; assert package_visibility(os.environ['GH_TOKEN']) == 'private'"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          tag="ghcr.io/hoyosgarciajohn-png/wan-video-generation-gpu:longcat-production-$GITHUB_SHA"
+          docker build -f workers/gpu/longcat.Dockerfile --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "$tag" .
+          docker run --rm --network none --entrypoint python "$tag" -c 'from workers.gpu.longcat_bootstrap import main; from workers.gpu.longcat_client import LongCatClient; print("OFFLINE_PRODUCTION_IMPORT_PASS")' | tee "$RUNNER_TEMP/longcat-production/import.log"
+          docker image inspect "$tag" --format '{{.Id}}' > "$RUNNER_TEMP/longcat-production/image-id.txt"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'longcat-production'
+          assert 'OFFLINE_PRODUCTION_IMPORT_PASS' in (p/'import.log').read_text()
+          (p/'build.json').write_text(json.dumps(dict(source_commit=os.environ['GITHUB_SHA'],
+              image_id=(p/'image-id.txt').read_text().strip(),protocol='longcat-song-batch-v1',offline_import='PASS'),indent=2)+'\n')
+          PY
+          python3 -m deployment.longcat_publish --output "$RUNNER_TEMP/longcat-production"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
+        with:
+          name: longcat-production-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/longcat-production
+          retention-days: 7
+          if-no-files-found: error

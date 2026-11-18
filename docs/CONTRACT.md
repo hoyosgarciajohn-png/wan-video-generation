@@ -46,16 +46,38 @@ Reserve estimated remaining cost before launch and before a retry. Move settled 
 
 ## Compatibility
 
-### Runtime policy 1.1.0
+### Runtime policy 1.2.0
 
 `contracts/runtime-policy.json` is the shared operational duration policy. Version
-1.1.0 increases new music-video projects to 360000 milliseconds; short films and
+1.2.0 increases new music-video projects to 363000 milliseconds so the owner's
+approved complete 362880 ms recording retains its ending; short films and
 cartoons retain 1800000 milliseconds. The Studio client, project creator, bundle
 validator and media exporter consume the same values. A stored project's smaller
 `runtime_limit_ms` remains binding; no existing records or accepted takes are
 rewritten. B07 issue #8 coordinates B01–B05 consumers. Canonical wire records and
 bundle schema remain 0.1.0; this separate version replaces the former hard-coded
-five-minute operational policy. The change does not authorize GPU spending.
+five-minute operational policy. Policy 1.1.0 previously allowed 360000 ms.
+Existing project limits, including 360000 ms projects, remain binding; create a
+new project for the newly approved recording. The change does not authorize GPU spending.
+
+### Private LongCat batch preparation v1
+
+`workers/gpu/longcat_batch.py` defines `longcat-song-batch-v1`, an isolated
+preparation/worker protocol for up to 200 independent 93-frame/25-fps shots in a
+363000 ms timeline. It does not change canonical bundle records or enable the
+public paid dispatch route. It binds project, batch, full manifest hash, exact
+audio offsets, reference/audio hashes, trim intervals and seeds. Each conditioning
+WAV includes a one-second lookahead (4.72 s at 16 kHz mono), distinct from the
+3.72-second video output. Output must be verified and acknowledged by storage
+outside the GPU before the next render. Model source is pinned by SHA-256.
+
+The maximum candidate runtime is 4800 seconds on two H100s at $8.78/hour. This
+source ceiling is not owner authority: preparation must still be bound to an
+unused explicit execution scope and an independent guard. No authority installer,
+Pod creator, new host deployment or automatic rerender is included here. The
+old `wan-song-queue-v1` and consumed 900-second benchmark remain unchanged.
+Controller admission, authenticated durable collection and image publication
+must be connected before this preparation becomes a live full-song pipeline.
 
 The earlier starter ZIP used a compact draft with singular record keys. Keep it as archived planning evidence. Use the versioned bundle for new work. This is a new repository, with no production data to migrate. An additive or breaking change must increment contract version and provide an updated fixture and consumer handoff.
 
@@ -68,3 +90,4 @@ bundle version 0.1.0. This separately versioned private extension is described i
 telemetry acknowledgement endpoint. B01 worker, B02 controller/operator and B05
 verification are coordinated in issue #7. It does not alter stored canonical
 records or enable fifteen-second work in other scopes.
+

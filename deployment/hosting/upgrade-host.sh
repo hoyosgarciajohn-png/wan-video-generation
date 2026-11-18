@@ -7,7 +7,9 @@ release_sha=${1:?}
 [[ $(hostname) == wan-controller-01 ]]
 cd /opt/wan/current
 old_sha=$(git rev-parse HEAD)
-expected_old_sha=2a28f36795ed803502904a52f6ef32dba914098c
+# Last verified installed release. Run the read-only verify operation first;
+# the exact match below still refuses an unexpected live baseline.
+expected_old_sha=d0543ae556588de3ef77a17e75dd4e734309e147
 if [[ $old_sha != "$expected_old_sha" ]]; then
     printf 'Upgrade baseline mismatch: expected %s; observed %s\n' "$expected_old_sha" "$old_sha" >&2
     exit 1
@@ -63,3 +65,4 @@ if ! systemctl restart wan-controller wan-cleanup; then
 fi
 trap - EXIT
 printf '%s\n' 'REVIEWED_SOURCE_UPGRADED; PRIVATE_STATE_AND_UNRESOLVED_REQUEST_PRESERVED'
+
